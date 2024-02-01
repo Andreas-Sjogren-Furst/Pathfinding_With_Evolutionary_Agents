@@ -2,7 +2,6 @@
 
 ### Implementation and evaluation of simple evolutionary agents for path finding in 2D environments
 
-#### Description
 Several popular metaheuristics, including ant colony optimization (ACO) and particle swarm optimization, employ swarm intelligence (SI) to find solutions to combinatorial optimization problems. For example, ACO uses a collection of simple agents, communicating via so-called pheromones, to search for shortest paths in unknown environments. The purpose of this bachelor project is to implement, visualise and evaluate collections of simple evolutionary or swarm intelligence agents for the solution of path finding problems in well-defined environments on a 2D plane. In detail, the following aspects will be studied:
 
 - literature research on the relevant type of SI algorithms, in particular ACO, and related results on their performance for path finding in 2D environments,
