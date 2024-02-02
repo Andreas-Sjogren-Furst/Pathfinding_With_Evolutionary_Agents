@@ -16,8 +16,8 @@ jobs:
       # Cache
       - uses: actions/cache@v3
         with:
-          path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          path: Unity/Evolutionary_Agents_Simulation/Library
+          key: Library-${{ hashFiles('Unity/Evolutionary_Agents_Simulation/Assets/**', 'Unity/Evolutionary_Agents_Simulation/Packages/**', 'Unity/Evolutionary_Agents_Simulation/ProjectSettings/**') }}
           restore-keys: |
             Library-
 
@@ -30,6 +30,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
+          projectPath: Unity/Evolutionary_Agents_Simulation
 
       # Build
       - name: Build project
@@ -40,9 +41,10 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: WebGL
+          projectPath: Unity/Evolutionary_Agents_Simulation
 
       # Output
       - uses: actions/upload-artifact@v3
         with:
           name: Build
-          path: build
+          path: Unity/Evolutionary_Agents_Simulation/build
