@@ -1,4 +1,4 @@
-  function Dijkstra(Graph, source):
+  function Dijkstra(Graph, source):  
       
       for each vertex v in Graph.Vertices:
           dist[v] ← INFINITY
