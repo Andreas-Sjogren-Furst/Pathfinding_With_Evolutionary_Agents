@@ -75,3 +75,6 @@
 /Unity/Evolutionary_Agents_Simulation/[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # End of https://www.toptal.com/developers/gitignore/api/unity
+Unity/.DS_Store
+Unity/Evolutionary_Agents_Simulation/.DS_Store
+Unity/.DS_Store
