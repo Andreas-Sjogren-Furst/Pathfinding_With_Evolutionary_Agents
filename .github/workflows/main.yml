@@ -18,7 +18,7 @@ jobs:
           lfs: true
 
       # Cache
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: Unity/Evolutionary_Agents_Simulation/Library
           key: Library-${{ hashFiles('Unity/Evolutionary_Agents_Simulation/Assets/**', 'Unity/Evolutionary_Agents_Simulation/Packages/**', 'Unity/Evolutionary_Agents_Simulation/ProjectSettings/**') }}
@@ -50,7 +50,7 @@ jobs:
           projectPath: Unity/Evolutionary_Agents_Simulation
 
       # Output
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Build
           path: Unity/Evolutionary_Agents_Simulation/build
