@@ -387,6 +387,7 @@ MonoBehaviour:
   MapWall: {fileID: 574305094228117303, guid: fa748ad60d2974a70a56519e1d541d6f, type: 3}
   MapSize: 10
   tileSize: 1
+  densityNoise: 0.1
 --- !u!4 &1340223255
 Transform:
   m_ObjectHideFlags: 0
