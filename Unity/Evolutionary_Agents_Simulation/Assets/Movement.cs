@@ -4,24 +4,41 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public float speed = 5.0f; // Speed of the ball movement
+    public float moveStrength = 5f; // Adjust the force strength
+    public float changeInterval = 2f; // Time in seconds between direction changes
 
-    // Start is called before the first frame update
+    private Rigidbody rb;
+    private float nextChangeTime = 0f;
+    private Vector3 currentDirection;
+
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody>();
+        ChangeDirection();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        float horizontalInput = Input.GetAxis("Horizontal"); // Get horizontal input (left/right arrow keys)
-        float verticalInput = Input.GetAxis("Vertical"); // Get vertical input (up/down arrow keys)
+        // Check if it's time to change the movement direction
+        if (Time.time >= nextChangeTime)
+        {
+            ChangeDirection();
+        }
 
-        // Calculate new position
-        Vector3 newPosition = transform.position + new Vector3(horizontalInput, 0, verticalInput) * speed * Time.deltaTime;
+        // Apply the movement force
+        MoveObject();
+    }
 
-        // Update the ball's position
-        transform.position = newPosition;
+    void ChangeDirection()
+    {
+        // Generate a random direction by creating a random vector
+        currentDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+        nextChangeTime = Time.time + changeInterval;
+    }
+
+    void MoveObject()
+    {
+        // Apply a force to the Rigidbody in the chosen direction
+        rb.AddForce(currentDirection * moveStrength);
     }
 }

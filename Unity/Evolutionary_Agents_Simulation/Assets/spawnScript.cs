@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class spawnScript : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
+    public GameObject antPrefab;
+    public int amountOfAnts = 10;
+    private int antCounter = 0;
     // Update is called once per frame
     void Update()
-    {
-        
+    {   
+        if(antCounter < amountOfAnts){
+            Instantiate(antPrefab, transform.position, Quaternion.identity);
+            antCounter += 1;
+        }
     }
 }
