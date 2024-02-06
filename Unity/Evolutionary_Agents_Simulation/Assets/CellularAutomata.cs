@@ -58,7 +58,7 @@ public class CellularAutomata : MonoBehaviour
             for (int j = 0; j < mapTileAmount; j++)
             {
                 float randomValue = UnityEngine.Random.Range(0f, 100f); // Generate a random value
-                map[i, j] = randomValue > density ? 0 : 1; // Assign wall or floor based on density
+                map[i, j] = randomValue > density ? 0 : 1; // Assign floor or wall based on density.
             }
         }
         return map;
@@ -86,10 +86,17 @@ public class CellularAutomata : MonoBehaviour
                         {
                             if (x >= 0 && x < width && y >= 0 && y < height)
                             {
-                                if (!(y == j && x == k) && tempGrid[y, x] == 1) // Assuming 1 represents wall
+                                if (y != j || x != k)
                                 {
-                                    neighborWallCount++;
+                                    if (tempGrid[y,x] == 1)
+                                    {
+                                        neighborWallCount++;
+                                    }
                                 }
+                              //  if (!(y == j && x == k) && tempGrid[y, x] == 1) // Assuming 1 represents wall
+                            //    {
+                             //       neighborWallCount++;
+                            //    }
                             }
                             else
                             {
