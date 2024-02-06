@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+    public GameObject Pheromone;
     public float changeInterval = 1f; // Time in seconds between direction changes
-    public float speed = 20f;
+    public float speed = 10f;
     private float nextChangeTime = 0f;
     private Vector3 currentDirection;
     void Start()
@@ -19,6 +20,7 @@ public class Movement : MonoBehaviour
         if (Time.time >= nextChangeTime)
         {
             ChangeDirection();
+            Instantiate(Pheromone, transform.position, Quaternion.identity);
         }
 
         // Apply the movement
