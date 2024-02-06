@@ -78,3 +78,7 @@
 Unity/.DS_Store
 Unity/Evolutionary_Agents_Simulation/.DS_Store
 Unity/.DS_Store
+
+# Ignore temporaries from GameCI
+/[Aa]rtifacts/
+/[Cc]odeCoverage/
