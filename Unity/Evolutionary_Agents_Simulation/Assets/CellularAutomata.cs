@@ -18,7 +18,7 @@ public class CellularAutomata : MonoBehaviour
     void Start()
     {
         MapSize = (int)(Plane.transform.localScale.x * Plane.transform.localScale.x);
-        MapWall.transform.localScale = new Vector3(tileSize,1,tileSize);
+        MapWall.transform.localScale = new Vector3(tileSize,MapWall.transform.localScale.y,tileSize);
         Debug.Log(MapSize);
 
         int[,] Map = init2dMap(MapSize, tileSize, density, CellularIterations); // Pass density here

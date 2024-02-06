@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public float moveStrength = 5f; // Adjust the force strength
     public float changeInterval = 2f; // Time in seconds between direction changes
     public float speed = 2f;
-  
     private float nextChangeTime = 0f;
     private Vector3 currentDirection;
 
