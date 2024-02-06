@@ -6,14 +6,13 @@ public class Movement : MonoBehaviour
 {
     public float moveStrength = 5f; // Adjust the force strength
     public float changeInterval = 2f; // Time in seconds between direction changes
-
-    private Rigidbody rb;
+    public float speed = 2f;
+  
     private float nextChangeTime = 0f;
     private Vector3 currentDirection;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
         ChangeDirection();
     }
 
@@ -32,13 +31,14 @@ public class Movement : MonoBehaviour
     void ChangeDirection()
     {
         // Generate a random direction by creating a random vector
-        currentDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+        currentDirection = new Vector3(0, Random.Range(0f, 360f), 0);
+        transform.rotation = Quaternion.Euler(currentDirection);
         nextChangeTime = Time.time + changeInterval;
     }
 
     void MoveObject()
     {
-        // Apply a force to the Rigidbody in the chosen direction
-        rb.AddForce(currentDirection * moveStrength);
+        transform.position += transform.right * (Time.deltaTime * speed);
+    
     }
 }
