@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 
 public class CellularAutomata : MonoBehaviour
 {
     public GameObject MapWall;
-    public int MapSize;
+    public GameObject Plane;
+    private int MapSize;
     public int tileSize;
     public float density; // Add a density field to control noise
     public int CellularIterations;
@@ -15,15 +17,19 @@ public class CellularAutomata : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int[,] Map = init2dMap(MapSize, tileSize, density, CellularIterations); // Pass density here
+        MapSize = (int)(Plane.transform.localScale.x * Plane.transform.localScale.x);
+        MapWall.transform.localScale = new Vector3(tileSize,1,tileSize);
+        Debug.Log(MapSize);
 
+        int[,] Map = init2dMap(MapSize, tileSize, density, CellularIterations); // Pass density here
         for (int i = 0; i < mapTileAmount; i++)
         {
             for (int j = 0; j < mapTileAmount; j++)
             {
                 if (Map[i, j] == 1) // Assuming 1 represents wall
-                {
-                    Instantiate(MapWall, transform.position + new Vector3(i * tileSize, 0, j * tileSize), Quaternion.identity);
+                {   
+                    
+                    Instantiate(MapWall, transform.position + new Vector3(i * tileSize, 0, j * tileSize) + new Vector3((float)(tileSize / 2.0), 0 , (float)(tileSize / 2.0)), Quaternion.identity);
                 }
             }
         }
