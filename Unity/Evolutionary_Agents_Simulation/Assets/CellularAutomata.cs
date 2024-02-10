@@ -9,12 +9,12 @@ public class CellularAutomata : MonoBehaviour
     public GameObject Plane;
     public GameObject CheckPoint;
     private int MapSize;
-    public int NumberOfCheckPoints;
-    public int tileSize;
-    public float density; // Density field to control noise
-    public int CellularIterations;
-    public int CheckPointSpacing;
-    public int erosionLimit = 3;
+    [Range(0, 20)] public int NumberOfCheckPoints;
+    [Range(1, 10)]  public int tileSize;
+    [Range(0, 100)] public float density; // Density field to control noise
+    [Range(0,100)] public int CellularIterations;
+    [Range(1, 30 )] public int CheckPointSpacing;
+    [Range(1, 10)] public int erosionLimit = 4;
     public int randomSeed = 42; // Added seed for random number generator
 
 
