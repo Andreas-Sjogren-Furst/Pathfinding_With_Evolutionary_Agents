@@ -13,6 +13,7 @@ public class FieldOfView : MonoBehaviour
     public List<GameObject> middleAreaTargets = new List<GameObject>();
     public List<GameObject> rightAreaTargets = new List<GameObject>();
 
+    public Queue<List<GameObject>> targets = new Queue<List<GameObject>>();
     void Start()
     {
         StartCoroutine("FindTargetsWithDelay", 0.2f);
@@ -27,7 +28,7 @@ public class FieldOfView : MonoBehaviour
         }
     }
 
-    void FindVisibleTargets()
+   void FindVisibleTargets()
 {
     leftAreaTargets.Clear();
     middleAreaTargets.Clear();
@@ -36,29 +37,48 @@ public class FieldOfView : MonoBehaviour
 
     for (int i = 0; i < targetsInViewRadius.Length; i++)
     {
-        GameObject targetGameObject = targetsInViewRadius[i].gameObject; // Get the GameObject
+        GameObject targetGameObject = targetsInViewRadius[i].gameObject;
         Vector3 dirToTarget = (targetGameObject.transform.position - transform.position).normalized;
-
+        
+        // Calculate the angle between the agent's forward direction and the direction to the target
         float angleToTarget = Vector3.Angle(transform.forward, dirToTarget);
-
+        
         if (angleToTarget < viewAngle / 2)
         {
             float dstToTarget = Vector3.Distance(transform.position, targetGameObject.transform.position);
-
+            
             if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
             {
-                // Determine which section the target is in
-                float normalizedAngleToTarget = angleToTarget / (viewAngle / 2); // Normalize angle to 0-1
-                if (normalizedAngleToTarget < 1f / 3f)
-                    leftAreaTargets.Add(targetGameObject); // Left section
-                else if (normalizedAngleToTarget < 2f / 3f)
-                    middleAreaTargets.Add(targetGameObject); // Middle section
+                // Use cross product to determine if the target is to the left or right of the agent
+                Vector3 crossProduct = Vector3.Cross(transform.forward, dirToTarget);
+                float dotProduct = Vector3.Dot(crossProduct, transform.up);
+                
+                // Classify targets based on the angle and direction relative to the agent
+                if (angleToTarget < viewAngle / 3)
+                {
+                    // Middle section
+                    middleAreaTargets.Add(targetGameObject);
+                }
                 else
-                    rightAreaTargets.Add(targetGameObject); // Right section
+                {
+                    if (dotProduct < 0)
+                    {
+                        // Right section
+                        rightAreaTargets.Add(targetGameObject);
+                    }
+                    else
+                    {
+                        // Left section
+                        leftAreaTargets.Add(targetGameObject);
+                    }
+                }
             }
         }
-    }
-    }
+    }   targets.Enqueue(leftAreaTargets);
+        targets.Enqueue(middleAreaTargets);
+        targets.Enqueue(rightAreaTargets); 
+}
+
 
     // Helper method to convert angle in degrees to a direction vector
     public Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)

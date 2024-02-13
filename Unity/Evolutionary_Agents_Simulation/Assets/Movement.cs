@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
     public GameObject Pheromone;
+    FieldOfView fieldOfView;
     public float spawnInterval;
     public bool Wandering;
     public float directionChangeInterval; // Time in seconds between direction changes
@@ -18,11 +17,12 @@ public class Movement : MonoBehaviour
     
     void Start()
     {   
+        fieldOfView = GetComponent<FieldOfView>();
         counter = 0;
         angle = Random.Range(-20f, 20f);
         steps = Random.Range(0,6);
         StartCoroutine(SpawnObjectRoutine());
-        ChangeDirection();
+        RandomDirection();
     }
 
     void Update()
@@ -58,7 +58,7 @@ public class Movement : MonoBehaviour
         // This example directly faces the wall's normal. Adjust as needed for your specific behavior (e.g., Quaternion.FromToRotation(Vector3.forward, -contactNormal) for facing towards, with adjustments for sliding behavior)
     }
 
-    void ChangeDirection()
+    Quaternion RandomDirection()
     {   
         if (counter == steps){
             angle = Random.Range(-12f, 12f);
@@ -73,20 +73,63 @@ public class Movement : MonoBehaviour
         currentDirection = rotationChange * transform.forward;
 
         // Apply the updated direction to the object's rotation
-        transform.rotation = Quaternion.LookRotation(currentDirection);
+        Quaternion rotation = Quaternion.LookRotation(currentDirection);
+        return rotation;
 
-        // Update the time for the next direction change
-        nextChangeTime = Time.time + directionChangeInterval;
     }
 
     void MoveObject()
     {
         transform.position += transform.forward * (Time.deltaTime * movementSpeed);
-    
     }
 
-    void ACO(){
+    void ChangeDirection() {
+        nextChangeTime = Time.time + directionChangeInterval;
+        if(Random.Range(0,101) < 0){
+            transform.rotation = ACO(fieldOfView.targets);
+        } else transform.rotation = RandomDirection();
+    }
+
+    Quaternion ACO(Queue<List<GameObject>> targets){
+        float[] pheromoneDistrubution = new float[3];
+        float viewAngle = GetComponent<FieldOfView>().viewAngle;
+        float totalArea = 0f;
+        for(int i = 0; i < 3; i++){
+            pheromoneDistrubution[i] = CalculativeCumulativeArea(targets.Dequeue());
+            totalArea += pheromoneDistrubution[i];
+            if(i != 0)
+                pheromoneDistrubution[i] += pheromoneDistrubution[i-1];
+        } int direction = getArea(totalArea, pheromoneDistrubution);
+        Quaternion temp = Quaternion.Euler(0,-viewAngle/2,0);
+        Quaternion actualPosition = Quaternion.Euler(0,viewAngle/2 * direction,0);
+        Vector3 tempDirection = temp * transform.forward;
+        Quaternion okosdsd = Quaternion.LookRotation(tempDirection);
+        return okosdsd;
+    }
+
+    int getArea(float totalArea, float[] segments){
         
+        // Generate a random number between 0 (inclusive) and 101 (exclusive)
+        float randomNumber = Random.Range(0, totalArea);
+
+        // Determine which segment the randomNumber falls into
+        for (int i = 0; i < segments.Length; i++)
+        {
+            if(i == 0 && randomNumber <= segments[i]){
+                return i;
+            } else {
+                if(randomNumber >= segments[i - 1] && randomNumber <= segments[i]){
+                    return i;
+                }
+            }
+        } return -1;
+    }
+
+    float CalculativeCumulativeArea(List<GameObject> targets){
+        float value = 0f;
+        foreach(GameObject pheromone in targets){
+                 value += pheromone.GetComponent<pheromoneBehavior>().alpha; 
+            } return value;
     }
 
 }
