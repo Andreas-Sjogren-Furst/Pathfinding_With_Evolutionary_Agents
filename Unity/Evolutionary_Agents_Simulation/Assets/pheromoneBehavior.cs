@@ -7,6 +7,7 @@ public class pheromoneBehavior : MonoBehaviour
 
     // Time in seconds before the object is destroyed
     public float evaporationConstant = 5f;
+    public float alpha;
 
     
     // Start is called before the first frame update
@@ -31,7 +32,7 @@ public class pheromoneBehavior : MonoBehaviour
         while (elapsedTime < evaporationConstant)
         {
             elapsedTime += Time.deltaTime;
-            float alpha = Mathf.Lerp(1.0f, 0.0f, elapsedTime / evaporationConstant);
+            alpha = Mathf.Lerp(1.0f, 0.0f, elapsedTime / evaporationConstant);
             mat.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
             yield return null;
         }

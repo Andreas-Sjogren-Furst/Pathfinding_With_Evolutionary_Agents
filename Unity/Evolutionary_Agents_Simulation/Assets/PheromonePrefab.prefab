@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 915379504026012374}
   - component: {fileID: 5405247550742315845}
   - component: {fileID: -5762279048994081022}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: PheromonePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,3 +119,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   evaporationConstant: 15
+  alpha: 0

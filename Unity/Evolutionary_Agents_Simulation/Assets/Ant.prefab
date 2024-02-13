@@ -168,8 +168,10 @@ MonoBehaviour:
   viewAngle: 45
   targetMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 256
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 0
-  visibleTargets: []
+    m_Bits: 512
+  leftAreaTargets: []
+  middleAreaTargets: []
+  rightAreaTargets: []

@@ -6,11 +6,12 @@ public class FieldOfView : MonoBehaviour
 {
     public float viewRadius;
     [Range(0, 360)] public float viewAngle;
-
     public LayerMask targetMask; // Specify which layer the objects are on that you want to detect
     public LayerMask obstacleMask; // Layer mask for obstacles
 
-    public List<Transform> visibleTargets = new List<Transform>();
+    public List<GameObject> leftAreaTargets = new List<GameObject>();
+    public List<GameObject> middleAreaTargets = new List<GameObject>();
+    public List<GameObject> rightAreaTargets = new List<GameObject>();
 
     void Start()
     {
@@ -27,25 +28,36 @@ public class FieldOfView : MonoBehaviour
     }
 
     void FindVisibleTargets()
+{
+    leftAreaTargets.Clear();
+    middleAreaTargets.Clear();
+    rightAreaTargets.Clear();
+    Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
+
+    for (int i = 0; i < targetsInViewRadius.Length; i++)
     {
-        visibleTargets.Clear();
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
+        GameObject targetGameObject = targetsInViewRadius[i].gameObject; // Get the GameObject
+        Vector3 dirToTarget = (targetGameObject.transform.position - transform.position).normalized;
 
-        for (int i = 0; i < targetsInViewRadius.Length; i++)
+        float angleToTarget = Vector3.Angle(transform.forward, dirToTarget);
+
+        if (angleToTarget < viewAngle / 2)
         {
-            Transform target = targetsInViewRadius[i].transform;
-            Vector3 dirToTarget = (target.position - transform.position).normalized;
+            float dstToTarget = Vector3.Distance(transform.position, targetGameObject.transform.position);
 
-            if (Vector3.Angle(transform.forward, dirToTarget) < viewAngle / 2)
+            if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
             {
-                float dstToTarget = Vector3.Distance(transform.position, target.position);
-
-                if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
-                {
-                    visibleTargets.Add(target);
-                }
+                // Determine which section the target is in
+                float normalizedAngleToTarget = angleToTarget / (viewAngle / 2); // Normalize angle to 0-1
+                if (normalizedAngleToTarget < 1f / 3f)
+                    leftAreaTargets.Add(targetGameObject); // Left section
+                else if (normalizedAngleToTarget < 2f / 3f)
+                    middleAreaTargets.Add(targetGameObject); // Middle section
+                else
+                    rightAreaTargets.Add(targetGameObject); // Right section
             }
         }
+    }
     }
 
     // Helper method to convert angle in degrees to a direction vector

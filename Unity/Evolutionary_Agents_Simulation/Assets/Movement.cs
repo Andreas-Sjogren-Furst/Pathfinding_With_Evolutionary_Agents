@@ -15,7 +15,7 @@ public class Movement : MonoBehaviour
     private Vector3 currentDirection;
     private int counter, steps;
     private float angle;
-
+    
     void Start()
     {   
         counter = 0;
@@ -43,7 +43,7 @@ public class Movement : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(spawnInterval); // Wait for the specified interval
-            Instantiate(Pheromone, transform.position, Quaternion.identity); // Spawn the object at the agent's position
+            Instantiate(Pheromone, transform.position - transform.forward * 1f, Quaternion.identity); // Spawn the object at the agent's position
         }
     }
     void OnCollisionEnter(Collision collision)
@@ -84,4 +84,9 @@ public class Movement : MonoBehaviour
         transform.position += transform.forward * (Time.deltaTime * movementSpeed);
     
     }
+
+    void ACO(){
+        
+    }
+
 }
