@@ -74,9 +74,7 @@ public class FieldOfView : MonoBehaviour
                 }
             }
         }
-    }   targets.Enqueue(leftAreaTargets);
-        targets.Enqueue(middleAreaTargets);
-        targets.Enqueue(rightAreaTargets); 
+    }  
 }
 
 

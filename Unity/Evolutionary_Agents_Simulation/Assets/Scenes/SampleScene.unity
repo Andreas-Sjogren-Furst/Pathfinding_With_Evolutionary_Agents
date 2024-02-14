@@ -245,7 +245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   antPrefab: {fileID: 8170326526364987173, guid: 4f9fe8b0533fb4e6986d9566735d987c, type: 3}
-  amountOfAnts: 15
+  amountOfAnts: 3
   xPosition: 0
   zPosition: 0
 --- !u!4 &561549448
@@ -497,9 +497,9 @@ MonoBehaviour:
   NumberOfCheckPoints: 0
   tileSize: 1
   density: 0
-  CellularIterations: 0
+  CellularIterations: 4
   CheckPointSpacing: 0
-  erosionLimit: 0
+  erosionLimit: 1
   randomSeed: 42
 --- !u!4 &1340223255
 Transform:
