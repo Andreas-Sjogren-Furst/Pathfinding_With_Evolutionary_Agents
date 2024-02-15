@@ -123,7 +123,7 @@ public class Movement : MonoBehaviour
     }
 
     int getArea(float totalArea, float[] segments){
-        // Generate a random number between 0 (inclusive) and 101 (exclusive)
+        // Generate a random number between 0 (inclusive) and totalarea (exclusive)
         float randomNumber = Random.Range(0, totalArea);
         // Determine which segment the randomNumber falls into
         for (int i = 0; i < segments.Length; i++)
