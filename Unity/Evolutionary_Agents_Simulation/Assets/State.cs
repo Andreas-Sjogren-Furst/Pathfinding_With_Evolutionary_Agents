@@ -13,23 +13,34 @@ public class State : MonoBehaviour
     };
 
     public AntState currentState;
+    private bool isChangingState;
     // Start is called before the first frame update
     void Start()
     {
+        isChangingState = false;
         sigmoid = new Sigmoid();
         movement = GetComponent<Movement>();
         currentState = AntState.Exploring;
+    }
+ 
+
+    IEnumerator ChangeStateWithDelay(AntState newState, float delay)
+    {
+        isChangingState = true;
+        yield return new WaitForSeconds(delay);
+        currentState = newState;
+        isChangingState = false;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(isChangingState) return;
         float randNumber = Random.Range(0f,1f);
         float sigmoidNumber = sigmoid.CalculateProbability(movement.pheromoneConcentration);
-        Debug.Log(sigmoid.CalculateProbability(3));
         if(randNumber <= sigmoidNumber){
-            currentState = AntState.FollowingPheromones;
-        } else currentState = AntState.Exploring;
+            StartCoroutine(ChangeStateWithDelay(AntState.FollowingPheromones, 2f));
+        } else StartCoroutine(ChangeStateWithDelay(AntState.Exploring, 0f));
     }
 
 }

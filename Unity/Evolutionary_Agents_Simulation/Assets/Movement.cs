@@ -28,10 +28,10 @@ public class Movement : MonoBehaviour
 
     void Update()
     {
-        SensePheromones();
-        CalculatePheromoneConcentration();
         // Check if it's time to change the movement direction
         if (Time.time >= nextChangeTime){
+            SensePheromones();
+            CalculatePheromoneConcentration();
             ChangeDirection();
             UpdateTime();
         }
@@ -112,22 +112,18 @@ public class Movement : MonoBehaviour
         Quaternion rotationChange;
         Vector3 currentDirection;
         float viewAngle = fieldOfView.viewAngle;
-  
-        // TODO: choice of segment is calculated by relative amount of pheromone in the area, 
-        // it should rather be a likelihood calculated by the amount of phermone, 
-        // and then random choice should also be an option here. 
-        
+        if(pheromoneConcentration == 0f) return;
         for(int i = 1; i < pheromoneDistrubution.Length; i++){ 
             pheromoneDistrubution[i] += pheromoneDistrubution[i-1];
         } int direction = getArea(pheromoneConcentration, pheromoneDistrubution);
         if(direction == 1) return;
-        rotationChange = direction == 0 ? Quaternion.Euler(0, -viewAngle/3, 0) : Quaternion.Euler(0, viewAngle/3, 0);
+        rotationChange = direction == 0 ? Quaternion.Euler(0, viewAngle/12, 0) : Quaternion.Euler(0, -viewAngle/12, 0);
         currentDirection = rotationChange * transform.forward;
         transform.rotation = Quaternion.LookRotation(currentDirection);
     }
 
     int getArea(float totalArea, float[] segments){
-        // Generate a random number between 0 (inclusive) and 101 (exclusive)
+        // Generate a random number between 0 (inclusive) and totalarea (exclusive)
         float randomNumber = Random.Range(0, totalArea);
         // Determine which segment the randomNumber falls into
         for (int i = 0; i < segments.Length; i++)
@@ -147,8 +143,9 @@ public class Movement : MonoBehaviour
         float value = 0f;
         if(pheromones.Count == 0) return value;
         foreach(GameObject pheromone in pheromones){
-                 value += pheromone.GetComponent<pheromoneBehavior>().alpha; 
-            } return value/100;
+                if(pheromone != null)
+                    value += pheromone.GetComponent<pheromoneBehavior>().alpha; 
+            } return value;
     }
 
 }

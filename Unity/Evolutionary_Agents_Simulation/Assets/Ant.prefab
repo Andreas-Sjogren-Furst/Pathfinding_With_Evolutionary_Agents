@@ -150,7 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pheromoneConcentration: 0
   spawnInterval: 0.2
-  directionChangeInterval: 0.2
+  directionChangeInterval: 0.05
   Pheromone: {fileID: 1553110994880429520, guid: b595843c43a744a1a9bc81a1ed81330c, type: 3}
   movementSpeed: 4
 --- !u!114 &857602312603241423
@@ -166,7 +166,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewRadius: 5
-  viewAngle: 35
+  viewAngle: 60
   targetMask:
     serializedVersion: 2
     m_Bits: 256
