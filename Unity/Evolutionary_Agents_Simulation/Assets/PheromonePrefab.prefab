@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 112aca3e2a29d4027a8d2c0a81ff36ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  evaporationConstant: 15
+  evaporationConstant: 20
   alpha: 0
 --- !u!54 &-6385482219165354762
 Rigidbody:

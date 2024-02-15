@@ -28,13 +28,13 @@ public class Movement : MonoBehaviour
 
     void Update()
     {
-        SensePheromones();
-        CalculatePheromoneConcentration();
         // Check if it's time to change the movement direction
-        //if (Time.time >= nextChangeTime){
+        if (Time.time >= nextChangeTime){
+            SensePheromones();
+            CalculatePheromoneConcentration();
             ChangeDirection();
-            //UpdateTime();
-        //}
+            UpdateTime();
+        }
         // Apply the movement
         MoveObject();
     }
@@ -112,16 +112,15 @@ public class Movement : MonoBehaviour
         Quaternion rotationChange;
         Vector3 currentDirection;
         float viewAngle = fieldOfView.viewAngle;
-  
+        if(pheromoneConcentration == 0f) return;
         // TODO: choice of segment is calculated by relative amount of pheromone in the area, 
         // it should rather be a likelihood calculated by the amount of phermone, 
         // and then random choice should also be an option here. 
-        
         for(int i = 1; i < pheromoneDistrubution.Length; i++){ 
             pheromoneDistrubution[i] += pheromoneDistrubution[i-1];
         } int direction = getArea(pheromoneConcentration, pheromoneDistrubution);
         if(direction == 1) return;
-        rotationChange = direction == 0 ? Quaternion.Euler(0, -viewAngle/3, 0) : Quaternion.Euler(0, viewAngle/3, 0);
+        rotationChange = direction == 0 ? Quaternion.Euler(0, viewAngle/12, 0) : Quaternion.Euler(0, -viewAngle/12, 0);
         currentDirection = rotationChange * transform.forward;
         transform.rotation = Quaternion.LookRotation(currentDirection);
     }
