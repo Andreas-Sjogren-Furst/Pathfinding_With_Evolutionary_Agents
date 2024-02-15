@@ -113,9 +113,6 @@ public class Movement : MonoBehaviour
         Vector3 currentDirection;
         float viewAngle = fieldOfView.viewAngle;
         if(pheromoneConcentration == 0f) return;
-        // TODO: choice of segment is calculated by relative amount of pheromone in the area, 
-        // it should rather be a likelihood calculated by the amount of phermone, 
-        // and then random choice should also be an option here. 
         for(int i = 1; i < pheromoneDistrubution.Length; i++){ 
             pheromoneDistrubution[i] += pheromoneDistrubution[i-1];
         } int direction = getArea(pheromoneConcentration, pheromoneDistrubution);
