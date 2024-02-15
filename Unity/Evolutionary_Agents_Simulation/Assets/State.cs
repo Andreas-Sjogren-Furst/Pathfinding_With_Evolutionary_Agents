@@ -26,7 +26,6 @@ public class State : MonoBehaviour
     {
         float randNumber = Random.Range(0f,1f);
         float sigmoidNumber = sigmoid.CalculateProbability(movement.pheromoneConcentration);
-        Debug.Log(sigmoid.CalculateProbability(3));
         if(randNumber <= sigmoidNumber){
             currentState = AntState.FollowingPheromones;
         } else currentState = AntState.Exploring;

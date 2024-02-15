@@ -31,10 +31,10 @@ public class Movement : MonoBehaviour
         SensePheromones();
         CalculatePheromoneConcentration();
         // Check if it's time to change the movement direction
-        if (Time.time >= nextChangeTime){
+        //if (Time.time >= nextChangeTime){
             ChangeDirection();
-            UpdateTime();
-        }
+            //UpdateTime();
+        //}
         // Apply the movement
         MoveObject();
     }
@@ -147,8 +147,9 @@ public class Movement : MonoBehaviour
         float value = 0f;
         if(pheromones.Count == 0) return value;
         foreach(GameObject pheromone in pheromones){
-                 value += pheromone.GetComponent<pheromoneBehavior>().alpha; 
-            } return value/100;
+                if(pheromone != null)
+                    value += pheromone.GetComponent<pheromoneBehavior>().alpha; 
+            } return value;
     }
 
 }
