@@ -80,7 +80,7 @@ public class CellularAutomata : MonoBehaviour
         lastCheckPointSpacing = CheckPointSpacing;
         lastErosionLimit = erosionLimit;
         lastRandomSeed = randomSeed; // Ensure this line is added
-        lastColonyCoordinates = Spawner.GetComponent<ObjectDropper>().colonyPositions;
+        lastColonyCoordinates = new List<Vector3>(Spawner.GetComponent<ObjectDropper>().colonyPositions);
 
 
     }
@@ -98,16 +98,40 @@ public class CellularAutomata : MonoBehaviour
 
     bool ParametersChanged()
     {
-        return lastDensity != density ||
-               lastNumberOfCheckPoints != NumberOfCheckPoints ||
-               lastTileSize != tileSize ||
-               lastCellularIterations != CellularIterations ||
-               lastCheckPointSpacing != CheckPointSpacing ||
-               lastErosionLimit != erosionLimit ||
-               lastRandomSeed != randomSeed // Include the seed in the change check 
-                || !lastColonyCoordinates.Equals(Spawner.GetComponent<ObjectDropper>().colonyPositions);
+        if (lastDensity != density ||
+            lastNumberOfCheckPoints != NumberOfCheckPoints ||
+            lastTileSize != tileSize ||
+            lastCellularIterations != CellularIterations ||
+            lastCheckPointSpacing != CheckPointSpacing ||
+            lastErosionLimit != erosionLimit ||
+            lastRandomSeed != randomSeed)
+        {
+            return true;
+        }
 
+        var currentColonyPositions = Spawner.GetComponent<ObjectDropper>().colonyPositions;
+        if (lastColonyCoordinates == null || currentColonyPositions == null)
+        {
+            return lastColonyCoordinates != currentColonyPositions;
+        }
+
+        if (lastColonyCoordinates.Count != currentColonyPositions.Count)
+        {
+            return true;
+        }
+
+        for (int i = 0; i < lastColonyCoordinates.Count; i++)
+        {
+            if (lastColonyCoordinates[i] != currentColonyPositions[i])
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
+
+
 
     void ClearMap()
     {
@@ -157,11 +181,11 @@ public class CellularAutomata : MonoBehaviour
         //      int[,] checkpointCoordinates = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
 
 
-        Map = RemoveWallsFromRealWorldPosition(Map, Spawner.transform.position, tileSize, 3);
+        Map = RemoveWallsFromRealWorldPosition(Map, lastColonyCoordinates, tileSize, 3);
 
         Map = generateNoise(Map, density);
         Map = applyCellularAutomaton(Map, iterations, erosionLimit);
-        //  Map = checkIfpathExists(Map);
+        Map = checkIfpathExists(Map);
 
 
 
@@ -300,22 +324,48 @@ public class CellularAutomata : MonoBehaviour
     int[,] checkIfpathExists(int[,] Map)
     {
         Boolean pathExists = false;
+        int counter = 0;
         while (!pathExists)
         {
+            counter++;
+            if (counter > 3)
+            {
+                Debug.Log("Path does not exist");
+                break;
+            }
+
             int[,] checkpoints = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
-            int[,] spawnerCoordinate = getObjectCoordinates(Map, 1, 3);
+            int[,] spawnerCoordinates = getObjectCoordinates(Map, 1, 3);
 
             Boolean[] paths = new Boolean[checkpoints.Length];
-
+            if (spawnerCoordinates.GetLength(0) == 0)
+            {
+                Debug.Log("No spawner found");
+                break;
+            }
+            if (checkpoints.GetLength(0) == 0)
+            {
+                Debug.Log("No checkpoints found");
+                break;
+            }
 
             for (int i = 0; i < checkpoints.GetLength(0); i++)
             {
-                foreach (Vector3 SpawnerPosition in lastColonyCoordinates)
+                for (int j = 0; j < spawnerCoordinates.GetLength(0); j++)
                 {
-                    Vector2Int spawner2d = calculateGridPosition(SpawnerPosition, tileSize);
+                    Debug.Log("Checkpoint: " + checkpoints[i, 0] + " " + checkpoints[i, 1]);
+                    Debug.Log("Spawner: " + spawnerCoordinates[j, 0] + " " + spawnerCoordinates[j, 1]);
+                    Debug.Log("running a star");
 
                     Vector2Int tempCheckPoint = new Vector2Int(checkpoints[i, 0], checkpoints[i, 1]);
+                    Vector2Int spawner2d = new Vector2Int(spawnerCoordinates[j, 0], spawnerCoordinates[j, 1]);
+
+                    Debug.Log("Checkpoint: " + tempCheckPoint);
+                    Debug.Log("Spawner: " + spawner2d);
                     paths[i] = aStar.FindPath(spawner2d, tempCheckPoint, Map);
+                    Debug.Log(paths[i]);
+
+                    Map = visualizePath(Map, aStar.ShortestPath);
                 }
 
             }
@@ -325,8 +375,8 @@ public class CellularAutomata : MonoBehaviour
                 bool path = paths[i];
                 if (!path)
                 {
-                    CellularIterations += 1;
-                    Map = applyCellularAutomaton(Map, CellularIterations, erosionLimit);
+                    // CellularIterations += 1;
+                    //  Map = applyCellularAutomaton(Map, CellularIterations, erosionLimit);
 
 
                 }
@@ -354,7 +404,7 @@ public class CellularAutomata : MonoBehaviour
         return new Vector2Int(i, j);
     }
 
-    int[,] RemoveWallsFromRealWorldPosition(int[,] grid, Vector3 antSpawnerWorldPosition, float tileSize, int ObjectValue)
+    int[,] RemoveWallFromRealWorldPosition(int[,] grid, Vector3 antSpawnerWorldPosition, float tileSize, int ObjectValue)
     {
         // Calculate grid coordinates from antSpawnerWorldPosition
         int i = Mathf.FloorToInt((antSpawnerWorldPosition.x - transform.position.x) / tileSize);
@@ -371,6 +421,15 @@ public class CellularAutomata : MonoBehaviour
             Debug.LogWarning("Ant spawner position is out of the grid bounds.");
         }
 
+        return grid;
+    }
+
+    int[,] RemoveWallsFromRealWorldPosition(int[,] grid, List<Vector3> antSpawnerWorldPositions, float tileSize, int ObjectValue)
+    {
+        foreach (Vector3 antSpawnerWorldPosition in antSpawnerWorldPositions)
+        {
+            grid = RemoveWallFromRealWorldPosition(grid, antSpawnerWorldPosition, tileSize, ObjectValue);
+        }
         return grid;
     }
 
