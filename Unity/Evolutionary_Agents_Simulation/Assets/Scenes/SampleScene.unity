@@ -407,7 +407,7 @@ MonoBehaviour:
   density: 0
   CellularIterations: 0
   CheckPointSpacing: 0
-  erosionLimit: 1
+  erosionLimit: 4
   randomSeed: 42
 --- !u!4 &1340223255
 Transform:

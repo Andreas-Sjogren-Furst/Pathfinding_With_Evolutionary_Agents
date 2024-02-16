@@ -5,15 +5,17 @@ using UnityEngine;
 
 public class CellularAutomata : MonoBehaviour
 {
+
+    Astar aStar = new Astar();
     public GameObject MapWall;
     public GameObject Plane;
     public GameObject CheckPoint;
     private int MapSize;
     [Range(0, 20)] public int NumberOfCheckPoints;
-    [Range(1, 10)]  public int tileSize;
+    [Range(1, 10)] public int tileSize;
     [Range(0, 100)] public float density; // Density field to control noise
-    [Range(0,100)] public int CellularIterations;
-    [Range(1, 30 )] public int CheckPointSpacing;
+    [Range(0, 100)] public int CellularIterations;
+    [Range(1, 30)] public int CheckPointSpacing;
     [Range(1, 10)] public int erosionLimit = 4;
     public int randomSeed = 42; // Added seed for random number generator
 
@@ -36,6 +38,8 @@ public class CellularAutomata : MonoBehaviour
     {
         InitializeParameters();
         CreateMap();
+
+
     }
 
     void Update()
@@ -43,9 +47,9 @@ public class CellularAutomata : MonoBehaviour
         if (ParametersChanged())
         {
             Debug.Log("Paramters changed");
-            ClearMap();
-            InitializeParameters();
-            CreateMap();
+            //  ClearMap();
+            //  InitializeParameters();
+            //  CreateMap();
         }
     }
 
@@ -65,6 +69,17 @@ public class CellularAutomata : MonoBehaviour
         lastErosionLimit = erosionLimit;
         lastRandomSeed = randomSeed; // Ensure this line is added
 
+    }
+
+    int[,] visualizePath(int[,] map, List<Vector2Int> path)
+    {
+        foreach (Vector2Int cell in path)
+        {
+            Debug.Log(cell.x);
+            Debug.Log(cell.y);
+            map[cell.x, cell.y] = 2;
+        }
+        return map;
     }
 
     bool ParametersChanged()
@@ -120,6 +135,9 @@ public class CellularAutomata : MonoBehaviour
             Map = generateCheckpoints(Map, NumberOfCheckPoints);
             Map = generateNoise(Map, density);
             Map = applyCellularAutomaton(Map, iterations, erosionLimit);
+            aStar.FindPath(new Vector2Int(10, 10), new Vector2Int(mapTileAmount - 10, mapTileAmount - 10), Map);
+            Map = visualizePath(Map, aStar.ShortestPath);
+
 
 
             return Map;
