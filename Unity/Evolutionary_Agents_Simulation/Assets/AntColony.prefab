@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 370415376954866280}
   - component: {fileID: 4376653867636562261}
   - component: {fileID: 2016919012905391586}
-  - component: {fileID: 1304866498964610022}
   - component: {fileID: 4584112375483899669}
   m_Layer: 7
   m_Name: AntColony
@@ -100,33 +99,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   antPrefab: {fileID: 8170326526364987173, guid: 4f9fe8b0533fb4e6986d9566735d987c, type: 3}
   amountOfAnts: 10
---- !u!54 &1304866498964610022
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5655545671311120630}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!136 &4584112375483899669
 CapsuleCollider:
   m_ObjectHideFlags: 0
