@@ -354,6 +354,7 @@ MonoBehaviour:
   MapWall: {fileID: 574305094228117303, guid: fa748ad60d2974a70a56519e1d541d6f, type: 3}
   Plane: {fileID: 1583591160}
   CheckPoint: {fileID: 553771973272868134, guid: 82a68e9ad2bea4dd38ac3c5ad6065c72, type: 3}
+  Spawner: {fileID: 1371200847515465607, guid: aabf52b1feed04ea3a5a323e6d7bd50d, type: 3}
   NumberOfCheckPoints: 0
   tileSize: 1
   density: 0
@@ -628,6 +629,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pheromone: {fileID: 1553110994880429520, guid: b595843c43a744a1a9bc81a1ed81330c, type: 3}
   colony: {fileID: 5655545671311120630, guid: 85e842dd4369e44fc94a6ff7fbe7c6cb, type: 3}
+  colonyPositions: []
 --- !u!1 &2096159087
 GameObject:
   m_ObjectHideFlags: 0
