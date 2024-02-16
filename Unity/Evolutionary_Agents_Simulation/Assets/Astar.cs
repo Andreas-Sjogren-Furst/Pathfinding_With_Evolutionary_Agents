@@ -34,7 +34,7 @@ public class Astar
         new Vector2Int(1, 1)    // Top-Right
     };
 
-    public void FindPath(Vector2Int start, Vector2Int end, int[,] map)
+    public bool FindPath(Vector2Int start, Vector2Int end, int[,] map)
     {
         openList = new List<NodeCell>();
         closedList = new HashSet<NodeCell>();
@@ -59,7 +59,7 @@ public class Astar
             if (currentNode.position == end)
             {
                 RetracePath(startNode, currentNode);
-                return;
+                return true;
             }
 
             foreach (Vector2Int direction in directions)
@@ -87,6 +87,7 @@ public class Astar
                 }
             }
         }
+        return false;
     }
 
     bool PositionIsValid(Vector2Int position, int[,] map)

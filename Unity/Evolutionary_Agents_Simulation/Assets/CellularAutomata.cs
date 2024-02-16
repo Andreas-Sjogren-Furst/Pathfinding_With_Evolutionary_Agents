@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
+using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 
 public class CellularAutomata : MonoBehaviour
@@ -10,6 +12,9 @@ public class CellularAutomata : MonoBehaviour
     public GameObject MapWall;
     public GameObject Plane;
     public GameObject CheckPoint;
+
+    public GameObject Spawner;
+
     private int MapSize;
     [Range(0, 20)] public int NumberOfCheckPoints;
     [Range(1, 10)] public int tileSize;
@@ -32,6 +37,8 @@ public class CellularAutomata : MonoBehaviour
     private int lastErosionLimit;
     private int lastRandomSeed; // Track the last seed used
 
+    private float lastSpawnerXCoordinate = 0;
+    private float lastSpawnerZCoordinate = 0;
 
 
     void Start()
@@ -47,9 +54,9 @@ public class CellularAutomata : MonoBehaviour
         if (ParametersChanged())
         {
             Debug.Log("Paramters changed");
-            //  ClearMap();
-            //  InitializeParameters();
-            //  CreateMap();
+            ClearMap();
+            InitializeParameters();
+            CreateMap();
         }
     }
 
@@ -68,6 +75,9 @@ public class CellularAutomata : MonoBehaviour
         lastCheckPointSpacing = CheckPointSpacing;
         lastErosionLimit = erosionLimit;
         lastRandomSeed = randomSeed; // Ensure this line is added
+        lastSpawnerXCoordinate = Spawner.transform.position.x;
+        lastSpawnerZCoordinate = Spawner.transform.position.z;
+
 
     }
 
@@ -90,7 +100,9 @@ public class CellularAutomata : MonoBehaviour
                lastCellularIterations != CellularIterations ||
                lastCheckPointSpacing != CheckPointSpacing ||
                lastErosionLimit != erosionLimit ||
-               lastRandomSeed != randomSeed; // Include the seed in the change check
+               lastRandomSeed != randomSeed // Include the seed in the change check 
+               || lastSpawnerXCoordinate != Spawner.transform.position.x
+               || lastSpawnerZCoordinate != Spawner.transform.position.z;
 
     }
 
@@ -122,6 +134,11 @@ public class CellularAutomata : MonoBehaviour
                     GameObject checkpoint = Instantiate(CheckPoint, position, Quaternion.identity);
                     spawnedObjects.Add(checkpoint);
                 }
+                else if (Map[i, j] == 3)
+                {
+                    // Spawned already made. 
+
+                }
             }
         }
 
@@ -133,10 +150,74 @@ public class CellularAutomata : MonoBehaviour
             mapTileAmount = MapSize / tileSize;
             int[,] Map = new int[mapTileAmount, mapTileAmount];
             Map = generateCheckpoints(Map, NumberOfCheckPoints);
+            int[,] checkpointCoordinates = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
+
+
+            Map = RemoveWallsFromRealWorldPosition(Map, Spawner.transform.position, tileSize, 3);
+
             Map = generateNoise(Map, density);
             Map = applyCellularAutomaton(Map, iterations, erosionLimit);
-            aStar.FindPath(new Vector2Int(10, 10), new Vector2Int(mapTileAmount - 10, mapTileAmount - 10), Map);
-            Map = visualizePath(Map, aStar.ShortestPath);
+
+            Boolean pathExists = false;
+            while (!pathExists)
+            {
+                int[,] checkpoints = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
+                int[,] spawnerCoordinate = getObjectCoordinates(Map, 1, 3);
+
+                Boolean[] paths = new Boolean[checkpoints.Length];
+
+                for (int i = 0; i < checkpoints.Length; i++)
+                {
+                    Vector2Int spawnerCoordinatetemp = new Vector2Int(spawnerCoordinate[0, 0], spawnerCoordinate[0, 1]);
+                    Vector2Int tempCheckPoint = new Vector2Int(checkpoints[i, 0], checkpoints[i, 1]);
+                    paths[i] = aStar.FindPath(spawnerCoordinatetemp, tempCheckPoint, Map);
+
+                }
+
+                for (int i = 0; i < paths.Length; i++)
+                {
+                    bool path = paths[i];
+                    if (!path)
+                    {
+                        CellularIterations += 1;
+                        Map = applyCellularAutomaton(Map, CellularIterations, erosionLimit);
+
+
+                    }
+
+                    if (i == paths.Length - 1 && path == true)
+                    {
+                        pathExists = true;
+                    }
+
+                }
+
+            }
+
+
+            // if (checkpointCoordinates.Length == 0)
+            // {
+            //     Debug.Log("No checkpoints found");
+            // }
+            // else
+            // {
+            //     Debug.Log("Checkpoints found");
+            //     Debug.Log($" CHECK POINT X {checkpointCoordinates[0, 0]}");
+            //     Debug.Log($" CHECK POINT Y {checkpointCoordinates[0, 1]}");
+
+            //     Debug.Log($" SPAWNER COORDINATE {spawnerCoordinate[0, 0]}");
+            //     Debug.Log($" SPAWNER COORDINATE {spawnerCoordinate[0, 1]}");
+
+
+            //     Vector2Int spawnerCoordinatetemp = new Vector2Int(checkpointCoordinates[0, 0], checkpointCoordinates[0, 1]);
+            //     Vector2Int tempCheckPoint = new Vector2Int(checkpointCoordinates[0, 0], spawnerCoordinate[0, 1]);
+
+            //     aStar.FindPath(spawnerCoordinatetemp, tempCheckPoint, Map);
+            //     Map = visualizePath(Map, aStar.ShortestPath);
+            // }
+
+
+
 
 
 
@@ -248,6 +329,46 @@ public class CellularAutomata : MonoBehaviour
 
             return grid;
 
+        }
+
+        int[,] getObjectCoordinates(int[,] grid, int numberOfCheckPoints, int ObjectValue)
+        {
+            int[,] CheckPointCoordinates = new int[numberOfCheckPoints, 2];
+            int counter = 0;
+            for (int i = 0; i < grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < grid.GetLength(1); j++)
+                {
+                    if (grid[i, j] == ObjectValue)
+                    {
+                        CheckPointCoordinates[counter, 0] = i;
+                        CheckPointCoordinates[counter, 1] = j;
+                        counter++;
+                    }
+                }
+            }
+            return CheckPointCoordinates;
+        }
+
+
+        int[,] RemoveWallsFromRealWorldPosition(int[,] grid, Vector3 antSpawnerWorldPosition, float tileSize, int ObjectValue)
+        {
+            // Calculate grid coordinates from antSpawnerWorldPosition
+            int i = Mathf.FloorToInt((antSpawnerWorldPosition.x - transform.position.x) / tileSize);
+            int j = Mathf.FloorToInt((antSpawnerWorldPosition.z - transform.position.z) / tileSize);
+
+            // Ensure the calculated indices are within the bounds of the grid
+            if (i >= 0 && i < grid.GetLength(0) && j >= 0 && j < grid.GetLength(1))
+            {
+                // Set the grid value to 3 at the calculated coordinates
+                grid[i, j] = ObjectValue;
+            }
+            else
+            {
+                Debug.LogWarning("Ant spawner position is out of the grid bounds.");
+            }
+
+            return grid;
         }
 
 
