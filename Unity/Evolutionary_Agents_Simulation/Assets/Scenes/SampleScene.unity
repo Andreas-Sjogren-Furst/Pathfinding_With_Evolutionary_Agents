@@ -156,6 +156,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pheromone: {fileID: 1553110994880429520, guid: b595843c43a744a1a9bc81a1ed81330c, type: 3}
   colony: {fileID: 5655545671311120630, guid: 85e842dd4369e44fc94a6ff7fbe7c6cb, type: 3}
+  colonyPositions: []
 --- !u!81 &178090568
 AudioListener:
   m_ObjectHideFlags: 0
