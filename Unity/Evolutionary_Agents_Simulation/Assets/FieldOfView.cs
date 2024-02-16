@@ -28,54 +28,54 @@ public class FieldOfView : MonoBehaviour
         }
     }
 
-   void FindVisibleTargets()
-{
-    leftAreaTargets.Clear();
-    middleAreaTargets.Clear();
-    rightAreaTargets.Clear();
-    Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
-
-    for (int i = 0; i < targetsInViewRadius.Length; i++)
+    void FindVisibleTargets()
     {
-        GameObject targetGameObject = targetsInViewRadius[i].gameObject;
-        Vector3 dirToTarget = (targetGameObject.transform.position - transform.position).normalized;
-        
-        // Calculate the angle between the agent's forward direction and the direction to the target
-        float angleToTarget = Vector3.Angle(transform.forward, dirToTarget);
-        
-        if (angleToTarget < viewAngle / 2)
+        leftAreaTargets.Clear();
+        middleAreaTargets.Clear();
+        rightAreaTargets.Clear();
+        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
+
+        for (int i = 0; i < targetsInViewRadius.Length; i++)
         {
-            float dstToTarget = Vector3.Distance(transform.position, targetGameObject.transform.position);
-            
-            if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
+            GameObject targetGameObject = targetsInViewRadius[i].gameObject;
+            Vector3 dirToTarget = (targetGameObject.transform.position - transform.position).normalized;
+
+            // Calculate the angle between the agent's forward direction and the direction to the target
+            float angleToTarget = Vector3.Angle(transform.forward, dirToTarget);
+
+            if (angleToTarget < viewAngle / 2)
             {
-                // Use cross product to determine if the target is to the left or right of the agent
-                Vector3 crossProduct = Vector3.Cross(transform.forward, dirToTarget);
-                float dotProduct = Vector3.Dot(crossProduct, transform.up);
-                
-                // Classify targets based on the angle and direction relative to the agent
-                if (angleToTarget < viewAngle / 3)
+                float dstToTarget = Vector3.Distance(transform.position, targetGameObject.transform.position);
+
+                if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
                 {
-                    // Middle section
-                    middleAreaTargets.Add(targetGameObject);
-                }
-                else
-                {
-                    if (dotProduct < 0)
+                    // Use cross product to determine if the target is to the left or right of the agent
+                    Vector3 crossProduct = Vector3.Cross(transform.forward, dirToTarget);
+                    float dotProduct = Vector3.Dot(crossProduct, transform.up);
+
+                    // Classify targets based on the angle and direction relative to the agent
+                    if (angleToTarget < viewAngle / 3)
                     {
-                        // Right section
-                        rightAreaTargets.Add(targetGameObject);
+                        // Middle section
+                        middleAreaTargets.Add(targetGameObject);
                     }
                     else
                     {
-                        // Left section
-                        leftAreaTargets.Add(targetGameObject);
+                        if (dotProduct < 0)
+                        {
+                            // Right section
+                            rightAreaTargets.Add(targetGameObject);
+                        }
+                        else
+                        {
+                            // Left section
+                            leftAreaTargets.Add(targetGameObject);
+                        }
                     }
                 }
             }
         }
-    }  
-}
+    }
 
 
     // Helper method to convert angle in degrees to a direction vector

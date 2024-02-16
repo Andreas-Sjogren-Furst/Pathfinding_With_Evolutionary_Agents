@@ -38,6 +38,8 @@ public class CellularAutomata : MonoBehaviour
     {
         InitializeParameters();
         CreateMap();
+
+
     }
 
     void Update()
@@ -45,9 +47,9 @@ public class CellularAutomata : MonoBehaviour
         if (ParametersChanged())
         {
             Debug.Log("Paramters changed");
-            ClearMap();
-            InitializeParameters();
-            CreateMap();
+            //  ClearMap();
+            //  InitializeParameters();
+            //  CreateMap();
         }
     }
 
@@ -67,6 +69,17 @@ public class CellularAutomata : MonoBehaviour
         lastErosionLimit = erosionLimit;
         lastRandomSeed = randomSeed; // Ensure this line is added
 
+    }
+
+    int[,] visualizePath(int[,] map, List<Vector2Int> path)
+    {
+        foreach (Vector2Int cell in path)
+        {
+            Debug.Log(cell.x);
+            Debug.Log(cell.y);
+            map[cell.x, cell.y] = 2;
+        }
+        return map;
     }
 
     bool ParametersChanged()
@@ -122,6 +135,9 @@ public class CellularAutomata : MonoBehaviour
             Map = generateCheckpoints(Map, NumberOfCheckPoints);
             Map = generateNoise(Map, density);
             Map = applyCellularAutomaton(Map, iterations, erosionLimit);
+            aStar.FindPath(new Vector2Int(10, 10), new Vector2Int(mapTileAmount - 10, mapTileAmount - 10), Map);
+            Map = visualizePath(Map, aStar.ShortestPath);
+
 
 
             return Map;

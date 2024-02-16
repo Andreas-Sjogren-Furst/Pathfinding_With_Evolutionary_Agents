@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 
 public class NodeCell
 {
@@ -14,29 +12,34 @@ public class NodeCell
     public NodeCell(Vector2Int _position) { position = _position; }
 }
 
-public class Astar : MonoBehaviour
+public class Astar
 {
-
     public Vector2Int startCoordinate;
     public Vector2Int endCoordinate;
-    public int[,] map;
+    public List<Vector2Int> ShortestPath = new List<Vector2Int>();
 
-    List<NodeCell> openList; // open for exploration. Nodes with lowest f(n) is chosen. 
-    HashSet<NodeCell> closedList; // already explored and their neigbours. 
+    List<NodeCell> openList;
+    HashSet<NodeCell> closedList;
 
-    void Start()
+    // Directions for 8 possible movements
+    private Vector2Int[] directions = new Vector2Int[]
     {
-        FindPath(startCoordinate, endCoordinate);
-    }
+        new Vector2Int(-1, 0),  // Left
+        new Vector2Int(1, 0),   // Right
+        new Vector2Int(0, -1),  // Down
+        new Vector2Int(0, 1),   // Up
+        new Vector2Int(-1, -1), // Bottom-Left
+        new Vector2Int(-1, 1),  // Top-Left
+        new Vector2Int(1, -1),  // Bottom-Right
+        new Vector2Int(1, 1)    // Top-Right
+    };
 
-    void FindPath(Vector2Int start, Vector2Int end)
+    public void FindPath(Vector2Int start, Vector2Int end, int[,] map)
     {
         openList = new List<NodeCell>();
         closedList = new HashSet<NodeCell>();
 
         NodeCell startNode = new NodeCell(start);
-        NodeCell endNode = new NodeCell(end);
-
         openList.Add(startNode);
 
         while (openList.Count > 0)
@@ -44,7 +47,7 @@ public class Astar : MonoBehaviour
             NodeCell currentNode = openList[0];
             for (int i = 1; i < openList.Count; i++)
             {
-                if (openList[i].fCost < currentNode.fCost || openList[i].fCost == currentNode.fCost && openList[i].hCost < currentNode.hCost)
+                if (openList[i].fCost < currentNode.fCost || (openList[i].fCost == currentNode.fCost && openList[i].hCost < currentNode.hCost))
                 {
                     currentNode = openList[i];
                 }
@@ -55,22 +58,28 @@ public class Astar : MonoBehaviour
 
             if (currentNode.position == end)
             {
-                RetracePath(startNode, endNode);
+                RetracePath(startNode, currentNode);
                 return;
             }
 
-            foreach (NodeCell neighbor in GetNeighbors(currentNode))
+            foreach (Vector2Int direction in directions)
             {
-                if (map[neighbor.position.x, neighbor.position.y] != 0 || closedList.Contains(neighbor))
+                Vector2Int neighborPos = currentNode.position + direction;
+                if (!PositionIsValid(neighborPos, map)) continue;
+
+                NodeCell neighbor = FindExistingNode(neighborPos, openList, closedList);
+                if (neighbor == null)
                 {
-                    continue;
+                    neighbor = new NodeCell(neighborPos);
                 }
 
-                float newCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor);
+                if (closedList.Contains(neighbor)) continue;
+
+                float newCostToNeighbor = currentNode.gCost + GetDistance(currentNode.position, neighbor.position);
                 if (newCostToNeighbor < neighbor.gCost || !openList.Contains(neighbor))
                 {
-                    neighbor.gCost = newCostToNeighbor; // g(n)
-                    neighbor.hCost = GetDistance(neighbor, endNode); // h(n)
+                    neighbor.gCost = newCostToNeighbor;
+                    neighbor.hCost = GetDistance(neighbor.position, end);
                     neighbor.parent = currentNode;
 
                     if (!openList.Contains(neighbor))
@@ -80,49 +89,49 @@ public class Astar : MonoBehaviour
         }
     }
 
-    List<NodeCell> GetNeighbors(NodeCell node)
+    bool PositionIsValid(Vector2Int position, int[,] map)
     {
-        List<NodeCell> neighbors = new List<NodeCell>();
+        return position.x >= 0 && position.x < map.GetLength(0) && position.y >= 0 && position.y < map.GetLength(1) && map[position.x, position.y] == 0;
+    }
 
-        for (int x = -1; x <= 1; x++)
+    NodeCell FindExistingNode(Vector2Int position, List<NodeCell> openList, HashSet<NodeCell> closedList)
+    {
+        foreach (var node in openList)
         {
-            for (int y = -1; y <= 1; y++)
-            {
-                if (x == 0 && y == 0)
-                    continue;
-
-                Vector2Int checkPoint = new Vector2Int(node.position.x + x, node.position.y + y);
-                if (checkPoint.x >= 0 && checkPoint.x < map.GetLength(0) && checkPoint.y >= 0 && checkPoint.y < map.GetLength(1))
-                {
-                    neighbors.Add(new NodeCell(checkPoint));
-                }
-            }
+            if (node.position == position) return node;
         }
-        return neighbors;
+
+        foreach (var node in closedList)
+        {
+            if (node.position == position) return node;
+        }
+
+        return null;
     }
 
-    float GetDistance(NodeCell a, NodeCell b)
+    float GetDistance(Vector2Int a, Vector2Int b)
     {
-        float distX = Mathf.Abs(a.position.x - b.position.x);
-        float distY = Mathf.Abs(a.position.y - b.position.y);
+        int dx = Mathf.Abs(a.x - b.x);
+        int dy = Mathf.Abs(a.y - b.y);
 
-        if (distX > distY) // 14 is approximation of sqrt(2)*10, 10 for straightmoves
-            return 14 * distY + 10 * (distX - distY);
-        return 14 * distX + 10 * (distY - distX);
+        if (dx > dy)
+            return 14 * dy + 10 * (dx - dy);
+        return 14 * dx + 10 * (dy - dx);
     }
+
 
     void RetracePath(NodeCell startNode, NodeCell endNode)
     {
-        List<NodeCell> path = new List<NodeCell>();
+        List<Vector2Int> path = new List<Vector2Int>();
         NodeCell currentNode = endNode;
 
         while (currentNode != startNode)
         {
-            path.Add(currentNode);
+            path.Add(currentNode.position);
             currentNode = currentNode.parent;
         }
+        path.Add(startNode.position); // Ensure the start node is included in the path
         path.Reverse();
-
-        // Here you can convert the path into world positions or whatever format you need
+        ShortestPath = path;
     }
 }
