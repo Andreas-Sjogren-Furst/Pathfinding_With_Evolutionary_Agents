@@ -13,6 +13,7 @@ public class ObjectDropper : MonoBehaviour
     private Camera cam;
     private Ray ray;
     void Start(){
+        colonyPositions = new List<Vector3>();
         cam = GetComponent<Camera>();
     }
     void Update()
