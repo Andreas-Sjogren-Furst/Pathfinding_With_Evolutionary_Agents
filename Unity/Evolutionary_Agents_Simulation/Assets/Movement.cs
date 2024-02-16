@@ -55,14 +55,9 @@ public class Movement : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        // Get the normal of the first contact point
-        Vector3 contactNormal = collision.GetContact(0).normal; 
-        // Rotate the agent to align with the normal vector of the wall
-        // This makes the agent's forward direction parallel to the wall's normal, effectively "facing away" from the wall
+        Vector3 contactNormal = collision.GetContact(0).normal;
         transform.rotation = Quaternion.LookRotation(contactNormal);
-        nextChangeTime = Time.time + directionChangeInterval;
-        // If you want the agent to "slide" along the wall instead of facing away, you might rotate it to be perpendicular
-        // This example directly faces the wall's normal. Adjust as needed for your specific behavior (e.g., Quaternion.FromToRotation(Vector3.forward, -contactNormal) for facing towards, with adjustments for sliding behavior)
+        nextChangeTime = Time.time + directionChangeInterval;   
     }
 
     void RandomDirection()

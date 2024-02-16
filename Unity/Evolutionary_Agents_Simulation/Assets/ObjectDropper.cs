@@ -33,7 +33,7 @@ public class ObjectDropper : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit)) // Check if the ray hits something
         {
             colonyPositions.Add(hit.point);
-            Instantiate(gameObject, hit.point, Quaternion.identity); // Instantiate the object at the hit position
+            Instantiate(gameObject, hit.point + new Vector3(0,0.5f,0), Quaternion.identity); // Instantiate the object at the hit position
         }
     }
 }
