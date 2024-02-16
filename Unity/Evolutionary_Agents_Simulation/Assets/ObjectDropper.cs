@@ -7,8 +7,11 @@ using UnityEngine;
 public class ObjectDropper : MonoBehaviour
 {
     public GameObject pheromone; // Assign your prefab in the Inspector
-    public GameObject colony; // Assign your prefab in the Inspector
+    public GameObject colony;
+    List<Vector3> colonyPositions;
+     // Assign your prefab in the Inspector
     private Camera cam;
+    private Ray ray;
     void Start(){
         cam = GetComponent<Camera>();
     }
@@ -19,14 +22,16 @@ public class ObjectDropper : MonoBehaviour
             DropObjectAtMousePosition(pheromone);
         } else if(Input.GetMouseButtonDown(1)){ // Check if the right mouse button was clicked
             DropObjectAtMousePosition(colony);
-        }   transform.position = Input.mousePosition;
+        }
     }
 
     void DropObjectAtMousePosition(GameObject gameObject)
     {
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        ray = cam.ScreenPointToRay(Input.mousePosition);
+        
         if (Physics.Raycast(ray, out RaycastHit hit)) // Check if the ray hits something
         {
+            colonyPositions.Add(hit.point);
             Instantiate(gameObject, hit.point, Quaternion.identity); // Instantiate the object at the hit position
         }
     }
