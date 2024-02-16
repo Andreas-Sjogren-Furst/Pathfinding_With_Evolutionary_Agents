@@ -153,9 +153,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   antPrefab: {fileID: 8170326526364987173, guid: 4f9fe8b0533fb4e6986d9566735d987c, type: 3}
-  amountOfAnts: 6
-  xPosition: 0
-  zPosition: 0
+  amountOfAnts: 20
+  AntColony: {fileID: 5655545671311120630, guid: 85e842dd4369e44fc94a6ff7fbe7c6cb, type: 3}
+  antCounter: 0
 --- !u!4 &561549448
 Transform:
   m_ObjectHideFlags: 0
@@ -674,7 +674,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7551aad9f01c413898e7d3d2d74f001, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectToDrop: {fileID: 1553110994880429520, guid: b595843c43a744a1a9bc81a1ed81330c, type: 3}
+  pheromone: {fileID: 1553110994880429520, guid: b595843c43a744a1a9bc81a1ed81330c, type: 3}
+  colony: {fileID: 5655545671311120630, guid: 85e842dd4369e44fc94a6ff7fbe7c6cb, type: 3}
 --- !u!1 &2096159087
 GameObject:
   m_ObjectHideFlags: 0
