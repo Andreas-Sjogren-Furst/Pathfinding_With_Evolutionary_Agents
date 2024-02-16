@@ -24,6 +24,9 @@ public class CellularAutomata : MonoBehaviour
     [Range(1, 10)] public int erosionLimit = 4;
     public int randomSeed = 42; // Added seed for random number generator
 
+    private List<Vector3> SpawnerCoordinates = new List<Vector3>();
+
+
 
     private int mapTileAmount;
     private List<GameObject> spawnedObjects = new List<GameObject>();
@@ -150,72 +153,13 @@ public class CellularAutomata : MonoBehaviour
             mapTileAmount = MapSize / tileSize;
             int[,] Map = new int[mapTileAmount, mapTileAmount];
             Map = generateCheckpoints(Map, NumberOfCheckPoints);
-            int[,] checkpointCoordinates = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
+            //      int[,] checkpointCoordinates = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
 
 
             Map = RemoveWallsFromRealWorldPosition(Map, Spawner.transform.position, tileSize, 3);
 
             Map = generateNoise(Map, density);
             Map = applyCellularAutomaton(Map, iterations, erosionLimit);
-
-            Boolean pathExists = false;
-            while (!pathExists)
-            {
-                int[,] checkpoints = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
-                int[,] spawnerCoordinate = getObjectCoordinates(Map, 1, 3);
-
-                Boolean[] paths = new Boolean[checkpoints.Length];
-
-                for (int i = 0; i < checkpoints.Length; i++)
-                {
-                    Vector2Int spawnerCoordinatetemp = new Vector2Int(spawnerCoordinate[0, 0], spawnerCoordinate[0, 1]);
-                    Vector2Int tempCheckPoint = new Vector2Int(checkpoints[i, 0], checkpoints[i, 1]);
-                    paths[i] = aStar.FindPath(spawnerCoordinatetemp, tempCheckPoint, Map);
-
-                }
-
-                for (int i = 0; i < paths.Length; i++)
-                {
-                    bool path = paths[i];
-                    if (!path)
-                    {
-                        CellularIterations += 1;
-                        Map = applyCellularAutomaton(Map, CellularIterations, erosionLimit);
-
-
-                    }
-
-                    if (i == paths.Length - 1 && path == true)
-                    {
-                        pathExists = true;
-                    }
-
-                }
-
-            }
-
-
-            // if (checkpointCoordinates.Length == 0)
-            // {
-            //     Debug.Log("No checkpoints found");
-            // }
-            // else
-            // {
-            //     Debug.Log("Checkpoints found");
-            //     Debug.Log($" CHECK POINT X {checkpointCoordinates[0, 0]}");
-            //     Debug.Log($" CHECK POINT Y {checkpointCoordinates[0, 1]}");
-
-            //     Debug.Log($" SPAWNER COORDINATE {spawnerCoordinate[0, 0]}");
-            //     Debug.Log($" SPAWNER COORDINATE {spawnerCoordinate[0, 1]}");
-
-
-            //     Vector2Int spawnerCoordinatetemp = new Vector2Int(checkpointCoordinates[0, 0], checkpointCoordinates[0, 1]);
-            //     Vector2Int tempCheckPoint = new Vector2Int(checkpointCoordinates[0, 0], spawnerCoordinate[0, 1]);
-
-            //     aStar.FindPath(spawnerCoordinatetemp, tempCheckPoint, Map);
-            //     Map = visualizePath(Map, aStar.ShortestPath);
-            // }
-
 
 
 
@@ -348,6 +292,45 @@ public class CellularAutomata : MonoBehaviour
                 }
             }
             return CheckPointCoordinates;
+        }
+
+        void checkIfpath()
+        {
+            Boolean pathExists = false;
+            while (!pathExists)
+            {
+                int[,] checkpoints = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
+                int[,] spawnerCoordinate = getObjectCoordinates(Map, 1, 3);
+
+                Boolean[] paths = new Boolean[checkpoints.Length];
+
+                for (int i = 0; i < checkpoints.GetLength(0); i++)
+                {
+                    Vector2Int spawnerCoordinatetemp = new Vector2Int(spawnerCoordinate[0, 0], spawnerCoordinate[0, 1]);
+                    Vector2Int tempCheckPoint = new Vector2Int(checkpoints[i, 0], checkpoints[i, 1]);
+                    paths[i] = aStar.FindPath(spawnerCoordinatetemp, tempCheckPoint, Map);
+
+                }
+
+                for (int i = 0; i < paths.Length; i++)
+                {
+                    bool path = paths[i];
+                    if (!path)
+                    {
+                        CellularIterations += 1;
+                        Map = applyCellularAutomaton(Map, CellularIterations, erosionLimit);
+
+
+                    }
+
+                    if (i == paths.Length - 1 && path == true)
+                    {
+                        pathExists = true;
+                    }
+
+                }
+
+            }
         }
 
 
