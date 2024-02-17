@@ -14,6 +14,8 @@ public class CellularAutomata : MonoBehaviour
     public GameObject Plane;
     public GameObject CheckPoint;
 
+    public GameObject pathVisualizer; // Assign this in the Unity Editor
+
     public GameObject Spawner;
 
     private int MapSize;
@@ -47,6 +49,7 @@ public class CellularAutomata : MonoBehaviour
 
     void Start()
     {
+
         InitializeParameters();
         CreateMap();
 
@@ -63,6 +66,24 @@ public class CellularAutomata : MonoBehaviour
             InitializeParameters();
             CreateMap();
         }
+    }
+
+
+    // Coroutine to move the pathVisualizer along the path
+    IEnumerator FollowPath(List<Vector2Int> path, Vector3 gridOrigin, float tileSize)
+    {
+        foreach (Vector2Int cell in path)
+        {
+            Vector3 worldPosition = gridOrigin + new Vector3(cell.x * tileSize, 1, cell.y * tileSize) + new Vector3(tileSize / 2.0f, 0, tileSize / 2.0f);
+            pathVisualizer.transform.position = worldPosition;
+            yield return new WaitForSeconds(0.01f); // Adjust for visual effect
+        }
+    }
+
+    // Method to start path visualization
+    public void StartVisualizingPath(List<Vector2Int> path, Vector3 gridOrigin, float tileSize)
+    {
+        StartCoroutine(FollowPath(path, gridOrigin, tileSize));
     }
 
     void InitializeParameters()
@@ -87,12 +108,18 @@ public class CellularAutomata : MonoBehaviour
 
     int[,] visualizePath(int[,] map, List<Vector2Int> path)
     {
-        foreach (Vector2Int cell in path)
-        {
-            Debug.Log(cell.x);
-            Debug.Log(cell.y);
-            map[cell.x, cell.y] = 2;
-        }
+        Debug.Log("Visualizing path with path length: " + path.Count);
+
+        StartVisualizingPath(path, transform.position, tileSize);
+
+
+        // foreach (Vector2Int cell in path)
+        // {
+        //     Debug.Log(cell.x);
+        //     Debug.Log(cell.y);
+        //     //   map[cell.x, cell.y] = 0;
+        // }
+        // return map;
         return map;
     }
 
@@ -185,7 +212,7 @@ public class CellularAutomata : MonoBehaviour
 
         Map = generateNoise(Map, density);
         Map = applyCellularAutomaton(Map, iterations, erosionLimit);
-        Map = checkIfpathExists(Map);
+        checkIfpathExists(Map);
 
 
 
@@ -316,15 +343,32 @@ public class CellularAutomata : MonoBehaviour
                     CheckPointCoordinates[counter, 1] = j;
                     counter++;
                 }
+                if (counter == numberOfCheckPoints)
+                {
+                    break;
+                }
             }
         }
         return CheckPointCoordinates;
     }
 
-    int[,] checkIfpathExists(int[,] Map)
+    void checkIfpathExists(int[,] Map)
     {
         Boolean pathExists = false;
         int counter = 0;
+
+        int[,] checkpoints = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
+        int[,] spawnerCoordinates = getObjectCoordinates(Map, 1, 3);
+        Boolean[] paths = new Boolean[checkpoints.Length];
+
+        Debug.Log($"map length");
+
+        Debug.Log("Checkpoint coordinates: " + checkpoints.GetLength(0));
+        Debug.Log("Spawner coordinates: " + spawnerCoordinates.GetLength(0));
+
+        List<Vector2Int> combinedPath = new List<Vector2Int>();
+
+
         while (!pathExists)
         {
             counter++;
@@ -334,11 +378,9 @@ public class CellularAutomata : MonoBehaviour
                 break;
             }
 
-            int[,] checkpoints = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
-            int[,] spawnerCoordinates = getObjectCoordinates(Map, 1, 3);
 
-            Boolean[] paths = new Boolean[checkpoints.Length];
-            if (spawnerCoordinates.GetLength(0) == 0)
+
+            if (spawnerCoordinates.GetLength(0) == 0 || spawnerCoordinates[0, 0] == 0 || spawnerCoordinates[0, 1] == 0)
             {
                 Debug.Log("No spawner found");
                 break;
@@ -362,38 +404,51 @@ public class CellularAutomata : MonoBehaviour
 
                     Debug.Log("Checkpoint: " + tempCheckPoint);
                     Debug.Log("Spawner: " + spawner2d);
-                    paths[i] = aStar.FindPath(spawner2d, tempCheckPoint, Map);
-                    Debug.Log(paths[i]);
-
-                    Map = visualizePath(Map, aStar.ShortestPath);
+                    paths[i] = aStar.FindPath(tempCheckPoint, spawner2d, Map);
+                    List<Vector2Int> pathSegment = aStar.ShortestPath;
+                    if (combinedPath.Count > 0 && pathSegment.Count > 0)
+                    {
+                        // Remove the first point of the next segment if it's the same as the last point of the previous segment to avoid duplicate points
+                        if (combinedPath[combinedPath.Count - 1] == pathSegment[0])
+                        {
+                            pathSegment.RemoveAt(0);
+                        }
+                    }
+                    combinedPath.AddRange(pathSegment);
                 }
 
-            }
 
-            for (int i = 0; i < paths.Length; i++)
-            {
-                bool path = paths[i];
-                if (!path)
-                {
-                    // CellularIterations += 1;
-                    //  Map = applyCellularAutomaton(Map, CellularIterations, erosionLimit);
-
-
-                }
-                else
-                {
-                    Debug.Log("Path exists");
-                }
-
-                if (i == paths.Length - 1 && path == true)
-                {
-                    pathExists = true;
-                }
 
             }
 
         }
-        return Map;
+
+        for (int i = 0; i < paths.Length; i++)
+        {
+            bool path = paths[i];
+            if (!path)
+            {
+                // CellularIterations += 1;
+                //  Map = applyCellularAutomaton(Map, CellularIterations, erosionLimit);
+
+
+            }
+            else
+            {
+                Debug.Log("Path exists");
+                visualizePath(Map, combinedPath);
+            }
+
+            if (i == paths.Length - 1 && path == true)
+            {
+                pathExists = true;
+            }
+
+            //   }
+
+        }
+
+
     }
 
     Vector2Int calculateGridPosition(Vector3 worldPosition, float tileSize)

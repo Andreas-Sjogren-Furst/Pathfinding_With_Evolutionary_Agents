@@ -568,9 +568,9 @@ MonoBehaviour:
   Plane: {fileID: 1583591160}
   CheckPoint: {fileID: 553771973272868134, guid: 82a68e9ad2bea4dd38ac3c5ad6065c72, type: 3}
   Spawner: {fileID: 178090566}
-  NumberOfCheckPoints: 0
+  NumberOfCheckPoints: 2
   tileSize: 1
-  density: 0
+  density: 63.6
   CellularIterations: 0
   CheckPointSpacing: 0
   erosionLimit: 1
