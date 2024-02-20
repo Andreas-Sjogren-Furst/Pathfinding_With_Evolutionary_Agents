@@ -6,10 +6,13 @@ using Unity.Collections;
 using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 
+
 public class CellularAutomata : MonoBehaviour
 {
 
     Astar aStar = new Astar();
+
+    InitCustomMaps initCustomMaps = new InitCustomMaps();
     public GameObject MapWall;
     public GameObject Plane;
     public GameObject CheckPoint;
@@ -25,6 +28,8 @@ public class CellularAutomata : MonoBehaviour
     [Range(0, 100)] public int CellularIterations;
     [Range(1, 30)] public int CheckPointSpacing;
     [Range(1, 10)] public int erosionLimit = 4;
+    [Range(0, 10)] public int mapNumber = 0;
+
     public int randomSeed = 42; // Added seed for random number generator
 
     private List<Vector3> ColonyCoordinates;
@@ -50,7 +55,14 @@ public class CellularAutomata : MonoBehaviour
     void Start()
     {
 
-        InitializeParameters();
+        if (mapNumber != 0)
+        {
+            InitializePreDefinedParameters(mapNumber);
+        }
+        else
+        {
+            InitializeParameters();
+        }
         CreateMap();
 
 
@@ -102,6 +114,23 @@ public class CellularAutomata : MonoBehaviour
         lastErosionLimit = erosionLimit;
         lastRandomSeed = randomSeed; // Ensure this line is added
         lastColonyCoordinates = new List<Vector3>(Spawner.GetComponent<ObjectDropper>().colonyPositions);
+
+
+    }
+
+    void InitializePreDefinedParameters(int MapNumber)
+    {
+        Dictionary<string, int> mapParameters = initCustomMaps.GetMapParameters(MapNumber);
+
+        density = mapParameters["Density"];
+        NumberOfCheckPoints = mapParameters["NumberOfCheckPoints"];
+        tileSize = mapParameters["TileSize"];
+        CellularIterations = mapParameters["CellularIterations"];
+        CheckPointSpacing = mapParameters["CheckPointSpacing"];
+        erosionLimit = mapParameters["ErosionLimit"];
+        randomSeed = mapParameters["RandomSeed"];
+
+
 
 
     }
