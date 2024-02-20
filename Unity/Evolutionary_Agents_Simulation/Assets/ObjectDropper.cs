@@ -8,6 +8,7 @@ public class ObjectDropper : MonoBehaviour
 {
     public GameObject pheromone; // Assign your prefab in the Inspector
     public GameObject colony;
+    public GameObject checkpoint;
     public List<Vector3> colonyPositions;
     // Assign your prefab in the Inspector
     private Camera cam;
@@ -19,13 +20,15 @@ public class ObjectDropper : MonoBehaviour
     }
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // Check if the left mouse button was clicked
+        if (Input.GetKeyDown(KeyCode.Q)) // Check if the left mouse button was clicked
         {
             DropObjectAtMousePosition(pheromone);
         }
-        else if (Input.GetMouseButtonDown(1))
+        else if (Input.GetKeyDown(KeyCode.W))
         { // Check if the right mouse button was clicked
             DropObjectAtMousePosition(colony);
+        } else if(Input.GetKeyDown(KeyCode.E)){
+            DropObjectAtMousePosition(checkpoint);
         }
     }
 

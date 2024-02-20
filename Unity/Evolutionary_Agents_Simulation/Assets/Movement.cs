@@ -9,19 +9,24 @@ public class Movement : MonoBehaviour
     public float spawnInterval;
     public float directionChangeInterval; // Time in seconds between direction changes
     public GameObject Pheromone;
+    public bool hasFood;
     private float[] pheromoneDistrubution;
     private FieldOfView fieldOfView;
+    private Memory memory;
     private State state;
     public float movementSpeed;
     private float nextChangeTime;
     
+    
    
     void Start()
     {   
+        hasFood = false;
         pheromoneDistrubution = new float[3];
         nextChangeTime = 0f;
         state = GetComponent<State>();
         fieldOfView = GetComponent<FieldOfView>();
+        memory = GetComponent<Memory>();
         StartCoroutine(SpawnObjectRoutine());
         transform.rotation = Quaternion.Euler(0,Random.Range(0,360),0);
     }
@@ -45,7 +50,7 @@ public class Movement : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(spawnInterval); // Wait for the specified interval
-            Instantiate(Pheromone, transform.position - transform.forward * 1f, Quaternion.identity); // Spawn the object at the agent's position
+            Instantiate(Pheromone, transform.position - transform.forward * 1f, Quaternion.Euler(90f,0f,0f)); // Spawn the object at the agent's position
         }
     }
 
@@ -60,6 +65,9 @@ public class Movement : MonoBehaviour
         nextChangeTime = Time.time + directionChangeInterval;   
     }
 
+    void ReturnHome(){
+        transform.LookAt(memory.positions.Pop());
+    }
     void RandomDirection()
     {   
         float randomAngle = Random.Range(-12f,12f);
@@ -87,9 +95,13 @@ public class Movement : MonoBehaviour
             case State.AntState.FollowingPheromones:
                 ACO();
                 break;
-            // case State.AntState.ReturningToColony:
-            //     //TODO: make a* algorithm for returning home
-            //     break;
+            case State.AntState.GetFood:
+                RotateTowardsFoodSource();
+                break;
+
+            case State.AntState.ReturningToColony:
+                ReturnHome();
+                break;
             default:
                 break;
         }
@@ -115,6 +127,10 @@ public class Movement : MonoBehaviour
         rotationChange = direction == 0 ? Quaternion.Euler(0, viewAngle/12, 0) : Quaternion.Euler(0, -viewAngle/12, 0);
         currentDirection = rotationChange * transform.forward;
         transform.rotation = Quaternion.LookRotation(currentDirection);
+    }
+
+    void RotateTowardsFoodSource(){
+        transform.LookAt(fieldOfView.foodSource.transform.position);
     }
 
     int getArea(float totalArea, float[] segments){

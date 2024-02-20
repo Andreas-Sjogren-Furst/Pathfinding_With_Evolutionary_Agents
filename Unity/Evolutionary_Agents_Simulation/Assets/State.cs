@@ -9,14 +9,17 @@ public class State : MonoBehaviour
     public enum AntState {
         Exploring,
         FollowingPheromones,
+        GetFood,
         ReturningToColony
     };
 
     public AntState currentState;
+    private FieldOfView fieldOfViewScript;
     private bool isChangingState;
     // Start is called before the first frame update
     void Start()
     {
+        fieldOfViewScript = gameObject.GetComponent<FieldOfView>();
         isChangingState = false;
         sigmoid = new Sigmoid();
         movement = GetComponent<Movement>();
@@ -35,6 +38,13 @@ public class State : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(fieldOfViewScript.locatedFood && !movement.hasFood){
+            currentState = AntState.GetFood;
+        }
+        else if(movement.hasFood){
+            currentState = AntState.ReturningToColony;
+            return;
+        }
         if(isChangingState) return;
         float randNumber = Random.Range(0f,1f);
         float sigmoidNumber = sigmoid.CalculateProbability(movement.pheromoneConcentration);

@@ -6,26 +6,31 @@ public class FieldOfView : MonoBehaviour
 {
     public float viewRadius;
     [Range(0, 360)] public float viewAngle;
-    public LayerMask targetMask; // Specify which layer the objects are on that you want to detect
     public LayerMask obstacleMask; // Layer mask for obstacles
-
-    public List<GameObject> leftAreaTargets = new List<GameObject>();
-    public List<GameObject> middleAreaTargets = new List<GameObject>();
-    public List<GameObject> rightAreaTargets = new List<GameObject>();
-
-    public Queue<List<GameObject>> targets = new Queue<List<GameObject>>();
+    public GameObject foodSource;
+    public List<GameObject> leftAreaTargets = new();
+    public List<GameObject> middleAreaTargets = new();
+    public List<GameObject> rightAreaTargets = new();
+    public bool locatedFood;
+    private LayerMask combinedMask;
+    private State state;
     void Start()
     {
-        StartCoroutine("FindTargetsWithDelay", 0.2f);
+        state = gameObject.GetComponent<State>();
+        combinedMask = LayerMask.GetMask("Pheromone") | LayerMask.GetMask("Checkpoint");
+        locatedFood = false;
+    }
+
+    void Update(){
+        if(state.currentState != State.AntState.ReturningToColony){
+            StartCoroutine(FindTargetsWithDelay(0.2f));
+        }
     }
 
     IEnumerator FindTargetsWithDelay(float delay)
     {
-        while (true)
-        {
-            yield return new WaitForSeconds(delay);
-            FindVisibleTargets();
-        }
+        yield return new WaitForSeconds(delay);
+        FindVisibleTargets();
     }
 
     void FindVisibleTargets()
@@ -33,8 +38,7 @@ public class FieldOfView : MonoBehaviour
         leftAreaTargets.Clear();
         middleAreaTargets.Clear();
         rightAreaTargets.Clear();
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
-
+        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, combinedMask);
         for (int i = 0; i < targetsInViewRadius.Length; i++)
         {
             GameObject targetGameObject = targetsInViewRadius[i].gameObject;
@@ -49,28 +53,24 @@ public class FieldOfView : MonoBehaviour
 
                 if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
                 {
-                    // Use cross product to determine if the target is to the left or right of the agent
-                    Vector3 crossProduct = Vector3.Cross(transform.forward, dirToTarget);
-                    float dotProduct = Vector3.Dot(crossProduct, transform.up);
-
-                    // Classify targets based on the angle and direction relative to the agent
-                    if (angleToTarget < viewAngle / 3)
-                    {
-                        // Middle section
-                        middleAreaTargets.Add(targetGameObject);
+                    if(targetGameObject.CompareTag("Checkpoint")){
+                        locatedFood = true;
+                        foodSource = targetGameObject;
                     }
-                    else
-                    {
-                        if (dotProduct < 0)
-                        {
-                            // Right section
-                            rightAreaTargets.Add(targetGameObject);
-                        }
-                        else
-                        {
-                            // Left section
-                            leftAreaTargets.Add(targetGameObject);
-                        }
+                    else if (targetGameObject.CompareTag("Pheromone")){
+                         // Use cross product to determine if the target is to the left or right of the agent
+                            Vector3 crossProduct = Vector3.Cross(transform.forward, dirToTarget);
+                            float dotProduct = Vector3.Dot(crossProduct, transform.up);
+
+                            // Classify targets based on the angle and direction relative to the agent
+                            if (angleToTarget < viewAngle / 3) {
+                                middleAreaTargets.Add(targetGameObject);
+                                continue;
+                            } 
+                            if(dotProduct < 0)
+                                rightAreaTargets.Add(targetGameObject);
+                            else
+                                leftAreaTargets.Add(targetGameObject);
                     }
                 }
             }
