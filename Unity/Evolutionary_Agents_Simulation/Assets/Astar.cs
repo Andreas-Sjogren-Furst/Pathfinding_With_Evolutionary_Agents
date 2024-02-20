@@ -5,9 +5,9 @@ using UnityEngine;
 public class NodeCell
 {
     public Vector2Int position;
-    public float gCost; // Cost from start to node
-    public float hCost; // Heuristic cost from node to end
-    public float fCost { get { return gCost + hCost; } } // Total cost
+    public int gCost; // Cost from start to node
+    public int hCost; // Heuristic cost from node to end
+    public int fCost { get { return gCost + hCost; } } // Total cost
     public NodeCell parent;
     public NodeCell(Vector2Int _position) { position = _position; }
 }
@@ -44,6 +44,7 @@ public class Astar
 
         while (openList.Count > 0)
         {
+            Debug.Log("OpenList: " + openList.Count);
             NodeCell currentNode = openList[0];
             for (int i = 1; i < openList.Count; i++)
             {
@@ -70,12 +71,13 @@ public class Astar
                 NodeCell neighbor = FindExistingNode(neighborPos, openList, closedList);
                 if (neighbor == null)
                 {
+                    //  Debug.Log("Creating new node at " + neighborPos + " from " + currentNode.position + " with gCost: " + currentNode.gCost + " and hCost: " + GetDistance(neighborPos, end) + " and fCost: " + (currentNode.gCost + GetDistance(neighborPos, end)) + " and parent: " + currentNode.position);
                     neighbor = new NodeCell(neighborPos);
                 }
 
                 if (closedList.Contains(neighbor)) continue;
 
-                float newCostToNeighbor = currentNode.gCost + GetDistance(currentNode.position, neighbor.position);
+                int newCostToNeighbor = currentNode.gCost + GetDistance(currentNode.position, neighbor.position);
                 if (newCostToNeighbor < neighbor.gCost || !openList.Contains(neighbor))
                 {
                     neighbor.gCost = newCostToNeighbor;
@@ -90,9 +92,9 @@ public class Astar
         return false;
     }
 
-    bool PositionIsValid(Vector2Int position, int[,] map)
+    bool PositionIsValid(Vector2Int position, int[,] map) // all 0s are walkable, 1s are walls, 2s are checkpoints (which are walkable.). 
     {
-        return position.x >= 0 && position.x < map.GetLength(0) && position.y >= 0 && position.y < map.GetLength(1) && map[position.x, position.y] == 0;
+        return position.x >= 0 && position.x < map.GetLength(0) && position.y >= 0 && position.y < map.GetLength(1) && (map[position.x, position.y] != 1);
     }
 
     NodeCell FindExistingNode(Vector2Int position, List<NodeCell> openList, HashSet<NodeCell> closedList)
@@ -110,14 +112,15 @@ public class Astar
         return null;
     }
 
-    float GetDistance(Vector2Int a, Vector2Int b)
+    int GetDistance(Vector2Int a, Vector2Int b)
     {
         int dx = Mathf.Abs(a.x - b.x);
         int dy = Mathf.Abs(a.y - b.y);
 
+
         if (dx > dy)
-            return 14 * dy + 10 * (dx - dy);
-        return 14 * dx + 10 * (dy - dx);
+            return (int)14 * dy + 10 * (dx - dy);
+        return (int)14 * dx + 10 * (dy - dx);
     }
 
 
