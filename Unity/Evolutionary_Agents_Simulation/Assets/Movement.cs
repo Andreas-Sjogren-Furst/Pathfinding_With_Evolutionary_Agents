@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
+using UnityEngine.Analytics;
+using UnityEngine.UIElements;
 
 public class Movement : MonoBehaviour
 {
@@ -16,11 +19,15 @@ public class Movement : MonoBehaviour
     private State state;
     public float movementSpeed;
     private float nextChangeTime;
+    private bool atTargetPosition;
+    private Vector3 targetPosition;
+    public float closeEnoughThreshold = 0.1f;
     
     
    
     void Start()
     {   
+        atTargetPosition = false;
         hasFood = false;
         pheromoneDistrubution = new float[3];
         nextChangeTime = 0f;
@@ -66,7 +73,23 @@ public class Movement : MonoBehaviour
     }
 
     void ReturnHome(){
-        transform.LookAt(memory.positions.Pop());
+       
+        if(atTargetPosition == false){
+            targetPosition = memory.positions.Pop();
+            atTargetPosition = true;
+        }
+        float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
+        if (distanceToTarget > closeEnoughThreshold)
+    {
+        Vector3 targetDirection = targetPosition - transform.position;
+        transform.rotation = Quaternion.LookRotation(targetDirection, Vector3.up);
+        // Consider adding movement towards the target here as well
+        } else {
+            if (memory.positions.Count > 0)
+            {
+            targetPosition = memory.positions.Pop();
+            }
+        }
     }
     void RandomDirection()
     {   
@@ -98,11 +121,8 @@ public class Movement : MonoBehaviour
             case State.AntState.GetFood:
                 RotateTowardsFoodSource();
                 break;
-
             case State.AntState.ReturningToColony:
                 ReturnHome();
-                break;
-            default:
                 break;
         }
     }

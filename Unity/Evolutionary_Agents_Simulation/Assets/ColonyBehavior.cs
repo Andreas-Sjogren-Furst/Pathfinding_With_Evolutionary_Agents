@@ -26,13 +26,17 @@ public class ColonyBehavior : MonoBehaviour
     }
     void OnTriggerEnter(Collider collider)
     {
+        GameObject gameObject = collider.gameObject;
     // Check if the object entering the trigger is an agent
-    if (collider.CompareTag("Ant"))
+    if (gameObject.CompareTag("Ant"))
     {
+        Debug.Log("collided");
         // Access the Agent script to check for resources
-        if (collider.gameObject.GetComponent<Movement>().hasFood)
+        if (gameObject.GetComponent<Movement>().hasFood)
         {
-            collider.gameObject.GetComponent<Movement>().hasFood = false;
+            Debug.Log("Ruturned food");
+            gameObject.GetComponent<Movement>().hasFood = false;
+            gameObject.GetComponent<Memory>().positions.Clear();
             resources++;
         }
     }

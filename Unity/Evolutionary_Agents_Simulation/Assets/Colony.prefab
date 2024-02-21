@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7964984725774354800}
   - component: {fileID: 7201495459628731544}
   - component: {fileID: 474203591406589644}
-  - component: {fileID: 890381742644227813}
   - component: {fileID: 2294545898719485718}
+  - component: {fileID: -1901749088035207984}
   m_Layer: 10
   m_Name: Colony
   m_TagString: Colony
@@ -85,8 +85,23 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &890381742644227813
-CapsuleCollider:
+--- !u!114 &2294545898719485718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5050800153701655147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 987925c655e3342259a3aad70c61cdd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Ant: {fileID: 8170326526364987173, guid: 4f9fe8b0533fb4e6986d9566735d987c, type: 3}
+  amountOfAnts: 1
+  resources: 0
+--- !u!65 &-1901749088035207984
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -103,23 +118,6 @@ CapsuleCollider:
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0000001, y: 2, z: 1.0000002}
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &2294545898719485718
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5050800153701655147}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 987925c655e3342259a3aad70c61cdd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Ant: {fileID: 8170326526364987173, guid: 4f9fe8b0533fb4e6986d9566735d987c, type: 3}
-  amountOfAnts: 1
-  resources: 0
