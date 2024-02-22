@@ -11,14 +11,20 @@ public class FieldOfView : MonoBehaviour
     public List<GameObject> leftAreaTargets = new();
     public List<GameObject> middleAreaTargets = new();
     public List<GameObject> rightAreaTargets = new();
-    public bool locatedFood;
+    public bool locatedFood, locatedHome;
     private LayerMask combinedMask;
+    public GameObject colony;
     private State state;
+    private Movement movement;
+    private Memory memory;
     void Start()
     {
+        memory = gameObject.GetComponent<Memory>();
+        movement = gameObject.GetComponent<Movement>();
         state = gameObject.GetComponent<State>();
         combinedMask = LayerMask.GetMask("Pheromone") | LayerMask.GetMask("Checkpoint");
         locatedFood = false;
+        locatedHome = false;
     }
 
     void Update(){
@@ -56,6 +62,11 @@ public class FieldOfView : MonoBehaviour
                     if(targetGameObject.CompareTag("Checkpoint")){
                         locatedFood = true;
                         foodSource = targetGameObject;
+                    }
+                    else if(targetGameObject.CompareTag("Colony") && movement.hasFood){
+                        locatedHome = true;
+                        colony = targetGameObject;
+                        memory.positions.Clear();
                     }
                     else if (targetGameObject.CompareTag("Pheromone")){
                          // Use cross product to determine if the target is to the left or right of the agent

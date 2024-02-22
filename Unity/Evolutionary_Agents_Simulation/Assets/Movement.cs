@@ -12,7 +12,7 @@ public class Movement : MonoBehaviour
     public float spawnInterval;
     public float directionChangeInterval; // Time in seconds between direction changes
     public GameObject Pheromone;
-    public bool hasFood;
+    public bool hasFood, isHome;
     private float[] pheromoneDistrubution;
     private FieldOfView fieldOfView;
     private Memory memory;
@@ -21,7 +21,7 @@ public class Movement : MonoBehaviour
     private float nextChangeTime;
     private bool atTargetPosition;
     private Vector3 targetPosition;
-    public float closeEnoughThreshold = 0.1f;
+    public float closeEnoughThreshold = 0.5f;
     
     
    
@@ -29,6 +29,7 @@ public class Movement : MonoBehaviour
     {   
         atTargetPosition = false;
         hasFood = false;
+        isHome = false;
         pheromoneDistrubution = new float[3];
         nextChangeTime = 0f;
         state = GetComponent<State>();
@@ -44,6 +45,7 @@ public class Movement : MonoBehaviour
         if (Time.time >= nextChangeTime){
             SensePheromones();
             CalculatePheromoneConcentration();
+            memory.UpdateMemory();
             ChangeDirection();
             UpdateTime();
         }
@@ -75,7 +77,8 @@ public class Movement : MonoBehaviour
     void ReturnHome(){
        
         if(atTargetPosition == false){
-            targetPosition = memory.positions.Pop();
+            targetPosition = memory.positions[memory.positions.Count - 1];
+            memory.positions.RemoveAt(memory.positions.Count - 1);
             atTargetPosition = true;
         }
         float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
@@ -87,7 +90,11 @@ public class Movement : MonoBehaviour
         } else {
             if (memory.positions.Count > 0)
             {
-            targetPosition = memory.positions.Pop();
+                targetPosition = memory.positions[memory.positions.Count - 1];
+                memory.positions.RemoveAt(memory.positions.Count - 1);
+            } else{
+                isHome = true;
+                memory.positions.Clear();
             }
         }
     }
@@ -121,6 +128,9 @@ public class Movement : MonoBehaviour
             case State.AntState.GetFood:
                 RotateTowardsFoodSource();
                 break;
+            case State.AntState.ReturnFood:
+                RotateTowardsColony();
+                break;
             case State.AntState.ReturningToColony:
                 ReturnHome();
                 break;
@@ -150,7 +160,24 @@ public class Movement : MonoBehaviour
     }
 
     void RotateTowardsFoodSource(){
-        transform.LookAt(fieldOfView.foodSource.transform.position);
+        float threshold = 1f;
+        Vector3 position = fieldOfView.foodSource.transform.position;
+        float distance = Vector3.Distance(transform.position, position);
+        if(distance < threshold){
+            hasFood = true;
+        } transform.LookAt(position);
+    }
+
+    void RotateTowardsColony(){
+        float threshold = 1f;
+        Vector3 position = fieldOfView.colony.transform.position;
+        float distance = Vector3.Distance(transform.position, position);
+        if(distance < threshold){
+            isHome = true;
+            fieldOfView.colony.GetComponent<ColonyBehavior>().resources++;
+            hasFood = false;
+            gameObject.GetComponent<Memory>().positions.Clear();
+        } transform.LookAt(position);
     }
 
     int getArea(float totalArea, float[] segments){
@@ -178,5 +205,4 @@ public class Movement : MonoBehaviour
                     value += pheromone.GetComponent<pheromoneBehavior>().alpha; 
             } return value;
     }
-
 }

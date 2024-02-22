@@ -16,14 +16,4 @@ public class CheckPointBehavior : MonoBehaviour
         
     }
 
-    void OnTriggerEnter(Collider collider)
-    {
-    // Check if the object entering the trigger is an agent
-    if (collider.CompareTag("Ant"))
-    {
-        Debug.Log("has entered the source");
-        collider.gameObject.GetComponent<Movement>().hasFood = true;
-        collider.gameObject.GetComponent<FieldOfView>().locatedFood = false;
-    }
-    }
 }
