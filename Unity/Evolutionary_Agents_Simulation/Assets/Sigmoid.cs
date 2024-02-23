@@ -6,7 +6,6 @@ public class Sigmoid
 {   
     public float steepness = 4f;
     public float xShift = 1f;
-
     public bool isActive = true;
     
     public float CalculateProbability(float x){

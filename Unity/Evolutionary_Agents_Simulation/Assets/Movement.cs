@@ -12,24 +12,30 @@ public class Movement : MonoBehaviour
     public float spawnInterval;
     public float directionChangeInterval; // Time in seconds between direction changes
     public GameObject Pheromone;
-    public bool hasFood, isHome;
+    public bool hasFood;
+    public float closeEnoughThreshold;
+    public float movementSpeed;
+    
     private float[] pheromoneDistrubution;
     private FieldOfView fieldOfView;
     private Memory memory;
     private State state;
-    public float movementSpeed;
     private float nextChangeTime;
-    private bool atTargetPosition;
-    private Vector3 targetPosition;
-    public float closeEnoughThreshold = 0.5f;
+    private Vector3? targetPosition;
+    private Vector3 startPosition;
+    private float totalDistance;
+
+
     
     
    
     void Start()
     {   
-        atTargetPosition = false;
+        targetPosition = null;
+        closeEnoughThreshold = 0.5f;
+        totalDistance = 0f;
+        startPosition = transform.position;
         hasFood = false;
-        isHome = false;
         pheromoneDistrubution = new float[3];
         nextChangeTime = 0f;
         state = GetComponent<State>();
@@ -45,7 +51,7 @@ public class Movement : MonoBehaviour
         if (Time.time >= nextChangeTime){
             SensePheromones();
             CalculatePheromoneConcentration();
-            memory.UpdateMemory();
+            UpdateTotalDistance();
             ChangeDirection();
             UpdateTime();
         }
@@ -53,13 +59,26 @@ public class Movement : MonoBehaviour
         MoveObject();
     }
 
+    public float GetTotalDistance(){
+        return totalDistance;
+    }
+    void UpdateTotalDistance(){
+        // Calculate the distance moved since the last frame
+        float distanceMoved = Vector3.Distance(transform.position, startPosition);
+        startPosition = transform.position;
+        totalDistance += distanceMoved;
+        // Update the total distance moved and the distance since the last threshold
+    }
+    public void ResetTotalDistance(){
+        totalDistance = 0f;
+    }
     private IEnumerator SpawnObjectRoutine()
     {
         // Infinite loop to spawn objects at intervals
         while (true)
         {
             yield return new WaitForSeconds(spawnInterval); // Wait for the specified interval
-            Instantiate(Pheromone, transform.position - transform.forward * 1f, Quaternion.Euler(90f,0f,0f)); // Spawn the object at the agent's position
+            Instantiate(Pheromone, transform.position - transform.forward, Quaternion.Euler(90f,0f,0f)); // Spawn the object at the agent's position
         }
     }
 
@@ -74,30 +93,31 @@ public class Movement : MonoBehaviour
         nextChangeTime = Time.time + directionChangeInterval;   
     }
 
-    void ReturnHome(){
-       
-        if(atTargetPosition == false){
-            targetPosition = memory.positions[memory.positions.Count - 1];
-            memory.positions.RemoveAt(memory.positions.Count - 1);
-            atTargetPosition = true;
-        }
-        float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
-        if (distanceToTarget > closeEnoughThreshold)
-    {
-        Vector3 targetDirection = targetPosition - transform.position;
-        transform.rotation = Quaternion.LookRotation(targetDirection, Vector3.up);
-        // Consider adding movement towards the target here as well
-        } else {
-            if (memory.positions.Count > 0)
-            {
-                targetPosition = memory.positions[memory.positions.Count - 1];
-                memory.positions.RemoveAt(memory.positions.Count - 1);
-            } else{
-                isHome = true;
-                memory.positions.Clear();
-            }
-        }
+    void AtHome(){
+        targetPosition = null;
+        hasFood = false;
     }
+
+    void ReturnHome(){
+    
+        if(targetPosition == null) targetPosition = memory.positions.Pop();
+
+        float distanceToTarget = Vector3.Distance(transform.position, (Vector3)targetPosition);
+
+        if (distanceToTarget > closeEnoughThreshold) {
+            Vector3 targetDirection = (Vector3)targetPosition - transform.position;
+            transform.rotation = Quaternion.LookRotation(targetDirection, Vector3.up);
+
+        } else {
+            if (memory.positions.Count > 0) 
+                targetPosition = memory.positions.Pop();
+            else 
+                AtHome();
+          }
+    }
+
+
+
     void RandomDirection()
     {   
         float randomAngle = Random.Range(-12f,12f);
@@ -127,9 +147,6 @@ public class Movement : MonoBehaviour
                 break;
             case State.AntState.GetFood:
                 RotateTowardsFoodSource();
-                break;
-            case State.AntState.ReturnFood:
-                RotateTowardsColony();
                 break;
             case State.AntState.ReturningToColony:
                 ReturnHome();
@@ -165,18 +182,6 @@ public class Movement : MonoBehaviour
         float distance = Vector3.Distance(transform.position, position);
         if(distance < threshold){
             hasFood = true;
-        } transform.LookAt(position);
-    }
-
-    void RotateTowardsColony(){
-        float threshold = 1f;
-        Vector3 position = fieldOfView.colony.transform.position;
-        float distance = Vector3.Distance(transform.position, position);
-        if(distance < threshold){
-            isHome = true;
-            fieldOfView.colony.GetComponent<ColonyBehavior>().resources++;
-            hasFood = false;
-            gameObject.GetComponent<Memory>().positions.Clear();
         } transform.LookAt(position);
     }
 

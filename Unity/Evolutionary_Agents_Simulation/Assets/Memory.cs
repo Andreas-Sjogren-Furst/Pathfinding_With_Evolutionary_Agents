@@ -1,26 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Memory : MonoBehaviour
 {
-    public List<Vector3> positions;
+    public Stack<Vector3> positions;
     private State state;
-    public float updateMemory;
-    private Coroutine updateMemoryCoroutine = null; // Reference to the coroutine
-    public bool shouldUpdateMemory = true; // Control variable
-
+    private Movement movement;
+    public float distanceThreshold = 2f;
+    
     void Start()
     {
+        movement = gameObject.GetComponent<Movement>();
         state = gameObject.GetComponent<State>();
         positions = new();
     }
 
-    public void UpdateMemory(){
-        if(state.currentState == State.AntState.Exploring || state.currentState == State.AntState.FollowingPheromones){
-            positions.Add(transform.position);
-        } else{
-            positions.Clear();
-        }
+    void Update(){
+        if(state.currentState != State.AntState.ReturningToColony){
+            if(movement.GetTotalDistance() > distanceThreshold){
+                positions.Push(transform.position);
+                movement.ResetTotalDistance();
+            }
+        } 
     }
 }

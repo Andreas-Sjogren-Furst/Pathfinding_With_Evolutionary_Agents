@@ -16,12 +16,6 @@ public class pheromoneBehavior : MonoBehaviour
         StartCoroutine(FadeOutRoutine());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private IEnumerator FadeOutRoutine()
     {
         Material mat = GetComponent<Renderer>().material;

@@ -10,7 +10,6 @@ public class State : MonoBehaviour
         Exploring,
         FollowingPheromones,
         GetFood,
-        ReturnFood,
         ReturningToColony
     };
 
@@ -31,24 +30,19 @@ public class State : MonoBehaviour
         float randNumber = Random.Range(0f,1f);
         float sigmoidNumber = sigmoid.CalculateProbability(movement.pheromoneConcentration);
         //TODO make distance logic
-        if(fieldOfViewScript.locatedFood && !movement.hasFood && !movement.isHome){
+        if(fieldOfViewScript.locatedFood && !movement.hasFood){
             currentState = AntState.GetFood;
-        } else if(fieldOfViewScript.locatedHome && movement.hasFood && !movement.isHome){
-            currentState = AntState.ReturnFood;
         }
-        else if(movement.hasFood && !movement.isHome && !fieldOfViewScript.locatedHome){
+        else if(movement.hasFood){
             currentState = AntState.ReturningToColony;
             fieldOfViewScript.locatedFood = false;
         } 
         else 
             {
-            movement.isHome = false;
-            movement.hasFood = false;
             if(randNumber <= sigmoidNumber)
                 currentState = AntState.FollowingPheromones;
             else 
-                currentState = AntState.Exploring;
-                
+                currentState = AntState.Exploring;   
             }
     }
 }

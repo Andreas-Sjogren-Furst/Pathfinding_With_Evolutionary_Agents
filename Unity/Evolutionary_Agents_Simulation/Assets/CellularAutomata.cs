@@ -47,8 +47,6 @@ public class CellularAutomata : MonoBehaviour
     private int lastCheckPointSpacing;
     private int lastErosionLimit;
     private int lastRandomSeed; // Track the last seed used
-
-
     private List<Vector3> lastColonyCoordinates;
 
 
