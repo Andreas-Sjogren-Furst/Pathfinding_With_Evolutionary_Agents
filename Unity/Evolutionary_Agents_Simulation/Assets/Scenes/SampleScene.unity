@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 178090569}
   - component: {fileID: 178090568}
   - component: {fileID: 178090567}
+  - component: {fileID: 178090571}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -158,6 +159,8 @@ MonoBehaviour:
   colony: {fileID: 5050800153701655147, guid: e2fabd3032cec485c9f6bbb196954683, type: 3}
   checkpoint: {fileID: 553771973272868134, guid: 82a68e9ad2bea4dd38ac3c5ad6065c72, type: 3}
   colonyPositions: []
+  colonies: []
+  checkpoints: []
 --- !u!81 &178090568
 AudioListener:
   m_ObjectHideFlags: 0
@@ -232,6 +235,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &178090571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 178090566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a740c765b218a4e4c96e56490d2420d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collectData: 0
 --- !u!1 &310619917
 GameObject:
   m_ObjectHideFlags: 0

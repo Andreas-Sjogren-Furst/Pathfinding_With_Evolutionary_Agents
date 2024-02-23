@@ -82,3 +82,5 @@ Unity/.DS_Store
 # Ignore temporaries from GameCI
 /[Aa]rtifacts/
 /[Cc]odeCoverage/
+
+/Unity/Evolutionary_Agents_Simulation/build_1
