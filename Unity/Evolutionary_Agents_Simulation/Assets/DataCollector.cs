@@ -77,7 +77,7 @@ public class DataCollector : MonoBehaviour
         string path = Path.Combine(Application.persistentDataPath, "data_" + System.DateTime.Now.ToString("yyyy-dd-MM_HH-mm-ss") + ".json");
         File.WriteAllText(path, jsonData);
 
-        Debug.Log($"Data exported to {path}");
+            Debug.Log($"Data exported to {path}");
 
 
 

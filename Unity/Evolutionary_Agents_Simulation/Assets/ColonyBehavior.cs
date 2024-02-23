@@ -30,4 +30,9 @@ public class ColonyBehavior : MonoBehaviour
             counter++;
         }
     }
+
+    internal List<GameObject> GetAnts()
+    {
+        return ants;
+    }
 }
