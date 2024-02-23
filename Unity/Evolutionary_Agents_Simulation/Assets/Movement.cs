@@ -22,11 +22,13 @@ public class Movement : MonoBehaviour
     private bool atTargetPosition;
     private Vector3 targetPosition;
     public float closeEnoughThreshold = 0.1f;
-    
-    
-   
+
+    private int totalSteps;
+
+
+
     void Start()
-    {   
+    {
         atTargetPosition = false;
         hasFood = false;
         pheromoneDistrubution = new float[3];
@@ -35,13 +37,14 @@ public class Movement : MonoBehaviour
         fieldOfView = GetComponent<FieldOfView>();
         memory = GetComponent<Memory>();
         StartCoroutine(SpawnObjectRoutine());
-        transform.rotation = Quaternion.Euler(0,Random.Range(0,360),0);
+        transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
     }
 
     void Update()
     {
         // Check if it's time to change the movement direction
-        if (Time.time >= nextChangeTime){
+        if (Time.time >= nextChangeTime)
+        {
             SensePheromones();
             CalculatePheromoneConcentration();
             ChangeDirection();
@@ -57,11 +60,12 @@ public class Movement : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(spawnInterval); // Wait for the specified interval
-            Instantiate(Pheromone, transform.position - transform.forward * 1f, Quaternion.Euler(90f,0f,0f)); // Spawn the object at the agent's position
+            Instantiate(Pheromone, transform.position - transform.forward * 1f, Quaternion.Euler(90f, 0f, 0f)); // Spawn the object at the agent's position
         }
     }
 
-    void UpdateTime(){
+    void UpdateTime()
+    {
         nextChangeTime = Time.time + directionChangeInterval;
     }
 
@@ -69,31 +73,35 @@ public class Movement : MonoBehaviour
     {
         Vector3 contactNormal = collision.GetContact(0).normal;
         transform.rotation = Quaternion.LookRotation(contactNormal);
-        nextChangeTime = Time.time + directionChangeInterval;   
+        nextChangeTime = Time.time + directionChangeInterval;
     }
 
-    void ReturnHome(){
-       
-        if(atTargetPosition == false){
+    void ReturnHome()
+    {
+
+        if (atTargetPosition == false)
+        {
             targetPosition = memory.positions.Pop();
             atTargetPosition = true;
         }
         float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
         if (distanceToTarget > closeEnoughThreshold)
-    {
-        Vector3 targetDirection = targetPosition - transform.position;
-        transform.rotation = Quaternion.LookRotation(targetDirection, Vector3.up);
-        // Consider adding movement towards the target here as well
-        } else {
+        {
+            Vector3 targetDirection = targetPosition - transform.position;
+            transform.rotation = Quaternion.LookRotation(targetDirection, Vector3.up);
+            // Consider adding movement towards the target here as well
+        }
+        else
+        {
             if (memory.positions.Count > 0)
             {
-            targetPosition = memory.positions.Pop();
+                targetPosition = memory.positions.Pop();
             }
         }
     }
     void RandomDirection()
-    {   
-        float randomAngle = Random.Range(-12f,12f);
+    {
+        float randomAngle = Random.Range(-12f, 12f);
 
         // Apply the angle to the current rotation around the Y axis
         Quaternion rotationChange = Quaternion.Euler(0, randomAngle, 0);
@@ -107,11 +115,17 @@ public class Movement : MonoBehaviour
 
     void MoveObject()
     {
+
+        totalSteps++;
+        // Debug.Log("Total steps: " + totalSteps);
+
         transform.position += transform.forward * (Time.deltaTime * movementSpeed);
     }
 
-    void ChangeDirection() {
-        switch(state.currentState){
+    void ChangeDirection()
+    {
+        switch (state.currentState)
+        {
             case State.AntState.Exploring:
                 RandomDirection();
                 break;
@@ -127,56 +141,80 @@ public class Movement : MonoBehaviour
         }
     }
 
-    void SensePheromones(){
+    void SensePheromones()
+    {
         pheromoneDistrubution[0] = CalculativeCumulativeArea(fieldOfView.leftAreaTargets);
         pheromoneDistrubution[1] = CalculativeCumulativeArea(fieldOfView.middleAreaTargets);
         pheromoneDistrubution[2] = CalculativeCumulativeArea(fieldOfView.rightAreaTargets);
     }
-    void CalculatePheromoneConcentration(){
-        pheromoneConcentration = pheromoneDistrubution[0] + pheromoneDistrubution[1] + pheromoneDistrubution[2]; 
+    void CalculatePheromoneConcentration()
+    {
+        pheromoneConcentration = pheromoneDistrubution[0] + pheromoneDistrubution[1] + pheromoneDistrubution[2];
     }
-    void ACO(){
+    void ACO()
+    {
         Quaternion rotationChange;
         Vector3 currentDirection;
         float viewAngle = fieldOfView.viewAngle;
-        if(pheromoneConcentration == 0f) return;
-        for(int i = 1; i < pheromoneDistrubution.Length; i++){ 
-            pheromoneDistrubution[i] += pheromoneDistrubution[i-1];
-        } int direction = getArea(pheromoneConcentration, pheromoneDistrubution);
-        if(direction == 1) return;
-        rotationChange = direction == 0 ? Quaternion.Euler(0, viewAngle/12, 0) : Quaternion.Euler(0, -viewAngle/12, 0);
+        if (pheromoneConcentration == 0f) return;
+        for (int i = 1; i < pheromoneDistrubution.Length; i++)
+        {
+            pheromoneDistrubution[i] += pheromoneDistrubution[i - 1];
+        }
+        int direction = getArea(pheromoneConcentration, pheromoneDistrubution);
+        if (direction == 1) return;
+        rotationChange = direction == 0 ? Quaternion.Euler(0, viewAngle / 12, 0) : Quaternion.Euler(0, -viewAngle / 12, 0);
         currentDirection = rotationChange * transform.forward;
         transform.rotation = Quaternion.LookRotation(currentDirection);
     }
 
-    void RotateTowardsFoodSource(){
+    void RotateTowardsFoodSource()
+    {
         transform.LookAt(fieldOfView.foodSource.transform.position);
     }
 
-    int getArea(float totalArea, float[] segments){
+    int getArea(float totalArea, float[] segments)
+    {
         // Generate a random number between 0 (inclusive) and totalarea (exclusive)
         float randomNumber = Random.Range(0, totalArea);
         // Determine which segment the randomNumber falls into
         for (int i = 0; i < segments.Length; i++)
         {
-            if(i == 0){
-                if(randomNumber <= segments[i])
-                return i;
-            } else {
-                if(randomNumber >= segments[i - 1] && randomNumber <= segments[i]){
+            if (i == 0)
+            {
+                if (randomNumber <= segments[i])
+                    return i;
+            }
+            else
+            {
+                if (randomNumber >= segments[i - 1] && randomNumber <= segments[i])
+                {
                     return i;
                 }
             }
-        } return -1;
+        }
+        return -1;
     }
 
-    float CalculativeCumulativeArea(List<GameObject> pheromones){
+    float CalculativeCumulativeArea(List<GameObject> pheromones)
+    {
         float value = 0f;
-        if(pheromones.Count == 0) return value;
-        foreach(GameObject pheromone in pheromones){
-                if(pheromone != null)
-                    value += pheromone.GetComponent<pheromoneBehavior>().alpha; 
-            } return value;
+        if (pheromones.Count == 0) return value;
+        foreach (GameObject pheromone in pheromones)
+        {
+            if (pheromone != null)
+                value += pheromone.GetComponent<pheromoneBehavior>().alpha;
+        }
+        return value;
     }
+
+    public int GetTotalSteps()
+    {
+        return totalSteps;
+    }
+
+
+
+
 
 }

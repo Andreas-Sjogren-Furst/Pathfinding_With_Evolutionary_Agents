@@ -98,8 +98,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Ant: {fileID: 8170326526364987173, guid: 4f9fe8b0533fb4e6986d9566735d987c, type: 3}
-  amountOfAnts: 1
-  resources: 0
+  amountOfAnts: 5
+  resources: 1
+  ants: []
 --- !u!65 &-1901749088035207984
 BoxCollider:
   m_ObjectHideFlags: 0

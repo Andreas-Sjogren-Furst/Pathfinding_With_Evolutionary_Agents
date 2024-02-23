@@ -37,7 +37,7 @@ public class Memory : MonoBehaviour
         {
             yield return new WaitForSeconds(delay);
             positions.Push(transform.position);
-            Debug.Log("has pushed position");
+            //  Debug.Log("has pushed position");
         }
     }
 }

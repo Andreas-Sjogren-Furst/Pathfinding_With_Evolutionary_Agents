@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Serialization;
@@ -10,6 +11,10 @@ public class ObjectDropper : MonoBehaviour
     public GameObject colony;
     public GameObject checkpoint;
     public List<Vector3> colonyPositions;
+
+    public List<GameObject> colonies;
+
+    public List<GameObject> checkpoints;
     // Assign your prefab in the Inspector
     private Camera cam;
     private Ray ray;
@@ -20,15 +25,20 @@ public class ObjectDropper : MonoBehaviour
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q)) // Check if the left mouse button was clicked
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             DropObjectAtMousePosition(pheromone);
         }
         else if (Input.GetKeyDown(KeyCode.W))
-        { // Check if the right mouse button was clicked
+        {
             DropObjectAtMousePosition(colony);
-        } else if(Input.GetKeyDown(KeyCode.E)){
+
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
             DropObjectAtMousePosition(checkpoint);
+            // add checkpoint reference. 
+
         }
     }
 
@@ -39,7 +49,28 @@ public class ObjectDropper : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit)) // Check if the ray hits something
         {
             colonyPositions.Add(hit.point);
-            Instantiate(gameObject, hit.point + new Vector3(0,0.5f,0), Quaternion.identity); // Instantiate the object at the hit position
+            GameObject instantiatedObject = Instantiate(gameObject, hit.point + new Vector3(0, 0.5f, 0), Quaternion.identity); // Instantiate the object at the hit position
+
+            if (gameObject == colony)
+            {
+                colonies.Add(instantiatedObject); // Add the instantiated colony to the list
+            }
+            else if (gameObject == checkpoint)
+            {
+                checkpoints.Add(instantiatedObject); // Add the instantiated colony to the list
+            }
         }
+    }
+
+    internal List<GameObject> GetColonies()
+    {
+
+        return colonies;
+    }
+
+    internal List<GameObject> GetCheckpoints()
+    {
+        return checkpoints;
+
     }
 }
