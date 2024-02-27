@@ -12,14 +12,10 @@ public class FieldOfView : MonoBehaviour
     public List<GameObject> middleAreaTargets = new();
     public List<GameObject> rightAreaTargets = new();
     public bool locatedFood;
-    private LayerMask combinedMask;
     private State state;
-
     void Start()
     {
         state = gameObject.GetComponent<State>();
-        combinedMask = LayerMask.GetMask("Pheromone") | LayerMask.GetMask("Checkpoint");
-        locatedFood = false;
     }
 
     void Update(){
@@ -36,6 +32,7 @@ public class FieldOfView : MonoBehaviour
 
     void FindVisibleTargets()
     {
+        LayerMask combinedMask = LayerMask.GetMask("Pheromone") | LayerMask.GetMask("Checkpoint");
         leftAreaTargets.Clear();
         middleAreaTargets.Clear();
         rightAreaTargets.Clear();

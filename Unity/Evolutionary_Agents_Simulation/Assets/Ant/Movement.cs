@@ -192,27 +192,26 @@ public class Movement : MonoBehaviour
         } transform.LookAt(position);
     }
 
-    int getArea(float totalArea, float[] segments)
+    int getArea(float totalArea, float[] fieldOfViewSegments)
     {
         // Generate a random number between 0 (inclusive) and totalarea (exclusive)
         float randomNumber = Random.Range(0, totalArea);
         // Determine which segment the randomNumber falls into
-        for (int i = 0; i < segments.Length; i++)
+        for (int i = 0; i < fieldOfViewSegments.Length; i++)
         {
             if (i == 0)
             {
-                if (randomNumber <= segments[i])
+                if (randomNumber <= fieldOfViewSegments[i])
                     return i;
             }
             else
             {
-                if (randomNumber >= segments[i - 1] && randomNumber <= segments[i])
+                if (randomNumber >= fieldOfViewSegments[i - 1] && randomNumber <= fieldOfViewSegments[i])
                 {
                     return i;
                 }
             }
-        }
-        return -1;
+        } throw new System.ArgumentException("Number is out of range");
     }
 
     float CalculativeCumulativeArea(List<GameObject> pheromones)
