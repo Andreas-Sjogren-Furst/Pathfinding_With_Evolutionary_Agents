@@ -2,9 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MemoryController : MonoBehaviour
+public class MemoryController
 {
-    public void UpdateMemory(Memory memory){}
+    private AntData antData;
+
+    MemoryController(AntData antData){
+        this.antData = antData;
+    }
+    public void UpdateMemory(Memory memory, Vector3 currentPosition){
+        antData.memoryPositions.Push(currentPosition);
+    }
     public void ReturnToLastPosition(Memory memory){}
     
 }

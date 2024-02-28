@@ -3,7 +3,7 @@ using UnityEngine;
 public abstract class Distrubution
 {
    
-    public static int Normal(float maxValue, float[] fieldOfViewSegments){
+    public static int Uniform(float maxValue, float[] fieldOfViewSegments){
         // Generate a random number between 0 (inclusive) and totalarea (exclusive)
         float randomNumber = Random.Range(0, maxValue);
         // Determine which segment the randomNumber falls into

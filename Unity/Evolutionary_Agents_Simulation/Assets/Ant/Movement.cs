@@ -185,7 +185,7 @@ public class Movement : MonoBehaviour
 
     void RotateTowardsFoodSource(){
         float threshold = 1f;
-        Vector3 position = fieldOfView.foodSource.transform.position;
+        Vector3 position = fieldOfView.foodSourcePosition;
         float distance = Vector3.Distance(transform.position, position);
         if(distance < threshold){
             hasFood = true;

@@ -7,6 +7,7 @@ public abstract class AntData : ScriptableObject
 {
     // Pheromone Data
     public float pheromoneConcentration;
+    public float alpha;
     [Range(0,45)] public float evaporationConstant;
     [Range(0,20)] public float dropPheromoneInterval;
 
@@ -22,8 +23,12 @@ public abstract class AntData : ScriptableObject
     public List<GameObject> middleAreaTargets = new();
     public List<GameObject> rightAreaTargets = new();
     public bool locatedFood;
+    public Vector3 foodSourcePosition;
 
     // Memory Data
     public Stack<Vector3> memoryPositions = new();
+
+    //State data
+    public State.AntState currentState;
     
 }
