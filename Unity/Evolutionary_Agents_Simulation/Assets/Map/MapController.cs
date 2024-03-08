@@ -5,7 +5,7 @@ using UnityEngine;
 
 public abstract class MapController
 {
-    public void ClearMap(ref List<GameObject> spawnedObjects)
+    public static void ClearMap(ref List<GameObject> spawnedObjects)
     {
         foreach (GameObject obj in spawnedObjects)
         {
@@ -19,7 +19,7 @@ public abstract class MapController
                      GameObject CheckPoint, Vector3 currentTransformPosition, List<Vector3> antSpawnerWorldPositions, MapModel mapModel)
     {
         mapModel.mapTileAmount = mapModel.mapSize / mapModel.TileSize;
-        int[,] Map = init2dMap(mapModel.mapSize, mapModel.TileSize, mapModel.Density, mapModel.CellularIterations, mapModel.NumberOfCheckPoints, antSpawnerWorldPositions, mapModel.ErosionLimit, mapModel.CheckPointSpacing, currentTransformPosition);
+        int[,] Map = init2dMap(mapModel.mapSize, mapModel.TileSize, mapModel.Density, mapModel.CellularIterations, mapModel.NumberOfCheckPoints, antSpawnerWorldPositions, mapModel.ErosionLimit, mapModel.CheckPointSpacing, currentTransformPosition, mapModel.mapTileAmount);
         for (int i = 0; i < mapModel.mapTileAmount; i++)
         {
             for (int j = 0; j < mapModel.mapTileAmount; j++)
@@ -47,16 +47,16 @@ public abstract class MapController
 
 
 
-    int[,] init2dMap(int MapSize, int tileSize, float density, int iterations, int numberOfCheckPoints,
-                    List<Vector3> antSpawnerWorldPositions, int erosionLimit, int checkPointSpacing, Vector3 currentTransformPosition)
+    static int[,] init2dMap(int MapSize, int tileSize, float density, int iterations, int numberOfCheckPoints,
+                    List<Vector3> antSpawnerWorldPositions, int erosionLimit, int checkPointSpacing, Vector3 currentTransformPosition, int mapTileAmount)
     {
-        mapModel.mapTileAmount = MapSize / tileSize;
-        int[,] Map = new int[mapModel.mapTileAmount, mapModel.mapTileAmount];
+        mapTileAmount = MapSize / tileSize;
+        int[,] Map = new int[mapTileAmount, mapTileAmount];
         Map = generateCheckpoints(Map, numberOfCheckPoints);
         //      int[,] checkpointCoordinates = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
 
         Map = RemoveWallsFromRealWorldPosition(Map, antSpawnerWorldPositions, tileSize, 3, currentTransformPosition);
-        Map = generateNoise(Map, density, checkPointSpacing);
+        Map = generateNoise(Map, density, checkPointSpacing, mapTileAmount);
         Map = applyCellularAutomaton(Map, iterations, erosionLimit);
         checkIfpathExists(Map, numberOfCheckPoints);
 
@@ -64,7 +64,7 @@ public abstract class MapController
     }
 
 
-    Boolean FloorOrWall(int cell)
+    static Boolean FloorOrWall(int cell)
     {
 
         if (cell > 1)
@@ -77,12 +77,12 @@ public abstract class MapController
         }
     }
 
-    int[,] generateNoise(int[,] map, float density, int CheckPointSpacing)
+    static int[,] generateNoise(int[,] map, float density, int CheckPointSpacing, int mapTileAmount)
     {
 
-        for (int i = 0; i < mapModel.mapTileAmount; i++)
+        for (int i = 0; i < mapTileAmount; i++)
         {
-            for (int j = 0; j < mapModel.mapTileAmount; j++)
+            for (int j = 0; j < mapTileAmount; j++)
             {
 
                 if (FloorOrWall(map[i, j]))
@@ -97,9 +97,9 @@ public abstract class MapController
         List<(int, int)> cellsToExpand = new List<(int, int)>();
 
         // Identify cells that are not floor or wall
-        for (int i = 0; i < mapModel.mapTileAmount; i++)
+        for (int i = 0; i < mapTileAmount; i++)
         {
-            for (int j = 0; j < mapModel.mapTileAmount; j++)
+            for (int j = 0; j < mapTileAmount; j++)
             {
                 if (!FloorOrWall(map[i, j])) // If the cell is not a floor or wall
                 {
@@ -118,7 +118,7 @@ public abstract class MapController
                     int ni = i + di;
                     int nj = j + dj;
                     // Check bounds
-                    if (ni >= 0 && ni < mapModel.mapTileAmount && nj >= 0 && nj < mapModel.mapTileAmount)
+                    if (ni >= 0 && ni < mapTileAmount && nj >= 0 && nj < mapTileAmount)
                     {
                         // Calculate the distance from the center point using the Euclidean distance formula
                         double distance = Math.Sqrt(di * di + dj * dj);
@@ -143,7 +143,7 @@ public abstract class MapController
 
 
 
-    int[,] generateCheckpoints(int[,] grid, int numberOfCheckPoints)
+    static int[,] generateCheckpoints(int[,] grid, int numberOfCheckPoints)
     {
         //   int totalCells = (grid.GetLength(1) - 1) * (grid.GetLength(0) - 1);
         // Random checkpoint coordinates.
@@ -171,7 +171,7 @@ public abstract class MapController
 
     }
 
-    int[,] getObjectCoordinates(int[,] grid, int numberOfCheckPoints, int ObjectValue)
+    static int[,] getObjectCoordinates(int[,] grid, int numberOfCheckPoints, int ObjectValue)
     {
         int[,] CheckPointCoordinates = new int[numberOfCheckPoints, 2];
         int counter = 0;
@@ -194,7 +194,7 @@ public abstract class MapController
         return CheckPointCoordinates;
     }
 
-    Boolean checkIfpathExists(int[,] Map, int numberOfCheckPoints)
+    static Boolean checkIfpathExists(int[,] Map, int numberOfCheckPoints)
     {
 
         Astar aStar = new Astar();
@@ -302,7 +302,7 @@ public abstract class MapController
         return new Vector2Int(i, j);
     }
 
-    int[,] RemoveWallFromRealWorldPosition(int[,] grid, Vector3 antSpawnerWorldPosition, float tileSize, int ObjectValue, Vector3 currentTransformPosition)
+    static int[,] RemoveWallFromRealWorldPosition(int[,] grid, Vector3 antSpawnerWorldPosition, float tileSize, int ObjectValue, Vector3 currentTransformPosition)
     {
         // Calculate grid coordinates from antSpawnerWorldPosition
         int i = Mathf.FloorToInt((antSpawnerWorldPosition.x - currentTransformPosition.x) / tileSize);
@@ -322,7 +322,7 @@ public abstract class MapController
         return grid;
     }
 
-    int[,] RemoveWallsFromRealWorldPosition(int[,] grid, List<Vector3> antSpawnerWorldPositions, float tileSize, int ObjectValue, Vector3 currentTransformPosition)
+    static int[,] RemoveWallsFromRealWorldPosition(int[,] grid, List<Vector3> antSpawnerWorldPositions, float tileSize, int ObjectValue, Vector3 currentTransformPosition)
     {
         foreach (Vector3 antSpawnerWorldPosition in antSpawnerWorldPositions)
         {
@@ -332,7 +332,7 @@ public abstract class MapController
     }
 
 
-    int[,] applyCellularAutomaton(int[,] grid, int count, int erosionLimit)
+    static int[,] applyCellularAutomaton(int[,] grid, int count, int erosionLimit)
     {
         int width = grid.GetLength(1);
         int height = grid.GetLength(0);

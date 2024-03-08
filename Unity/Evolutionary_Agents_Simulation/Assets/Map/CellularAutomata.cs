@@ -7,7 +7,6 @@ using UnityEngine;
 public class CellularAutomata : MonoBehaviour
 {
 
-    Astar aStar = new Astar();
 
     public GameObject MapWall;
     public GameObject Plane;
@@ -41,7 +40,7 @@ public class CellularAutomata : MonoBehaviour
 
     void Start()
     {
-        mapModel = GetComponent<MapModel>();
+        mapModel = Resources.Load<MapModel>("MapModel");
 
         if (mapModel.MapNumber != 0)
         {
@@ -66,9 +65,9 @@ public class CellularAutomata : MonoBehaviour
         if (ParametersChanged())
         {
             Debug.Log("Paramters changed");
-            mapController.ClearMap(ref spawnedObjects);
+            MapController.ClearMap(ref spawnedObjects);
             InitializeParameters();
-            mapController.CreateMap(
+            MapController.CreateMap(
                 ref spawnedObjects, // ref parameter must be in the correct position
                 mapModel: mapModel,
                 MapWall: MapWall,
@@ -79,11 +78,13 @@ public class CellularAutomata : MonoBehaviour
         }
     }
 
-    public static void ViewDestroyObject(GameObject gameObject){
+    public static void ViewDestroyObject(GameObject gameObject)
+    {
         Destroy(gameObject);
     }
 
-    public static GameObject ViewInistiateObject(GameObject prefab, Vector3 position){
+    public static GameObject ViewInistiateObject(GameObject prefab, Vector3 position)
+    {
         return Instantiate(prefab, position, Quaternion.identity);
     }
     // Coroutine to move the pathVisualizer along the path
@@ -159,6 +160,14 @@ public class CellularAutomata : MonoBehaviour
 
     bool ParametersChanged()
     {
+        Debug.Log("Last density:" + lastDensity.ToString());
+
+        Debug.Log("map model: " + mapModel.Density.ToString());
+
+
+
+
+
         if (lastDensity != mapModel.Density ||
             lastNumberOfCheckPoints != mapModel.NumberOfCheckPoints ||
             lastTileSize != mapModel.TileSize ||

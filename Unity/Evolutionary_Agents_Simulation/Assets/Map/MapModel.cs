@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapModel : MonoBehaviour
+[CreateAssetMenu(fileName = "MapModel", menuName = "MapModel", order = 0)]
+public class MapModel : ScriptableObject
 {
     [Range(0, 20)]
     public int NumberOfCheckPoints;
@@ -22,7 +23,11 @@ public class MapModel : MonoBehaviour
     public int RandomSeed = 42; // Added seed for random number generator
 
     public int mapSize = 100;
-    public int mapTileAmount;
+    public int mapTileAmount
+    {
+        get { return mapSize / TileSize; }
+        set { mapTileAmount = value; }
+    }
 
     public List<Vector3> ColonyCoordinates;
 
