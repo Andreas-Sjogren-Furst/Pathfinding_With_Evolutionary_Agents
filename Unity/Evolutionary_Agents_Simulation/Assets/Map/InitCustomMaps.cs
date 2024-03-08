@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-public class InitCustomMaps
+public static class InitCustomMaps
 {
-    private Dictionary<string, int> InitializePreDefinedParameters(int mapNumber)
+    private static Dictionary<string, int> InitializePreDefinedParameters(int mapNumber)
     {
         Dictionary<string, int> mapParameters = new Dictionary<string, int>();
 
@@ -111,7 +111,7 @@ public class InitCustomMaps
         return mapParameters;
     }
 
-    public Dictionary<string, int> GetMapParameters(int mapNumber)
+    public static Dictionary<string, int> GetMapParameters(int mapNumber)
     {
         return InitializePreDefinedParameters(mapNumber);
     }

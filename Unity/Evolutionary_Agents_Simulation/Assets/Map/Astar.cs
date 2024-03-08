@@ -32,9 +32,6 @@ public class NodeCell : IComparable<NodeCell>
 
 public class Astar
 {
-    public Vector2Int startCoordinate;
-    public Vector2Int endCoordinate;
-    public List<Vector2Int> ShortestPath = new List<Vector2Int>();
 
 
 
@@ -58,7 +55,7 @@ public class Astar
       //  new Vector2Int(1, 1)    // Top-Right
     };
 
-    public bool FindPath(Vector2Int start, Vector2Int end, int[,] map)
+    public List<Vector2Int> FindPath(Vector2Int start, Vector2Int end, int[,] map)
     {
         openList = new FibonacciHeapPriorityQueue<NodeCell>(SortDirection.Ascending); // TODO: change to Priority queue with fibonaci heap. 
         Dictionary<Vector2Int, NodeCell> openListLookup = new Dictionary<Vector2Int, NodeCell>();  // for constant time lookup
@@ -101,8 +98,8 @@ public class Astar
 
             if (currentNode.position == end) // N
             {
-                RetracePath(startNode, currentNode);
-                return true;
+
+                return RetracePath(startNode, currentNode); ;
             }
 
             foreach (Vector2Int direction in directions)  // 8
@@ -135,7 +132,7 @@ public class Astar
                 }
             }
         }
-        return false;
+        return null;
     }
 
     bool PositionIsValid(Vector2Int position, int[,] map) // all 0s are walkable, 1s are walls, 2s are checkpoints (which are walkable.). 
@@ -180,7 +177,7 @@ public class Astar
     }
 
 
-    void RetracePath(NodeCell startNode, NodeCell endNode)
+    List<Vector2Int> RetracePath(NodeCell startNode, NodeCell endNode)
     {
         List<Vector2Int> path = new List<Vector2Int>();
         NodeCell currentNode = endNode;
@@ -192,6 +189,6 @@ public class Astar
         }
         path.Add(startNode.position); // Ensure the start node is included in the path
         path.Reverse();
-        ShortestPath = path;
+        return path;
     }
 }
