@@ -36,13 +36,12 @@ public class CellularAutomata : MonoBehaviour
     private int lastRandomSeed; // Track the last seed used
     private List<Vector3> lastColonyCoordinates;
 
-    private MapController mapController = new MapController();
-
-    private MapModel mapModel = new MapModel();
+    private MapModel mapModel;
 
 
     void Start()
     {
+        mapModel = GetComponent<MapModel>();
 
         if (mapModel.MapNumber != 0)
         {
@@ -52,7 +51,7 @@ public class CellularAutomata : MonoBehaviour
         {
             InitializeParameters();
         }
-        mapController.CreateMap(
+        MapController.CreateMap(
             ref spawnedObjects, // ref parameter must be in the correct position
             mapModel: mapModel,
             MapWall: MapWall,
@@ -80,7 +79,13 @@ public class CellularAutomata : MonoBehaviour
         }
     }
 
+    public static void ViewDestroyObject(GameObject gameObject){
+        Destroy(gameObject);
+    }
 
+    public static GameObject ViewInistiateObject(GameObject prefab, Vector3 position){
+        return Instantiate(prefab, position, Quaternion.identity);
+    }
     // Coroutine to move the pathVisualizer along the path
     IEnumerator FollowPath(List<Vector2Int> path, Vector3 gridOrigin, float tileSize)
     {

@@ -3,38 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapController : ScriptableObject
+public abstract class MapController
 {
-    private int mapTileAmount; // { get; private set; }
-
     public void ClearMap(ref List<GameObject> spawnedObjects)
     {
         foreach (GameObject obj in spawnedObjects)
         {
-            Destroy(obj);
+            CellularAutomata.ViewDestroyObject(obj);
         }
         // Clear the list
         spawnedObjects.Clear();
     }
 
-    public void CreateMap(ref List<GameObject> spawnedObjects, GameObject MapWall,
+    public static void CreateMap(ref List<GameObject> spawnedObjects, GameObject MapWall,
                      GameObject CheckPoint, Vector3 currentTransformPosition, List<Vector3> antSpawnerWorldPositions, MapModel mapModel)
     {
-        mapTileAmount = mapModel.mapSize / mapModel.TileSize;
+        mapModel.mapTileAmount = mapModel.mapSize / mapModel.TileSize;
         int[,] Map = init2dMap(mapModel.mapSize, mapModel.TileSize, mapModel.Density, mapModel.CellularIterations, mapModel.NumberOfCheckPoints, antSpawnerWorldPositions, mapModel.ErosionLimit, mapModel.CheckPointSpacing, currentTransformPosition);
-        for (int i = 0; i < mapTileAmount; i++)
+        for (int i = 0; i < mapModel.mapTileAmount; i++)
         {
-            for (int j = 0; j < mapTileAmount; j++)
+            for (int j = 0; j < mapModel.mapTileAmount; j++)
             {
                 Vector3 position = currentTransformPosition + new Vector3(i * mapModel.TileSize, 0, j * mapModel.TileSize) + new Vector3((float)(mapModel.TileSize / 2.0), 0, (float)(mapModel.TileSize / 2.0));
                 if (Map[i, j] == 1) // 1 represents wall
                 {
-                    GameObject wall = Instantiate(MapWall, position, Quaternion.identity);
+                    GameObject wall = CellularAutomata.ViewInistiateObject(MapWall, position);
                     spawnedObjects.Add(wall);
                 }
                 else if (Map[i, j] == 2) // 2 represents checkpoint
                 {
-                    GameObject checkpoint = Instantiate(CheckPoint, position, Quaternion.identity);
+                    GameObject checkpoint = CellularAutomata.ViewInistiateObject(CheckPoint, position);
                     spawnedObjects.Add(checkpoint);
                 }
                 else if (Map[i, j] == 3)
@@ -52,8 +50,8 @@ public class MapController : ScriptableObject
     int[,] init2dMap(int MapSize, int tileSize, float density, int iterations, int numberOfCheckPoints,
                     List<Vector3> antSpawnerWorldPositions, int erosionLimit, int checkPointSpacing, Vector3 currentTransformPosition)
     {
-        mapTileAmount = MapSize / tileSize;
-        int[,] Map = new int[mapTileAmount, mapTileAmount];
+        mapModel.mapTileAmount = MapSize / tileSize;
+        int[,] Map = new int[mapModel.mapTileAmount, mapModel.mapTileAmount];
         Map = generateCheckpoints(Map, numberOfCheckPoints);
         //      int[,] checkpointCoordinates = getObjectCoordinates(Map, NumberOfCheckPoints, 2);
 
@@ -82,9 +80,9 @@ public class MapController : ScriptableObject
     int[,] generateNoise(int[,] map, float density, int CheckPointSpacing)
     {
 
-        for (int i = 0; i < mapTileAmount; i++)
+        for (int i = 0; i < mapModel.mapTileAmount; i++)
         {
-            for (int j = 0; j < mapTileAmount; j++)
+            for (int j = 0; j < mapModel.mapTileAmount; j++)
             {
 
                 if (FloorOrWall(map[i, j]))
@@ -99,9 +97,9 @@ public class MapController : ScriptableObject
         List<(int, int)> cellsToExpand = new List<(int, int)>();
 
         // Identify cells that are not floor or wall
-        for (int i = 0; i < mapTileAmount; i++)
+        for (int i = 0; i < mapModel.mapTileAmount; i++)
         {
-            for (int j = 0; j < mapTileAmount; j++)
+            for (int j = 0; j < mapModel.mapTileAmount; j++)
             {
                 if (!FloorOrWall(map[i, j])) // If the cell is not a floor or wall
                 {
@@ -120,7 +118,7 @@ public class MapController : ScriptableObject
                     int ni = i + di;
                     int nj = j + dj;
                     // Check bounds
-                    if (ni >= 0 && ni < mapTileAmount && nj >= 0 && nj < mapTileAmount)
+                    if (ni >= 0 && ni < mapModel.mapTileAmount && nj >= 0 && nj < mapModel.mapTileAmount)
                     {
                         // Calculate the distance from the center point using the Euclidean distance formula
                         double distance = Math.Sqrt(di * di + dj * dj);

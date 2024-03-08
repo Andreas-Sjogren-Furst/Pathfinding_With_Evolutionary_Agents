@@ -14,13 +14,12 @@ public class DataCollector : MonoBehaviour
     // Boolean to collect data. 
 
     public bool collectData = false;
-
+    
 
     // Start is called before the first frame update
     void Start()
     {
         objectDropper = gameObject.GetComponent<ObjectDropper>();
-
 
     }
 
@@ -56,8 +55,8 @@ public class DataCollector : MonoBehaviour
 
             foreach (var antObj in ants)
             {
-                Movement antMovement = antObj.GetComponent<Movement>();
-                colonyData.Ants.Add(new AntData { Steps = antMovement.GetTotalSteps() });
+                AntData antMovement = antObj.GetComponent<AntData>();
+                colonyData.Ants.Add(new AntDataExport(antMovement.totalSteps));
             }
 
             data.Colonies.Add(colonyData);

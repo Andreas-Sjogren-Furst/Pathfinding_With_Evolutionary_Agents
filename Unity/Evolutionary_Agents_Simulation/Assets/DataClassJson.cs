@@ -3,9 +3,12 @@ using UnityEngine;
 
 
 [System.Serializable]
-public class AntData
+public class AntDataExport
 {
-    public int Steps;
+    int steps;
+    public AntDataExport(int steps){
+        this.steps = steps;
+    }
 }
 
 [System.Serializable]
@@ -14,7 +17,7 @@ public class ColonyData
     public int AntCount;
     public Vector3 position;
 
-    public List<AntData> Ants = new List<AntData>();
+    public List<AntDataExport> Ants = new();
 }
 
 [System.Serializable]
