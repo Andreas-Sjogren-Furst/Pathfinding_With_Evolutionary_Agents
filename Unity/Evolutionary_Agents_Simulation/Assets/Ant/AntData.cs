@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class AntData : ScriptableObject
+public class AntData : ScriptableObject
 {
     // Physical and Movement Data
     public readonly float stepSize;
