@@ -1,27 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class DrawFieldOfView : MonoBehaviour
 {
+    AntData antData;
+    DrawFieldOfView(AntData antData){
+        this.antData = antData;
+    }
     void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(transform.position, viewRadius);
-        Vector3 viewAngleA = DirFromAngle(-viewAngle / 2, false);
-        Vector3 viewAngleB = DirFromAngle(viewAngle / 2, false);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius);
-        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius);
+        DrawVisionArea(transform.position, antData.viewRadius);
     }
 
-    private Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
+    void DrawVisionArea(Vector3 currentPosition, float radius)
     {
-        if (!angleIsGlobal)
+        int segmentCount = 360; // Increase for smoother circles
+        float angle = 0f;
+
+        // Start at 0 degrees and move up by small increments to draw the circle
+        for (int i = 0; i <= segmentCount; i++)
         {
-            angleInDegrees += transform.eulerAngles.y;
+            // Calculate the x and z positions of the current point
+            float x = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
+            float z = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
+            Vector3 point = new Vector3(x, 0, z) + currentPosition;
+
+            // Calculate the x and z positions of the next point
+            angle += 360f / segmentCount;
+            float nextX = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
+            float nextZ = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
+            Vector3 nextPoint = new Vector3(nextX, 0, nextZ) + currentPosition;
+
+            // Draw a line between the current point and the next point
+            Gizmos.DrawLine(point, nextPoint);
         }
-        return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
     }
 }

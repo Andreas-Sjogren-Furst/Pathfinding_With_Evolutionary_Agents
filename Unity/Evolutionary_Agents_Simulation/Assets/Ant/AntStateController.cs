@@ -5,15 +5,11 @@ using UnityEngine;
 
 public class AntStateController : MonoBehaviour
 {
-    private AntData antData;
-    public AntStateController(AntData antData){
-        this.antData = antData;
+    
+    public void ChangeState(ref State.AntState currentState, State.AntState newState){
+        currentState = newState;
     }
-
-    public void ChangeState(State.AntState newState){
-        antData.currentState = newState;
-    }
-    public void ExecuteBehavior(State.AntState currentState){
+    /*public void ExecuteBehavior(State.AntState currentState){
         switch (currentState)
         {
             case State.AntState.Exploring:
@@ -29,10 +25,5 @@ public class AntStateController : MonoBehaviour
                 ReturnHome();
                 break;
         }
-    }
-    
-    public State.AntState GetCurrentState(){
-        return antData.currentState;
-    }
-    
+    }*/
 }
