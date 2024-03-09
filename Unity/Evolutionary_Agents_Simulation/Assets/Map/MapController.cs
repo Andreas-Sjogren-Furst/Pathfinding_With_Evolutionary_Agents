@@ -18,7 +18,7 @@ public abstract class MapController
     public static void CreateMap(ref List<GameObject> spawnedObjects, GameObject MapWall,
                      GameObject CheckPoint, Vector3 currentTransformPosition, List<Vector3> antSpawnerWorldPositions, MapModel mapModel)
     {
-        mapModel.mapTileAmount = mapModel.mapSize / mapModel.TileSize;
+        // mapModel.mapTileAmount = mapModel.mapSize / mapModel.TileSize;
         int[,] Map = init2dMap(mapModel.mapSize, mapModel.TileSize, mapModel.Density, mapModel.CellularIterations, mapModel.NumberOfCheckPoints, antSpawnerWorldPositions, mapModel.ErosionLimit, mapModel.CheckPointSpacing, currentTransformPosition, mapModel.mapTileAmount);
         for (int i = 0; i < mapModel.mapTileAmount; i++)
         {

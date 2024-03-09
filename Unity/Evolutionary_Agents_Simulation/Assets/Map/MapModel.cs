@@ -26,7 +26,7 @@ public class MapModel : ScriptableObject
     public int mapTileAmount
     {
         get { return mapSize / TileSize; }
-        set { mapTileAmount = value; }
+
     }
 
     public List<Vector3> ColonyCoordinates;
