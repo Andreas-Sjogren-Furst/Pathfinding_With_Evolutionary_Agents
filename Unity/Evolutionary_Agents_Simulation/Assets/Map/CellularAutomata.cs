@@ -115,7 +115,7 @@ public class CellularAutomata : MonoBehaviour
         lastDensity = mapModel.Density;
         lastNumberOfCheckPoints = mapModel.NumberOfCheckPoints;
         lastTileSize = mapModel.TileSize;
-        lastCellularIterations = mapModel.NumberOfCheckPoints;
+        lastCellularIterations = mapModel.CellularIterations;
         lastCheckPointSpacing = mapModel.CheckPointSpacing;
         lastErosionLimit = mapModel.ErosionLimit;
         lastRandomSeed = mapModel.RandomSeed; // Ensure this line is added
@@ -160,9 +160,22 @@ public class CellularAutomata : MonoBehaviour
 
     bool ParametersChanged()
     {
-        Debug.Log("Last density:" + lastDensity.ToString());
+        // Debug.Log("Last density:" + lastDensity.ToString() + " map model: " + mapModel.Density.ToString());
 
-        Debug.Log("map model: " + mapModel.Density.ToString());
+
+        // Debug.Log("Last number of check points: " + lastNumberOfCheckPoints.ToString() + " map model: " + mapModel.NumberOfCheckPoints.ToString());
+
+        // Debug.Log("Last tile size: " + lastTileSize.ToString() + " map model: " + mapModel.TileSize.ToString());
+
+        // Debug.Log("Last cellular iterations: " + lastCellularIterations.ToString() + " map model: " + mapModel.CellularIterations.ToString());
+
+        // Debug.Log("Last check point spacing: " + lastCheckPointSpacing.ToString() + " map model: " + mapModel.CheckPointSpacing.ToString());
+
+        // Debug.Log("Last erosion limit: " + lastErosionLimit.ToString() + " map model: " + mapModel.ErosionLimit.ToString());
+
+        // Debug.Log("Last random seed: " + lastRandomSeed.ToString() + " map model: " + mapModel.RandomSeed.ToString());
+
+
 
 
 
@@ -176,17 +189,25 @@ public class CellularAutomata : MonoBehaviour
             lastErosionLimit != mapModel.ErosionLimit ||
             lastRandomSeed != mapModel.RandomSeed)
         {
+            Debug.Log("FIRST PARAMETERS CHANGED! !!!  ");
             return true;
         }
 
         var currentColonyPositions = Spawner.GetComponent<ObjectDropper>().colonyPositions;
         if (lastColonyCoordinates == null || currentColonyPositions == null)
         {
+            Debug.Log("Colony positions are null");
+
+            // Debug.Log("lastColonyCoordinates is null" + lastColonyCoordinates == null);
+            // Debug.Log("currentColonyPositions is null" + currentColonyPositions == null);
+
             return lastColonyCoordinates != currentColonyPositions;
         }
 
         if (lastColonyCoordinates.Count != currentColonyPositions.Count)
         {
+            Debug.Log("Colony positions count is different");
+
             return true;
         }
 
@@ -194,6 +215,8 @@ public class CellularAutomata : MonoBehaviour
         {
             if (lastColonyCoordinates[i] != currentColonyPositions[i])
             {
+                Debug.Log("Colony positions are different in for loop");
+
                 return true;
             }
         }
