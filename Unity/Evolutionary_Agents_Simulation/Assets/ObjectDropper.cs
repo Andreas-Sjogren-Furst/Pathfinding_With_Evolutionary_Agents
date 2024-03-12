@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class ObjectDropper : MonoBehaviour
 {
-    public GameObject pheromone; // Assign your prefab in the Inspector
     public GameObject colony;
     public GameObject checkpoint;
     public List<Vector3> colonyPositions;
@@ -25,20 +24,14 @@ public class ObjectDropper : MonoBehaviour
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            DropObjectAtMousePosition(pheromone);
-        }
-        else if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.W))
         {
             DropObjectAtMousePosition(colony);
-
         }
         else if (Input.GetKeyDown(KeyCode.E))
         {
             DropObjectAtMousePosition(checkpoint);
             // add checkpoint reference. 
-
         }
     }
 
@@ -62,15 +55,13 @@ public class ObjectDropper : MonoBehaviour
         }
     }
 
-    internal List<GameObject> GetColonies()
+    public List<GameObject> GetColonies()
     {
-
         return colonies;
     }
 
-    internal List<GameObject> GetCheckpoints()
+    public List<GameObject> GetCheckpoints()
     {
         return checkpoints;
-
     }
 }

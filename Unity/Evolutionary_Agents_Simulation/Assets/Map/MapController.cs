@@ -16,7 +16,7 @@ public abstract class MapController
     }
 
     public static void CreateMap(ref List<GameObject> spawnedObjects, GameObject MapWall,
-                     GameObject CheckPoint, Vector3 currentTransformPosition, List<Vector3> antSpawnerWorldPositions, MapModel mapModel)
+                     GameObject CheckPoint, GameObject GridTile, Vector3 currentTransformPosition, List<Vector3> antSpawnerWorldPositions, MapModel mapModel)
     {
         // mapModel.mapTileAmount = mapModel.mapSize / mapModel.TileSize;
         int[,] Map = init2dMap(mapModel.mapSize, mapModel.TileSize, mapModel.Density, mapModel.CellularIterations, mapModel.NumberOfCheckPoints, antSpawnerWorldPositions, mapModel.ErosionLimit, mapModel.CheckPointSpacing, currentTransformPosition, mapModel.mapTileAmount);
@@ -25,7 +25,12 @@ public abstract class MapController
             for (int j = 0; j < mapModel.mapTileAmount; j++)
             {
                 Vector3 position = currentTransformPosition + new Vector3(i * mapModel.TileSize, 0, j * mapModel.TileSize) + new Vector3((float)(mapModel.TileSize / 2.0), 0, (float)(mapModel.TileSize / 2.0));
-                if (Map[i, j] == 1) // 1 represents wall
+                if (Map[i, j] == 0) // 1 represents wall
+                {
+                    GameObject wall = CellularAutomata.ViewInistiateObject(MapWall, position);
+                    spawnedObjects.Add(wall);
+                }
+                else if (Map[i, j] == 1) // 1 represents wall
                 {
                     GameObject wall = CellularAutomata.ViewInistiateObject(MapWall, position);
                     spawnedObjects.Add(wall);

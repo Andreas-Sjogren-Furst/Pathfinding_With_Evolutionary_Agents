@@ -9,6 +9,7 @@ public class CellularAutomata : MonoBehaviour
 
 
     public GameObject MapWall;
+    public GameObject GridTile;
     public GameObject Plane;
     public GameObject CheckPoint;
 
@@ -54,6 +55,7 @@ public class CellularAutomata : MonoBehaviour
             ref spawnedObjects, // ref parameter must be in the correct position
             mapModel: mapModel,
             MapWall: MapWall,
+            GridTile : GridTile,
             CheckPoint: CheckPoint,
             currentTransformPosition: transform.position,
             antSpawnerWorldPositions: Spawner.GetComponent<ObjectDropper>().colonyPositions
@@ -72,6 +74,7 @@ public class CellularAutomata : MonoBehaviour
                 mapModel: mapModel,
                 MapWall: MapWall,
                 CheckPoint: CheckPoint,
+                GridTile: GridTile,
                 currentTransformPosition: transform.position,
                 antSpawnerWorldPositions: Spawner.GetComponent<ObjectDropper>().colonyPositions
                 );
