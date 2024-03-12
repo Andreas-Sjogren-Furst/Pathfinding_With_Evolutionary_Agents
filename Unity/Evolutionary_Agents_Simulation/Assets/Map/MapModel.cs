@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "MapModel", menuName = "Map/MapModel", order = 0)]
+[CreateAssetMenu(fileName = "MapModel", menuName = "MapModel", order = 0)]
 public class MapModel : ScriptableObject
 {
     [Range(0, 20)]

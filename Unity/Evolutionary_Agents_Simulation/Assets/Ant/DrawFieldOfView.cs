@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class DrawFieldOfView : MonoBehaviour
 {
     AntData antData;
-    DrawFieldOfView(AntData antData){
-        this.antData = antData;
+    void Start() {
+        antData = GetComponent<AntData>();
     }
     void OnDrawGizmos()
     {

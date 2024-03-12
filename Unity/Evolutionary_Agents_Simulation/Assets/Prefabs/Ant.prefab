@@ -12,11 +12,10 @@ GameObject:
   - component: {fileID: 7599104096219458661}
   - component: {fileID: 6156075158144303546}
   - component: {fileID: 3601900115823350796}
+  - component: {fileID: 405241957502264323}
   - component: {fileID: 4586672714386716612}
-  - component: {fileID: 857602312603241423}
-  - component: {fileID: -4295455637513004547}
+  - component: {fileID: 5897788593813019287}
   - component: {fileID: -1372616293737970893}
-  - component: {fileID: 8635417985597707425}
   m_Layer: 7
   m_Name: Ant
   m_TagString: Ant
@@ -110,6 +109,23 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &405241957502264323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8170326526364987173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1ab27bf1dc9b4787934929f6c6c3630, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  totalSteps: 0
+  currentDirection: 0
+  viewRadius: 0
+  detectableObjects: []
+  currentState: 0
 --- !u!114 &4586672714386716612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,13 +138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcb590569aaf246f1911bcdd2ece3b92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pheromoneConcentration: 0
-  spawnInterval: 0.2
-  directionChangeInterval: 0.05
-  Pheromone: {fileID: 7965665073063652657, guid: e8d82856b0ac14e8195dd27e3319044d, type: 3}
-  hasFood: 0
-  movementSpeed: 4
---- !u!114 &857602312603241423
+--- !u!114 &5897788593813019287
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -137,32 +147,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8170326526364987173}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b168afb43849848bab41a8583315b685, type: 3}
+  m_Script: {fileID: 11500000, guid: f14dec5e83b324c0f87b6c23eae50db2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewRadius: 5
-  viewAngle: 60
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 512
-  foodSource: {fileID: 0}
-  leftAreaTargets: []
-  middleAreaTargets: []
-  rightAreaTargets: []
-  locatedFood: 0
---- !u!114 &-4295455637513004547
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8170326526364987173}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df590e1f1df5a41c8a69406166e954cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentState: 0
 --- !u!54 &-1372616293737970893
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -190,16 +177,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8635417985597707425
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8170326526364987173}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af424bda8373349488bce8b48fc8e704, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  updateMemory: 1
