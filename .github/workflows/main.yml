@@ -47,6 +47,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
+          allowDirtyBuild: true
           targetPlatform: WebGL
           projectPath: Unity/Evolutionary_Agents_Simulation
 
@@ -55,3 +56,32 @@ jobs:
         with:
           name: Build
           path: Unity/Evolutionary_Agents_Simulation/build
+      # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./Unity/Evolutionary_Agents_Simulation/build
+      # Create Release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      # Upload Release Asset
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Unity/Evolutionary_Agents_Simulation/build/YourBuildFileName.zip
+          asset_name: YourBuildFileName.zip
+          asset_content_type: application/zip
+
