@@ -4,8 +4,7 @@ using UnityEngine;
 public class AntData : MonoBehaviour
 {
     // Physical and Movement Data
-    public readonly int stepSize = 1;
-    public readonly float moveSpeed = 2f;
+    public readonly float stepSize;
     public int totalSteps;
     public AntDirection.Direction currentDirection;
 

@@ -8,6 +8,7 @@ public class ColonyBehavior : MonoBehaviour
 
     public GameObject Ant;
     public int amountOfAnts;
+    public int resources;
     private int counter;
 
     public List<GameObject> ants; // List to store references to all ants
@@ -15,6 +16,7 @@ public class ColonyBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        resources = 0;
         counter = 0;
     }
 
@@ -29,7 +31,7 @@ public class ColonyBehavior : MonoBehaviour
         }
     }
 
-    public List<GameObject> GetAnts()
+    internal List<GameObject> GetAnts()
     {
         return ants;
     }

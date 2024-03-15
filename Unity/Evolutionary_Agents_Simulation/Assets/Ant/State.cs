@@ -2,7 +2,9 @@
 public class State
 {
     public enum AntState {
-        Wandering,
-        FrontierBasedExploration
+        Exploring,
+        FollowingPheromones,
+        GetFood,
+        ReturningToColony
     };
 }
