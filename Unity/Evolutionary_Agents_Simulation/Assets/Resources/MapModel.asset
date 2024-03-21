@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ba7676c561a4e31844ac28f77bbdb7, type: 3}
   m_Name: MapModel
   m_EditorClassIdentifier: 
-  NumberOfCheckPoints: 3
+  NumberOfCheckPoints: 1
   TileSize: 1
-  Density: 56.5
-  CellularIterations: 5
+  Density: 0
+  CellularIterations: 6
   CheckPointSpacing: 10
   ErosionLimit: 4
   MapNumber: 1

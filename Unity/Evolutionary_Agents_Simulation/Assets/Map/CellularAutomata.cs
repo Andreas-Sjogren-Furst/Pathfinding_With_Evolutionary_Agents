@@ -40,6 +40,7 @@ public class CellularAutomata : MonoBehaviour
 
     void Start()
     {
+
         mapModel = Resources.Load<MapModel>("MapModel");
 
         if (mapModel.MapNumber != 0)
