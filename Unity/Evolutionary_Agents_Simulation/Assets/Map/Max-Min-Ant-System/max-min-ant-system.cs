@@ -33,12 +33,25 @@ public class Edge
 public class Graph
 {
     public List<Node> Nodes { get; set; }
-    public List<Edge> Edges { get; set; }
+    // Removed the Edges list as it's replaced by the adjacency matrix.
+    public double[,] AdjacencyMatrix { get; private set; } // Edges. 
 
-    public Graph()
+    public Graph(int numberOfNodes)
     {
-        Nodes = new List<Node>();
-        Edges = new List<Edge>();
+        Nodes = new List<Node>(numberOfNodes);
+        AdjacencyMatrix = new double[numberOfNodes, numberOfNodes];
+
+        // Initialize the adjacency matrix with Double.MaxValue to indicate no direct connection.
+        for (int i = 0; i < numberOfNodes; i++)
+        {
+            for (int j = 0; j < numberOfNodes; j++)
+            {
+                if (i == j)
+                    AdjacencyMatrix[i, j] = 0; // Distance to itself is 0.
+                else
+                    AdjacencyMatrix[i, j] = Double.MaxValue;
+            }
+        }
     }
 
     public void AddNode(Node node)
@@ -46,9 +59,14 @@ public class Graph
         Nodes.Add(node);
     }
 
-    public void AddEdge(Edge edge)
+    public void AddEdge(Node source, Node destination, double distance)
     {
-        Edges.Add(edge);
+        int sourceIndex = Nodes.IndexOf(source);
+        int destinationIndex = Nodes.IndexOf(destination);
+
+        // Update the adjacency matrix to reflect the new edge.
+        AdjacencyMatrix[sourceIndex, destinationIndex] = distance;
+        AdjacencyMatrix[destinationIndex, sourceIndex] = distance; // For undirected graph. Remove this line for directed graph.
     }
 }
 
@@ -89,7 +107,7 @@ public class MMAS
         _rho = rho; // pheromone evaporation
         _q = q; // 
 
-        _graph = new Graph();
+        _graph = null;
         _pheromones = null;
         _bestTour = null;
         _bestTourLength = double.MaxValue;
@@ -190,15 +208,13 @@ public class MMAS
 
         for (int i = 0; i < _graph.Nodes.Count; i++)
         {
-            if (!ant.TabuList.Contains(i))
+            if (!ant.TabuList.Contains(i) && _graph.AdjacencyMatrix[currentNode, i] < Double.MaxValue)
             {
-                Edge edge = _graph.Edges.Find(e => e.Source.Id == currentNode && e.Destination.Id == i);
-                if (edge != null)
-                {
-                    probabilities[i] = Math.Pow(_pheromones[currentNode, i], _alpha) *
-                                       Math.Pow(1.0 / edge.Distance, _beta);
-                    sum += probabilities[i];
-                }
+                // Directly access the distance from the adjacency matrix
+                double distance = _graph.AdjacencyMatrix[currentNode, i];
+                // Calculate the probability of moving to node i
+                probabilities[i] = Math.Pow(_pheromones[currentNode, i], _alpha) * Math.Pow(1.0 / distance, _beta);
+                sum += probabilities[i];
             }
         }
 
@@ -225,13 +241,33 @@ public class MMAS
         double length = 0.0;
         for (int i = 0; i < tour.Length - 1; i++)
         {
-            Edge edge = _graph.Edges.Find(e => e.Source.Id == tour[i] && e.Destination.Id == tour[i + 1]);
-            length += edge.Distance;
+            // Directly access the distance between consecutive nodes in the tour from the adjacency matrix
+            double distance = _graph.AdjacencyMatrix[tour[i], tour[i + 1]];
+            if (distance < Double.MaxValue)
+            {
+                length += distance;
+            }
+            else
+            {
+                // Handle the case where there is no direct path between consecutive nodes in the tour
+                // This case should theoretically not occur in a valid tour, but the check is here for completeness
+                throw new InvalidOperationException($"No direct path between nodes {tour[i]} and {tour[i + 1]}.");
+            }
         }
-        Edge lastEdge = _graph.Edges.Find(e => e.Source.Id == tour[tour.Length - 1] && e.Destination.Id == tour[0]);
-        length += lastEdge.Distance;
+        // Add the distance from the last node back to the first to complete the tour
+        double lastDistance = _graph.AdjacencyMatrix[tour[tour.Length - 1], tour[0]];
+        if (lastDistance < Double.MaxValue)
+        {
+            length += lastDistance;
+        }
+        else
+        {
+            // Handle the case where there is no direct path from the last node back to the first
+            throw new InvalidOperationException($"No direct path between nodes {tour[tour.Length - 1]} and {tour[0]}.");
+        }
         return length;
     }
+
 
     private void UpdatePheromones(int[][] antTours, double[] antTourLengths)
     {
@@ -270,7 +306,7 @@ public class MMAS
     private double GetNearestNeighborTourLength()
     {
         bool[] visited = new bool[_graph.Nodes.Count];
-        int currentNode = 0;
+        int currentNode = 0; // Starting from the first node
         double tourLength = 0.0;
         visited[currentNode] = true;
 
@@ -278,17 +314,15 @@ public class MMAS
         {
             int nearestNode = -1;
             double minDistance = double.MaxValue;
+
             for (int j = 0; j < _graph.Nodes.Count; j++)
             {
-                if (!visited[j])
+                // Directly use the adjacency matrix to get the distance
+                double distance = _graph.AdjacencyMatrix[currentNode, j];
+                if (!visited[j] && distance < minDistance)
                 {
-                    Edge edge = _graph.Edges.Find(e => (e.Source.Id == currentNode && e.Destination.Id == j) ||
-                                                       (e.Source.Id == j && e.Destination.Id == currentNode));
-                    if (edge != null && edge.Distance < minDistance)
-                    {
-                        nearestNode = j;
-                        minDistance = edge.Distance;
-                    }
+                    nearestNode = j;
+                    minDistance = distance;
                 }
             }
 
@@ -300,42 +334,26 @@ public class MMAS
             }
             else
             {
-                // Handle the case when no unvisited node is found
-                // Find the nearest unvisited node by calculating the distances directly
-                double minDistanceToUnvisited = double.MaxValue;
-                for (int j = 0; j < _graph.Nodes.Count; j++)
-                {
-                    if (!visited[j])
-                    {
-                        double distance = CalculateDistance(_graph.Nodes[currentNode], _graph.Nodes[j]);
-                        if (distance < minDistanceToUnvisited)
-                        {
-                            nearestNode = j;
-                            minDistanceToUnvisited = distance;
-                        }
-                    }
-                }
-
-                if (nearestNode != -1)
-                {
-                    visited[nearestNode] = true;
-                    tourLength += minDistanceToUnvisited;
-                    currentNode = nearestNode;
-                }
-                else
-                {
-                    // All nodes have been visited
-                    break;
-                }
+                // If no unvisited node is found (which should not happen in a well-defined TSP)
+                break;
             }
         }
 
-        // Connect the last node back to the first node
-        double distanceToFirst = CalculateDistance(_graph.Nodes[currentNode], _graph.Nodes[0]);
-        tourLength += distanceToFirst;
+        // Add the distance from the last node back to the first to complete the tour
+        if (_graph.AdjacencyMatrix[currentNode, 0] < Double.MaxValue)
+        {
+            tourLength += _graph.AdjacencyMatrix[currentNode, 0];
+        }
+        else
+        {
+            // Handle the case where returning to the start node is not possible
+            // This should theoretically not happen in a complete graph used for TSP
+            throw new InvalidOperationException("Cannot return to start node from last node.");
+        }
 
         return tourLength;
     }
+
 
     private double CalculateDistance(Node node1, Node node2)
     {

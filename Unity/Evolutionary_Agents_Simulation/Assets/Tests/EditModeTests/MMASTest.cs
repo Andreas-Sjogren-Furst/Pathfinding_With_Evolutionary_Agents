@@ -62,7 +62,7 @@ public class MMASTest
     private Graph ReadTSPFile(string filePath)
     {
         UnityEngine.Debug.Log("Reading Nodes from TSP file");
-        Graph graph = new Graph();
+        Graph graph = new Graph(51);
         string[] lines = File.ReadAllLines(filePath);
         int dimension = 0;
         bool readingNodes = false;
@@ -102,8 +102,8 @@ public class MMASTest
             for (int j = i + 1; j < graph.Nodes.Count; j++)
             {
                 double distance = CalculateDistance(graph.Nodes[i], graph.Nodes[j]);
-                graph.AddEdge(new Edge(graph.Nodes[i], graph.Nodes[j], distance));
-                graph.AddEdge(new Edge(graph.Nodes[j], graph.Nodes[i], distance));
+                graph.AddEdge(graph.Nodes[i], graph.Nodes[j], distance);
+                graph.AddEdge(graph.Nodes[j], graph.Nodes[i], distance);
             }
         }
 
@@ -160,47 +160,35 @@ public class MMASTest
         double length = 0.0;
         for (int i = 0; i < tour.Length - 1; i++)
         {
-            Node node1 = graph.Nodes.Find(n => n.Id == tour[i]);
-            Node node2 = graph.Nodes.Find(n => n.Id == tour[i + 1]);
-
-            if (node1 != null && node2 != null)
+            // Access the distance between consecutive nodes directly from the adjacency matrix
+            double distance = graph.AdjacencyMatrix[tour[i], tour[i + 1]];
+            if (distance < System.Double.MaxValue)
             {
-                Edge edge = graph.Edges.Find(e => (e.Source == node1 && e.Destination == node2) ||
-                                                  (e.Source == node2 && e.Destination == node1));
-                if (edge != null)
-                {
-                    length += edge.Distance;
-                }
-                else
-                {
-                    // Handle the case when an edge is not found between the nodes
-                    double distance = CalculateDistance(node1, node2);
-                    length += distance;
-                }
-            }
-        }
-
-        Node lastNode = graph.Nodes.Find(n => n.Id == tour[tour.Length - 1]);
-        Node firstNode = graph.Nodes.Find(n => n.Id == tour[0]);
-
-        if (lastNode != null && firstNode != null)
-        {
-            Edge lastEdge = graph.Edges.Find(e => (e.Source == lastNode && e.Destination == firstNode) ||
-                                                  (e.Source == firstNode && e.Destination == lastNode));
-            if (lastEdge != null)
-            {
-                length += lastEdge.Distance;
+                length += distance;
             }
             else
             {
-                // Handle the case when an edge is not found between the last and first nodes
-                double distance = CalculateDistance(lastNode, firstNode);
-                length += distance;
+                // Handle the case when there is no direct path between nodes
+                // This scenario should not typically occur in a well-defined TSP
+                throw new System.InvalidOperationException($"No direct path between nodes {tour[i]} and {tour[i + 1]}.");
             }
+        }
+
+        // Add the distance from the last node back to the first node to complete the tour
+        double distanceToFirst = graph.AdjacencyMatrix[tour[tour.Length - 1], tour[0]];
+        if (distanceToFirst < System.Double.MaxValue)
+        {
+            length += distanceToFirst;
+        }
+        else
+        {
+            // Handle the case when there is no direct path from the last node back to the first
+            throw new System.InvalidOperationException($"No direct path between nodes {tour[tour.Length - 1]} and {tour[0]}.");
         }
 
         return length;
     }
+
 
 
 }
