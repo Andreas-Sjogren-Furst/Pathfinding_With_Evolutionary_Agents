@@ -91,7 +91,7 @@ public class MMASTest
                     int id = int.Parse(parts[0]) - 1;
                     double x = double.Parse(parts[1]);
                     double y = double.Parse(parts[2]);
-                    UnityEngine.Debug.Log("Node: " + id + " (" + x + ", " + y + ")");
+                    //UnityEngine.Debug.Log("Node: " + id + " (" + x + ", " + y + ")");
                     graph.AddNode(new Node(id, x, y));
                 }
             }
@@ -146,7 +146,7 @@ public class MMASTest
                     {
                         int nodeId = int.Parse(part) - 1;
                         tour.Add(nodeId);
-                        UnityEngine.Debug.Log("Opt tour node " + nodeId);
+                        //    UnityEngine.Debug.Log("Opt tour node " + nodeId);
                     }
                 }
             }
