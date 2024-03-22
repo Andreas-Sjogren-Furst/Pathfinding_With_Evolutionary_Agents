@@ -149,7 +149,7 @@ public class MMAS
 
             for (int i = 0; i < _numAnts; i++)
             {
-                int[] tour = BuildTour(ants[i]);
+                int[] tour = BuildTour(ants[i], i);
                 double tourLength = CalculateTourLength(tour);
                 antTours[i] = tour;
                 antTourLengths[i] = tourLength;
@@ -177,16 +177,16 @@ public class MMAS
         }
     }
 
-    private int[] BuildTour(Ant ant)
+    private int[] BuildTour(Ant ant, int startNode)
     {
         int numNodes = _graph.Nodes.Count;
         int[] tour = new int[numNodes];
         ant.TabuList.Clear();
         // This will generate a random integer between 1 and 10 (1 inclusive, 10 exclusive)
-        int randomNumber = UnityEngine.Random.Range(0, numNodes);
+        // int randomNumber = UnityEngine.Random.Range(0, numNodes);
         // UnityEngine.Debug.Log("random number " + randomNumber);
 
-        ant.CurrentNode = _graph.Nodes[randomNumber].Id; // Start at a random node. 
+        ant.CurrentNode = _graph.Nodes[startNode].Id; // Start at a random node. 
         ant.TabuList.Add(ant.CurrentNode);
         tour[0] = ant.CurrentNode;
 
@@ -213,7 +213,7 @@ public class MMAS
                 // Directly access the distance from the adjacency matrix
                 double distance = _graph.AdjacencyMatrix[currentNode, i];
                 // Calculate the probability of moving to node i
-                probabilities[i] = Math.Pow(_pheromones[currentNode, i], _alpha) * Math.Pow(1.0 / distance, _beta);
+                probabilities[i] = Math.Pow(_pheromones[currentNode, i], _alpha) * Math.Pow(1.0 / distance, _beta); // the heuritct value for Nij is 1/Jij where J is the distance. Since shorter distance, will give higher heuristic. 
                 sum += probabilities[i];
             }
         }

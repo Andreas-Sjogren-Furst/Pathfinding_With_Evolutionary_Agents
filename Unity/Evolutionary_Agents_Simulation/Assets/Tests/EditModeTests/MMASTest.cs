@@ -22,11 +22,11 @@ public class MMASTest
         double optimalTourLength = CalculateTourLength(optimalTour, graph);
 
         int numAnts = 51;
-        double alpha = 1.0;
-        double beta = 2.5;
-        double rho = 0.98;
+        double alpha = 1.5;
+        double beta = 4.5;
+        double rho = 0.90;
         double q = 100.0;
-        int maxIterations = 300;
+        int maxIterations = 500;
 
         MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q);
         mmas.SetGraph(graph);
