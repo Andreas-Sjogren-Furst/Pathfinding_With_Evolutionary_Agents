@@ -14,14 +14,14 @@ public class MMASTest
     {
 
 
-        string tspFilePath = "/Users/gustavsiphone/Documents/GitHub/Pathfinding_With_Evolutionary_Agents/Unity/Evolutionary_Agents_Simulation/Assets/Tests/EditModeTests/eil51.tsp";
-        string optimalTourFilePath = "/Users/gustavsiphone/Documents/GitHub/Pathfinding_With_Evolutionary_Agents/Unity/Evolutionary_Agents_Simulation/Assets/Tests/EditModeTests/eil51.opt.tour";
+        string tspFilePath = "/Users/gustavsiphone/Documents/GitHub/Pathfinding_With_Evolutionary_Agents/Unity/Evolutionary_Agents_Simulation/Assets/Tests/EditModeTests/berlin52.tsp";
+        string optimalTourFilePath = "/Users/gustavsiphone/Documents/GitHub/Pathfinding_With_Evolutionary_Agents/Unity/Evolutionary_Agents_Simulation/Assets/Tests/EditModeTests/berlin52.opt.tour";
 
         Graph graph = ReadTSPFile(tspFilePath);
         int[] optimalTour = ReadOptimalTour(optimalTourFilePath);
         double optimalTourLength = CalculateTourLength(optimalTour, graph);
 
-        int numAnts = 51;
+        int numAnts = 52;
         double alpha = 1.5;
         double beta = 4.5;
         double rho = 0.90;
@@ -62,7 +62,7 @@ public class MMASTest
     private Graph ReadTSPFile(string filePath)
     {
         UnityEngine.Debug.Log("Reading Nodes from TSP file");
-        Graph graph = new Graph(51);
+        Graph graph = new Graph(52);
         string[] lines = File.ReadAllLines(filePath);
         int dimension = 0;
         bool readingNodes = false;
