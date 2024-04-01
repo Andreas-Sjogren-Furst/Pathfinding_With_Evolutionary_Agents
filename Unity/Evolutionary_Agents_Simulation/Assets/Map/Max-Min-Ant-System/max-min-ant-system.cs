@@ -4,7 +4,7 @@ using System.Linq;
 
 public class Node
 {
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public double X { get; set; }
     public double Y { get; set; }
 
@@ -134,7 +134,7 @@ public class MMAS
         return _bestTourLength;
     }
 
-    public void Run(int maxIterations) // The ants construct solutions concurrently. Avg. computation time of Berlin52 = 2.7 seconds on M1 Pro. 
+    public void Run(int maxIterations) // O(I*N^2) // The ants construct solutions concurrently. Avg. computation time of Berlin52 = 2.7 seconds on M1 Pro. 
     {
         for (int iteration = 0; iteration < maxIterations; iteration++)
         {
@@ -145,8 +145,8 @@ public class MMAS
             System.Threading.Tasks.Parallel.For(0, _numAnts, i =>
             {
                 ants[i] = new Ant();
-                antTours[i] = BuildTour(ants[i], i);
-                antTourLengths[i] = CalculateTourLength(antTours[i]);
+                antTours[i] = BuildTour(ants[i], i); // O(N^2)
+                antTourLengths[i] = CalculateTourLength(antTours[i]); // O(N)
             });
 
             // Find the best tour after all ants have finished their tours
@@ -157,8 +157,8 @@ public class MMAS
                 _bestTourLength = antTourLengths[bestIndex];
             }
 
-            UpdatePheromones(antTours, antTourLengths);
-            ApplyPheromoneTrailLimits();
+            UpdatePheromones(antTours, antTourLengths); // O(N^2)
+            ApplyPheromoneTrailLimits(); // O(N^2)
         }
     }
 
@@ -189,7 +189,7 @@ public class MMAS
 
         for (int i = 1; i < numNodes; i++)
         {
-            ant.CurrentNode = SelectNextNode(ant);
+            ant.CurrentNode = SelectNextNode(ant); // O(N)
             ant.TabuList.Add(ant.CurrentNode);
             tour[i] = ant.CurrentNode;
         }

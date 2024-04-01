@@ -16,6 +16,7 @@ public abstract class MMASController
             Vector2Int checkPoint1 = checkpointCoordinates[i];
             Node node = new Node(i, checkPoint1.x, checkPoint1.y);
             graph.AddNode(node);
+
             for (int j = 0; j < checkpointCoordinates.Length; j++)
             {
                 Vector2Int checkPoint2 = checkpointCoordinates[j];
