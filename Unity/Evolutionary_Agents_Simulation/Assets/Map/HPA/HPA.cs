@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Codice.Client.BaseCommands;
+using Codice.Client.Common.GameUI;
 using UnityEngine;
 
+
+// TODO:  Global positionss
 public class HPAStarGraphConstruction
 {
+    public int[,] GlobalTileMap { get; set; } // Map
     private Dictionary<int, HashSet<Entrance>> EntrancesByLevel { get; set; } // E 
     public Dictionary<int, List<Cluster>> ClusterByLevel { get; set; } // C
     public Dictionary<int, List<HPANode>> NodesByLevel { get; set; } // N
@@ -124,59 +128,87 @@ public class HPAStarGraphConstruction
     // ... (previous code remains the same)
 
     // Helper methods
-    private List<Cluster> BuildClusters(int level)
+    public List<Cluster> BuildClusters(int level)
     {
-        // Implementation to build clusters at the specified level
-        // This method should create and return a list of clusters based on the level
-        // You can use your own logic to determine how to group nodes into clusters
-        // For example, you can use a grid-based approach or any other clustering algorithm
-        // we will use a grid based approach, where each level is divided into a grid of clusters
-        // the size of the clusters is 5 * level. 
-        // Return the list of created clusters
-
         List<Cluster> clusters = new List<Cluster>();
-
-        // Determine the size of each cluster based on the level
         int clusterSize = 5 * level;
 
-        // Get the dimensions of the grid
-        int gridWidth = 100 / clusterSize;
-        int gridHeight = 100 / clusterSize;
+        int gridWidth = GlobalTileMap.GetLength(0) / clusterSize;
+        int gridHeight = GlobalTileMap.GetLength(1) / clusterSize;
 
-        // Create clusters based on the grid
         for (int row = 0; row < gridHeight; row++)
         {
             for (int col = 0; col < gridWidth; col++)
             {
-                Cluster cluster = new Cluster();
-                cluster.Id = Guid.NewGuid();
-                cluster.Level = level;
-                cluster.Nodes = new List<HPANode>();
-                cluster.Entrances = new List<Entrance>();
+                Cluster cluster = new Cluster
+                {
+                    Id = Guid.NewGuid(),
+                    Level = level,
+                    Nodes = new List<HPANode>(),
+                    Entrances = new List<Entrance>(),
+                    AdjacencyMatrix = new HPAEdge[clusterSize, clusterSize]
+                };
 
-                // Determine the boundaries of the cluster
                 int startX = col * clusterSize;
                 int startY = row * clusterSize;
                 int endX = startX + clusterSize - 1;
                 int endY = startY + clusterSize - 1;
 
-                // Add nodes to the cluster based on their positions
-                foreach (HPANode node in NodesByLevel[level])
+                if (NodesByLevel.ContainsKey(level))
                 {
-                    if (node.Position.x >= startX && node.Position.x <= endX &&
-                        node.Position.y >= startY && node.Position.y <= endY)
+                    foreach (HPANode node in NodesByLevel[level])
                     {
-                        cluster.Nodes.Add(node);
-                        node.Cluster = cluster;
+                        if (node.Position.x >= startX && node.Position.x <= endX &&
+                            node.Position.y >= startY && node.Position.y <= endY)
+                        {
+                            cluster.Nodes.Add(node);
+                            node.Cluster = cluster;
+                        }
                     }
                 }
 
+                // Create edges for nodes within the cluster
+                cluster = CreateEdgesForCluster(cluster, startX, startY, endX, endY, clusterSize);
                 clusters.Add(cluster);
             }
         }
 
         return clusters;
+    }
 
+    private Cluster CreateEdgesForCluster(Cluster cluster, int startX, int startY, int endX, int endY, int clusterSize)
+    {
+        foreach (HPANode node in cluster.Nodes)
+        {
+            int x = node.Position.x;
+            int y = node.Position.y;
+
+            int[] dx = { 0, 1, 0, -1 };
+            int[] dy = { 1, 0, -1, 0 };
+
+            for (int direction = 0; direction < 4; direction++)
+            {
+                int newX = x + dx[direction];
+                int newY = y + dy[direction];
+
+                if (newX >= startX && newX <= endX && newY >= startY && newY <= endY && GlobalTileMap[newX, newY] != 1)
+                {
+                    HPANode adjacentNode = cluster.Nodes.FirstOrDefault(n => n.Position.x == newX && n.Position.y == newY);
+                    if (adjacentNode != null)
+                    {
+                        HPAEdge edge = new HPAEdge
+                        {
+                            Node1 = node,
+                            Node2 = adjacentNode,
+                            Weight = 1
+                        };
+
+                        cluster.AdjacencyMatrix[node.Position.x - startX, node.Position.y - startY] = edge;
+                    }
+                }
+            }
+        }
+        return cluster;
     }
 
     private bool Adjacent(Cluster c1, Cluster c2)
@@ -322,28 +354,11 @@ public class HPAStarGraphConstruction
     }
     private double SearchForDistance(HPANode n1, HPANode n2, Cluster c)
     {
-        // Assuming a fixed size for the example. You might need to dynamically calculate or retrieve this.
-        int mapWidth = 100; // Example width
-        int mapHeight = 100; // Example height
+        // Implementation to search for the distance between two HPANodes within a cluster
+        // This method should calculate and return the distance between the two HPANodes within the cluster
+        // You can use any pathfinding algorithm like A* to find the distance
 
-        // Initialize the map array with 1s
-        int[,] map = new int[mapWidth, mapHeight];
-        for (int x = 0; x < mapWidth; x++)
-        {
-            for (int y = 0; y < mapHeight; y++)
-            {
-                map[x, y] = 1; // 1 indicates non traversable terrain
-            }
-        }
-
-        // Mark positions of HPANodes within the cluster as 0 (considering these positions are special or non-traversable)
-        foreach (HPANode node in c.Nodes)
-        {
-            if (node.Position.x >= 0 && node.Position.x < mapWidth && node.Position.y >= 0 && node.Position.y < mapHeight)
-            {
-                map[(int)node.Position.x, (int)node.Position.y] = 0;
-            }
-        }
+        int[,] map = convertToGrid(c.AdjacencyMatrix);
 
         // Implement A* or another pathfinding algorithm to find the shortest path
         // This is a placeholder; you'll need to implement or integrate an actual pathfinding algorithm
@@ -374,7 +389,7 @@ public class HPAStarGraphConstruction
 
     }
 
-    private void AddHPAEdge(HPANode n1, HPANode n2, int level, double weight, HPAEdgeType type)
+    public void AddHPAEdge(HPANode n1, HPANode n2, int level, double weight, HPAEdgeType type)
     {
         // Implementation to add an HPAEdge between two HPANodes at the specified level
         // This method should create an HPAEdge object and add it to the AdjacencyMatrices dictionary
@@ -490,6 +505,268 @@ public class HPAStarGraphConstruction
 
         return null;
     }
+
+    private void connectToBorder(HPANode n, Cluster c)
+    {
+        int level = c.Level;
+
+        foreach (HPANode node in NodesByLevel[level])
+        {
+            if (node.Cluster != c)
+            {
+                double d = SearchForDistance(n, node, c);
+                if (d < double.PositiveInfinity)
+                {
+                    AddHPAEdge(n, node, level, d, HPAEdgeType.INTRA); //TODO: unsure if Intra is corect.? 
+                }
+            }
+        }
+    }
+
+    public void insertNode(HPANode s, int maxLevel)
+    {
+        for (int l = 1; l <= maxLevel; l++)
+        {
+            Cluster c = determineCluster(s, l);
+            connectToBorder(s, c);
+        }
+
+        SetLevel(s, maxLevel);
+    }
+
+
+
+    private Cluster determineCluster(HPANode n, int l)
+    {
+        // Check if the ClusterByLevel dictionary contains the specified level
+        if (ClusterByLevel.ContainsKey(l))
+        {
+            // Retrieve the clusters at the specified level
+            List<Cluster> clusters = ClusterByLevel[l];
+
+            // Iterate through the clusters
+            foreach (Cluster cluster in clusters)
+            {
+                // Check if the node belongs to the current cluster
+                if (cluster.Nodes.Contains(n))
+                {
+                    // Return the found cluster
+                    return cluster;
+                }
+            }
+        }
+
+        // Return null if no cluster is found
+        throw new Exception("No cluster found");
+    }
+
+    public List<Vector2Int> hierarchicalSearch(HPANode s, HPANode g, int level)
+    {
+        insertNode(s, level);
+        insertNode(g, level);
+        List<HPANode> absPath = searchForPath(s, g, level);
+        List<Vector2Int> llPath = refinePath(absPath, level);
+        //smPath = smoothPath(llPath);
+        return llPath;
+    }
+
+    public List<HPANode> searchForPath(HPANode s, HPANode g, int level)
+    {
+        // Implementation of A* search algorithm to find a path in the abstract graph
+        // You can use any standard A* implementation or library
+        // The search should be performed on the abstract graph at the specified level
+        // Return the list of HPANodes representing the abstract path from s to g
+
+        // Example implementation using a placeholder A* algorithm
+        Astar astar = new Astar();
+        int[,] map = convertToGrid(AdjacencyMatrices[level]);
+        List<Vector2Int> abstractPath = astar.FindPath(s.Position, g.Position, map);
+
+        // Convert the abstract path to a list of HPANodes
+        List<HPANode> path = new List<HPANode>();
+        foreach (Vector2Int pos in abstractPath)
+        {
+            HPANode node = NodesByLevel[level].FirstOrDefault(n => n.Position == pos);
+            if (node != null)
+            {
+                path.Add(node);
+            }
+        }
+
+        return path;
+
+
+
+
+
+    }
+
+    public List<Vector2Int> refinePath(List<HPANode> abstractPath, int level)
+    {
+        List<Vector2Int> refinedPath = new List<Vector2Int>();
+
+        // Iterate through each pair of consecutive HPANodes in the abstract path
+        for (int i = 0; i < abstractPath.Count - 1; i++)
+        {
+            HPANode startNode = abstractPath[i];
+            HPANode endNode = abstractPath[i + 1];
+
+            // Check if the start and end nodes are in the same cluster
+            if (startNode.Cluster == endNode.Cluster)
+            {
+                // If in the same cluster, find the local path within the cluster
+                List<Vector2Int> localPath = findLocalPath(startNode, endNode, startNode.Cluster);
+                refinedPath.AddRange(localPath);
+            }
+            else
+            {
+                // If in different clusters, find the path through the entrance
+                Entrance entrance = findEntrance(startNode.Cluster, endNode.Cluster);
+                List<Vector2Int> entrancePath = findLocalPath(startNode, entrance.Node1, startNode.Cluster);
+                refinedPath.AddRange(entrancePath);
+                refinedPath.Add(entrance.Node2.Position);
+            }
+        }
+
+        // Add the position of the last HPANode in the abstract path
+        refinedPath.Add(abstractPath[abstractPath.Count - 1].Position);
+
+        return refinedPath;
+    }
+
+    private List<Vector2Int> findLocalPath(HPANode startNode, HPANode endNode, Cluster cluster)
+    {
+        // Implementation to find the local path between two HPANodes within a cluster
+        // You can use any pathfinding algorithm like A* to find the path
+        // Return the list of Vector2Int positions representing the local path
+
+        // Example implementation using a placeholder A* algorithm
+        int[,] map = convertToGrid(cluster.AdjacencyMatrix);
+        Astar astar = new Astar();
+        List<Vector2Int> localPath = astar.FindPath(startNode.Position, endNode.Position, map);
+
+        return localPath;
+    }
+
+    private Entrance findEntrance(Cluster startCluster, Cluster endCluster)
+    {
+        // Implementation to find the entrance connecting two clusters
+        // You can iterate through the entrances of the clusters and find the matching one
+        // Return the found Entrance object
+
+        foreach (Entrance entrance in startCluster.Entrances)
+        {
+            if ((entrance.Cluster1 == startCluster && entrance.Cluster2 == endCluster) ||
+                (entrance.Cluster1 == endCluster && entrance.Cluster2 == startCluster))
+            {
+                return entrance;
+            }
+        }
+
+        return null;
+    }
+
+
+    private int[,] convertToGrid(HPAEdge[,] AdjacencyMatrix)
+    {
+        // Implementation to convert an HPAEdge adjacency matrix to a grid
+        // This method should convert the adjacency matrix to a grid representation
+        // You can use the weight of the edges to determine the grid values
+        // Return the 2D array representing the grid
+
+        // Example implementation using a placeholder conversion
+        int rows = AdjacencyMatrix.GetLength(0);
+        int cols = AdjacencyMatrix.GetLength(1);
+        int[,] grid = new int[rows, cols];
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                HPAEdge edge = AdjacencyMatrix[i, j];
+                grid[i, j] = edge != null ? 1 : 0;
+            }
+        }
+
+        return grid;
+    }
+
+
+    // public List<Vector2Int> smoothPath(List<Vector2Int> path)
+    // {
+    //     List<Vector2Int> smoothedPath = new List<Vector2Int>();
+
+    //     // Add the first position to the smoothed path
+    //     smoothedPath.Add(path[0]);
+
+    //     // Iterate through the path positions
+    //     for (int i = 1; i < path.Count - 1; i++)
+    //     {
+    //         Vector2Int currentPos = path[i];
+    //         Vector2Int nextPos = path[i + 1];
+
+    //         // Check if there is a straight line between the current position and the next position
+    //         if (!isWalkable(currentPos, nextPos))
+    //         {
+    //             // If not walkable, add the current position to the smoothed path
+    //             smoothedPath.Add(currentPos);
+    //         }
+    //     }
+
+    //     // Add the last position to the smoothed path
+    //     smoothedPath.Add(path[path.Count - 1]);
+
+    //     return smoothedPath;
+    // }
+
+    // private bool isWalkable(Vector2Int startPos, Vector2Int endPos)
+    // {
+    //     // Implementation to check if there is a walkable straight line between two positions
+    //     // You can use a line drawing algorithm like Bresenham's line algorithm
+    //     // Check if all the positions along the line are walkable (e.g., not blocked by obstacles)
+    //     // Return true if the line is walkable, false otherwise
+
+    //     // Example implementation using a placeholder walkability check
+    //     // Assuming you have a method to check if a position is walkable
+    //     foreach (Vector2Int pos in getPositionsAlongLine(startPos, endPos))
+    //     {
+    //         if (!isPositionWalkable(pos))
+    //         {
+    //             return false;
+    //         }
+    //     }
+
+    //     return true;
+    // }
+
+    // private bool isPositionWalkable(Vector2Int position)
+    // {
+    //     // Implementation to check if a position is walkable
+    //     // You can check against your game's walkability criteria (e.g., not blocked by obstacles)
+    //     // Return true if the position is walkable, false otherwise
+
+    //     // Placeholder implementation
+    //     // Assuming you have a method to check if a position is walkable in your game
+    //     return IsWalkable(position);
+    // }
+
+    // private bool IsWalkable(Vector2Int position)
+    // {
+    //     return GlobalTileMap[position.x, position.y] == 0;
+
+
+    // }
+
+    // private List<Vector2Int> getPositionsAlongLine(Vector2Int startPos, Vector2Int endPos)
+    // {
+    //     // Implementation to get the positions along a straight line between two positions
+    //     // You can use a line drawing algorithm like Bresenham's line algorithm
+    //     // Return the list of Vector2Int positions along the line
+
+    //     // Placeholder implementation
+    //     // Assuming you have a method to get the positions along a line in your game
+    //     return GetPositionsAlongLine(startPos, endPos);
+    // }
 }
 
 
@@ -498,6 +775,9 @@ public class Cluster
     public Guid Id { get; set; }
     public int Level { get; set; }
     public List<HPANode> Nodes { get; set; }
+
+    public HPAEdge[,] AdjacencyMatrix { get; set; }
+
     public List<Entrance> Entrances { get; set; }
 }
 public class Entrance
