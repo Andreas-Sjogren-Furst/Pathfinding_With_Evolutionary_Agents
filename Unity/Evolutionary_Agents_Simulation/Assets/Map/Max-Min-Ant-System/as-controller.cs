@@ -20,9 +20,8 @@ public abstract class MMASController
             for (int j = 0; j < checkpointCoordinates.Length; j++)
             {
                 Vector2Int checkPoint2 = checkpointCoordinates[j];
-                Astar astar = new Astar();
-                List<Vector2Int> optPath = astar.FindPath(checkPoint1, checkPoint2, map);
-                graph.AddEdge(graph.Nodes[i], graph.Nodes[j], optPath.Count);
+                //      List<Vector2Int> optPath = Astar.FindPath(checkPoint1, checkPoint2);
+                //    graph.AddEdge(graph.Nodes[i], graph.Nodes[j], optPath.Count); //TODO: ADD HPA* implementation
 
             }
 

@@ -60,6 +60,7 @@ public abstract class MapController
         Map = applyCellularAutomaton(Map, iterations, erosionLimit);
         checkIfpathExists(Map, numberOfCheckPoints);
 
+
         return Map;
     }
 
@@ -197,7 +198,9 @@ public abstract class MapController
     static Boolean checkIfpathExists(int[,] Map, int numberOfCheckPoints)
     {
 
-        Astar aStar = new Astar();
+        //Astar aStar = new Astar();
+
+        HPAPathfinding hpaStar = new HPAPathfinding();
 
         // Boolean pathExists = false;
         int counter = 0;
@@ -252,7 +255,7 @@ public abstract class MapController
 
                     Debug.Log("Checkpoint: " + tempCheckPoint);
                     Debug.Log("Spawner: " + spawner2d);
-                    paths[i] = aStar.FindPath(tempCheckPoint, spawner2d, Map);
+                    paths[i] = hpaStar.FindPath(tempCheckPoint, spawner2d, Map);
                     List<Vector2Int> pathSegment = paths[i];
                     if (combinedPath.Count > 0 && pathSegment.Count > 0)
                     {

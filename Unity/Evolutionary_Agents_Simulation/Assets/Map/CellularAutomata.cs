@@ -142,7 +142,7 @@ public class CellularAutomata : MonoBehaviour
 
     }
 
-    int[,] visualizePath(int[,] map, List<Vector2Int> path)
+    public int[,] visualizePath(int[,] map, List<Vector2Int> path)
     {
         Debug.Log("Visualizing path with path length: " + path.Count);
 
@@ -158,6 +158,7 @@ public class CellularAutomata : MonoBehaviour
         // return map;
         return map;
     }
+
 
     bool ParametersChanged()
     {

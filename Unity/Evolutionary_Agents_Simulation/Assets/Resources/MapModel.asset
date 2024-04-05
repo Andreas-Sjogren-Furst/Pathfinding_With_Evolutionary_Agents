@@ -15,10 +15,10 @@ MonoBehaviour:
   NumberOfCheckPoints: 1
   TileSize: 1
   Density: 0
-  CellularIterations: 6
+  CellularIterations: 0
   CheckPointSpacing: 10
   ErosionLimit: 4
-  MapNumber: 1
+  MapNumber: 0
   RandomSeed: 42
   mapSize: 100
   ColonyCoordinates: []
