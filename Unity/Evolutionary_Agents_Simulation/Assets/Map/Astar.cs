@@ -130,7 +130,7 @@ public static class Astar
     // }
 
 
-    public static List<HPANode> FindPath(HPANode start, HPANode end)
+    public static List<HPANode> FindPath(HPANode start, HPANode end, HPAEdgeType edgeType = HPAEdgeType.INTRA)
     {
         var openList = new FibonacciHeapPriorityQueue<HPANode>(SortDirection.Ascending);
         var openListLookup = new Dictionary<Vector2Int, HPANode>();
@@ -149,10 +149,10 @@ public static class Astar
 
         openList.Enqueue(start);
         openListLookup.Add(start.Position, start);
-        Debug.Log($"Starting pathfinding from {start.Position} to {end.Position}.");
+        // Debug.Log($"Starting pathfinding from {start.Position} to {end.Position}.");
         Vector3 trans = new Vector3((float)(1 / 2.0), 0, (float)(1 / 2.0));
         Vector3 curTrans = new Vector3(-50, 1, -50);
-        Debug.DrawRay(new Vector3(start.Position.x, 0, start.Position.y) + trans + curTrans, new Vector3(end.Position.x, 0, end.Position.y) + trans + curTrans, Color.green, duration: 5f);
+        //  Debug.DrawRay(new Vector3(start.Position.x, 0, start.Position.y) + trans + curTrans, new Vector3(end.Position.x, 0, end.Position.y) + trans + curTrans, Color.green, duration: 5f);
 
 
         while (openList.Count > 0)
@@ -161,7 +161,7 @@ public static class Astar
             // When moving a node from open to closed list
             HPANode currentNode = openList.Dequeue();
             openListLookup.Remove(currentNode.Position);
-            Debug.Log($"Moving to closed list: {currentNode.Position}.");
+            // Debug.Log($"Moving to closed list: {currentNode.Position}.");
 
 
 
@@ -183,6 +183,7 @@ public static class Astar
 
             foreach (HPAEdge edge in currentNode.Edges)
             {
+                if (edge.Type != edgeType) continue;
                 HPANode neighbor = edge.Node1 == currentNode ? edge.Node2 : edge.Node1;
 
                 if (closedList.ContainsKey(neighbor.Position)) continue;
@@ -195,7 +196,7 @@ public static class Astar
                     neighbor.hCost = GetDistance(neighbor.Position, end.Position);
                     neighbor.parent = currentNode;
 
-                    Debug.Log($"Updating node {neighbor.Position}: New gCost: {newCostToNeighbor}, New hCost: {neighbor.hCost}.");
+                    // Debug.Log($"Updating node {neighbor.Position}: New gCost: {newCostToNeighbor}, New hCost: {neighbor.hCost}.");
                     if (!openListLookup.ContainsKey(neighbor.Position))
                     {
                         // When adding to open list
@@ -209,8 +210,8 @@ public static class Astar
         }
 
 
+        return null;
 
-        throw new Exception("Path not found");
     }
 
     // Adjust the GetDistance method if necessary to fit your needs

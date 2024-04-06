@@ -13,6 +13,15 @@ public class Cluster
     public Vector2Int topRightPos { get; set; }
     public HashSet<HPANode> Nodes { get; set; }
 
+    public HashSet<HPANode> NodesLeft { get { return getNodesBasedOnDirection(CompassDirection.West); } }
+    public HashSet<HPANode> NodesRight { get { return getNodesBasedOnDirection(CompassDirection.East); } }
+    public HashSet<HPANode> NodesTop { get { return getNodesBasedOnDirection(CompassDirection.North); } }
+    public HashSet<HPANode> NodesBottom { get { return getNodesBasedOnDirection(CompassDirection.South); } }
+
+
+
+    public int ClusterLengthInTile { get { return topRightPos.x - bottomLeftPos.x; } }
+
 
     public HashSet<Entrance> Entrances { get; set; }
 
@@ -27,6 +36,9 @@ public class Cluster
 
         this.bottomLeftPos = bottomLeftPos;
         this.topRightPos = topRightPos;
+
+
+
     }
 
     public bool Contains(Vector2Int position)
@@ -35,50 +47,81 @@ public class Cluster
 
     }
 
-    public static HPAEdge[,] ConvertGridToAdjacencyMatrix(int[,] map, Dictionary<Vector2Int, HPANode> tileToHPANode)
+
+    private HashSet<HPANode> getNodesBasedOnDirection(CompassDirection direction)
     {
-        int size = tileToHPANode.Count;
-        // Assuming tileToHPANode contains all walkable nodes, the matrix size should match the number of nodes
-        HPAEdge[,] adjacencyMatrix = new HPAEdge[size, size];
-
-        foreach (var entry in tileToHPANode)
+        HashSet<HPANode> nodes = new HashSet<HPANode>();
+        foreach (HPANode node in this.Nodes)
         {
-            Vector2Int currentPosition = entry.Key;
-            HPANode currentNode = entry.Value;
-
-            // Directions for N, S, E, W
-            Vector2Int[] directions = {
-            new Vector2Int(0, 1),
-            new Vector2Int(0, -1),
-            new Vector2Int(1, 0),
-            new Vector2Int(-1, 0)
-            // Include diagonals if desired
-        };
-
-            foreach (Vector2Int direction in directions)
+            if (direction == CompassDirection.North)
             {
-                Vector2Int neighborPosition = currentPosition + direction;
-                if (tileToHPANode.TryGetValue(neighborPosition, out HPANode neighborNode))
+                if (node.Position.y == topRightPos.y)
                 {
-                    // Assuming index mapping is sequential and based on the order of insertion into tileToHPANode
-                    int currentIndex = GetIndexFromPosition(currentPosition, tileToHPANode);
-                    int neighborIndex = GetIndexFromPosition(neighborPosition, tileToHPANode);
-
-                    // Create edge only if both nodes exist and are walkable
-                    adjacencyMatrix[currentIndex, neighborIndex] = new HPAEdge(node1: currentNode, node2: neighborNode, weight: 1, level: 0, type: HPAEdgeType.INTRA);
+                    nodes.Add(node);
+                }
+            }
+            if (direction == CompassDirection.South)
+            {
+                if (node.Position.y == bottomLeftPos.y)
+                {
+                    nodes.Add(node);
+                }
+            }
+            if (direction == CompassDirection.East)
+            {
+                if (node.Position.x == topRightPos.x)
+                {
+                    nodes.Add(node);
+                }
+            }
+            if (direction == CompassDirection.West)
+            {
+                if (node.Position.x == bottomLeftPos.x)
+                {
+                    nodes.Add(node);
                 }
             }
         }
 
-        return adjacencyMatrix;
+
+        return nodes;
     }
 
-    private static int GetIndexFromPosition(Vector2Int position, Dictionary<Vector2Int, HPANode> tileToHPANode)
-    {
-        // Assuming tileToHPANode.Values is ordered or you have a mechanism to map positions to sequential indices
-        // You might need to adjust this based on how you manage node indices
-        return Array.IndexOf(tileToHPANode.Values.ToArray(), tileToHPANode[position]);
-    }
+
+    // private void setNodesFromCoordinate()
+    // {
+    //     foreach (HPANode node in this.Nodes)
+    //     {
+    //         if (node.Position.x == bottomLeftPos.x)
+    //         {
+    //             this.NodesLeft.Add(node);
+    //         }
+    //         if (node.Position.x == topRightPos.x)
+    //         {
+    //             this.NodesRight.Add(node);
+    //         }
+    //         if (node.Position.y == bottomLeftPos.y)
+    //         {
+    //             this.NodesBottom.Add(node);
+    //         }
+    //         if (node.Position.y == topRightPos.y)
+    //         {
+    //             this.NodesTop.Add(node);
+    //         }
+    //     }
+    // }
+
 
 
 }
+
+public enum CompassDirection
+{
+    North,
+    South,
+    East,
+    West,
+    None
+
+}
+

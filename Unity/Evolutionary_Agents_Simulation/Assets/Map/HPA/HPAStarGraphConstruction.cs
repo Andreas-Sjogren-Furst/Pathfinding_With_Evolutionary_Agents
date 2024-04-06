@@ -87,31 +87,61 @@ public class HPAStarGraphConstruction
             Cluster c1 = E.Cluster1;
             Cluster c2 = E.Cluster2;
 
-            HPANode n1 = NewHPANode(E, c1);
-            HPANode n2 = NewHPANode(E, c2);
-            AddHPANode(n1, 1);
-            AddHPANode(n2, 1);
-            AddHPAEdge(n1, n2, 1, 1, HPAEdgeType.INTER);
+            // HPANode n1 = NewHPANode(E, c1);
+            // HPANode n2 = NewHPANode(E, c2);
+            // AddHPANode(n1, 1);
+            // AddHPANode(n2, 1);
+
+            AddHPAEdge(E.Node1, E.Node2, 1, 1, HPAEdgeType.INTER); // optimize to only put 1 entrance in the middle. 
 
         }
 
+        // add INTER edges between Entrances in the same cluster. 
+
+        Debug.Log("clusters: " + ClusterByLevel[1].Count);
+
+
         foreach (Cluster c in ClusterByLevel[1])
         {
-            foreach (HPANode n1 in c.Nodes)
+            Debug.Log($"Cluster {c.Id} has {c.Entrances.Count} entrances");
+
+            foreach (Entrance e1 in c.Entrances)
             {
-                foreach (HPANode n2 in c.Nodes)
+                foreach (Entrance e2 in c.Entrances)
                 {
-                    if (n1.Id != n2.Id)
+                    if (e1.Node1.Position != e2.Node1.Position)
                     {
-                        double d = SearchForDistance(n1, n2, c);
+                        double d = SearchForDistance(e1.Node1, e2.Node1, c);
                         if (d < double.PositiveInfinity)
                         {
-                            AddHPAEdge(n1, n2, weight: d, level: 1, HPAEdgeType.INTRA);
+                            AddHPAEdge(e1.Node1, e2.Node1, weight: 1, level: 1, HPAEdgeType.INTER);
                         }
                     }
                 }
             }
         }
+
+
+
+        // Not needed: too much overhead. 
+
+        // foreach (Cluster c in ClusterByLevel[1])
+        // {
+        //     foreach (HPANode n1 in c.Nodes)
+        //     {
+        //         foreach (HPANode n2 in c.Nodes)
+        //         {
+        //             if (n1.Id != n2.Id)
+        //             {
+        //                 double d = SearchForDistance(n1, n2, c);
+        //                 if (d < double.PositiveInfinity)
+        //                 {
+        //                     // AddHPAEdge(n1, n2, weight: d, level: 1, HPAEdgeType.INTRA);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 
 
@@ -127,112 +157,60 @@ public class HPAStarGraphConstruction
     // ... (previous code remains the same)
 
     // Helper methods
-    public HashSet<Cluster> BuildClusters(int level) // A2. 
+    public HashSet<Cluster> BuildClusters(int level)
     {
         HashSet<Cluster> clusters = new HashSet<Cluster>();
-        int clusterSize = 5 * level;
+        int clusterSize = 10 * level; // This defines how large each cluster is relative to the level.
 
-        int gridHeight = GlobalTileMap.GetLength(0) / clusterSize;
-        int gridWidth = GlobalTileMap.GetLength(1) / clusterSize;
+        // Calculating the number of clusters needed to cover the entire map.
+        int gridHeight = (int)Math.Ceiling((double)GlobalTileMap.GetLength(0) / clusterSize);
+        int gridWidth = (int)Math.Ceiling((double)GlobalTileMap.GetLength(1) / clusterSize);
 
+        // Ensure the node count for this level is initialized.
         if (!nodeCountByLevel.ContainsKey(level))
         {
             nodeCountByLevel.Add(level, 0);
         }
 
-
-
-
+        // Loop through each grid position to create clusters.
         for (int i = 0; i < gridHeight; i++)
         {
             for (int j = 0; j < gridWidth; j++)
             {
-                Cluster cluster = new Cluster
-                (
-                    bottomLeftPos: new Vector2Int(i * clusterSize, j * clusterSize),
-                    topRightPos: new Vector2Int((i + 1) * clusterSize - 1, (j + 1) * clusterSize - 1),
+                int startX = i * clusterSize;
+                int startY = j * clusterSize;
+                int endX = Math.Min(startX + clusterSize - 1, GlobalTileMap.GetLength(0) - 1);
+                int endY = Math.Min(startY + clusterSize - 1, GlobalTileMap.GetLength(1) - 1);
+
+                Cluster cluster = new Cluster(
+                    bottomLeftPos: new Vector2Int(startX, startY),
+                    topRightPos: new Vector2Int(endX, endY),
                     level: level,
                     hPANodes: new HashSet<HPANode>(),
                     entrances: new HashSet<Entrance>()
                 );
 
-                int startX = i * clusterSize;
-                int startY = j * clusterSize;
-                int endX = startX + clusterSize - 1;
-                int endY = startY + clusterSize - 1;
-
-                if (GlobalTileMap[i, j] != 1)
-                { // If the tile is walkable
-                  // Create a new HPANode for this tile
-                    int nCount = nodeCountByLevel[level];
-                    HPANode newNode = new HPANode(id: nCount, cluster: cluster, position: new Vector2Int(i, j), level: level);
-                    nodeCountByLevel[level] = nCount + 1;
-
-                    // Add the new node to the cluster's nodes
-                    //      cluster.Nodes.Add(newNode);
-
-                    // Ensure NodesByLevel is properly initialized for the current level
-                    if (!NodesByLevel.ContainsKey(level))
-                    {
-                        NodesByLevel[level] = new Dictionary<Vector2Int, HPANode>();
-                    }
-
-                    // Add the new node to NodesByLevel
-                    NodesByLevel[level].Add(newNode.Position, newNode);
-                }
-            }
-        }
-
-        for (int i = 0; i < gridHeight; i++)
-        {
-            for (int j = 0; j < gridWidth; j++)
-            {
-                Cluster cluster = new Cluster
-                (
-                    bottomLeftPos: new Vector2Int(i * clusterSize, j * clusterSize),
-                    topRightPos: new Vector2Int((i + 1) * clusterSize - 1, (j + 1) * clusterSize - 1),
-                    level: level,
-                    hPANodes: new HashSet<HPANode>(),
-                    entrances: new HashSet<Entrance>()
-                );
-
-                int startX = i * clusterSize;
-                int startY = j * clusterSize;
-                int endX = startX + clusterSize - 1;
-                int endY = startY + clusterSize - 1;
-
-
-                if (NodesByLevel.ContainsKey(level))
+                // Populate nodes within the cluster bounds.
+                for (int x = startX; x <= endX; x++)
                 {
-                    if (NodesByLevel[level].Count == 0)
+                    for (int y = startY; y <= endY; y++)
                     {
-                        Debug.Log("THERE ARE NOT NODES !!!"); //TODO: FIX NO NODES
-                    }
-                    {
-
-                    }
-
-
-                    if (NodesByLevel.TryGetValue(level, out var levelNodes))
-                    {
-                        foreach (KeyValuePair<Vector2Int, HPANode> kvp in levelNodes)
+                        if (GlobalTileMap[x, y] != 1) // Assuming 1 means non-walkable.
                         {
-                            Vector2Int position = kvp.Key;
-                            HPANode node = kvp.Value;
+                            int nCount = nodeCountByLevel[level]++;
+                            HPANode newNode = new HPANode(id: nCount, cluster: cluster, position: new Vector2Int(x, y), level: level);
+                            cluster.Nodes.Add(newNode);
 
-                            if (position.x >= startX && position.x <= endX &&
-                                position.y >= startY && position.y <= endY)
+                            if (!NodesByLevel.ContainsKey(level))
                             {
-                                cluster.Nodes.Add(node);
-                                node.Cluster = cluster;
+                                NodesByLevel[level] = new Dictionary<Vector2Int, HPANode>();
                             }
+                            NodesByLevel[level].Add(new Vector2Int(x, y), newNode);
                         }
                     }
-
                 }
 
-
-                // Create edges for nodes within the cluster
+                // Optionally, create edges for nodes within the cluster if necessary here.
                 cluster = CreateEdgesForCluster(cluster, startX, startY, endX, endY, clusterSize);
                 clusters.Add(cluster);
             }
@@ -241,41 +219,185 @@ public class HPAStarGraphConstruction
         return clusters;
     }
 
-    private HashSet<Entrance> BuildEntrances(Cluster c1, Cluster c2) // A3. 
-    {
-        // Implementation to build entrances between two adjacent clusters
-        // This method should create and return a set of entrances that connect the two clusters
-        // Entrances are shared nodes between two adjacent clusters that allow movement between them
-        // Create Entrance objects and set their properties (Id, Cluster1, Cluster2, Node1, Node2)
-        // Return the set of created entrances
+    // private HashSet<Entrance> BuildEntrances(Cluster c1, Cluster c2)
+    // {
+    //     HashSet<Entrance> entrances = new HashSet<Entrance>();
 
+    //     // Ensure the clusters are adjacent; Adjacent method remains unchanged
+    //     if (!Adjacent(c1, c2)) return entrances;
+
+    //     // Calculate shared borders for all possible adjacency cases
+    //     // Horizontal Adjacency (East-West or West-East)
+    //     if (c1.bottomLeftPos.y == c2.bottomLeftPos.y && c1.topRightPos.y == c2.topRightPos.y)
+    //     {
+    //         int sharedStartY = c1.bottomLeftPos.y;
+    //         int sharedEndY = c1.topRightPos.y;
+    //         // Determine which cluster is on the left
+    //         int xForC1 = c1.topRightPos.x == c2.bottomLeftPos.x - 1 ? c1.topRightPos.x : c1.bottomLeftPos.x - 1;
+    //         int xForC2 = xForC1 == c1.topRightPos.x ? c2.bottomLeftPos.x : c2.topRightPos.x;
+
+    //         for (int y = sharedStartY; y <= sharedEndY; y++)
+    //         {
+    //             if (GlobalTileMap[xForC1, y] != 1 && GlobalTileMap[xForC2, y] != 1)
+    //             {
+    //                 // Find or create nodes and entrances
+    //                 var node1 = FindOrCreateNode(xForC1, y, c1);
+    //                 var node2 = FindOrCreateNode(xForC2, y, c2);
+    //                 entrances.Add(new Entrance(c1, c2, node1, node2)); //  undirected graph
+    //                 entrances.Add(new Entrance(c2, c1, node2, node1)); // undirected graph
+    //             }
+    //         }
+    //     }
+    //     // Vertical Adjacency (North-South or South-North)
+    //     else if (c1.bottomLeftPos.x == c2.bottomLeftPos.x && c1.topRightPos.x == c2.topRightPos.x)
+    //     {
+    //         int sharedStartX = c1.bottomLeftPos.x;
+    //         int sharedEndX = c1.topRightPos.x;
+    //         // Determine which cluster is on the bottom
+    //         int yForC1 = c1.topRightPos.y == c2.bottomLeftPos.y - 1 ? c1.topRightPos.y : c1.bottomLeftPos.y - 1;
+    //         int yForC2 = yForC1 == c1.topRightPos.y ? c2.bottomLeftPos.y : c2.topRightPos.y;
+
+    //         for (int x = sharedStartX; x <= sharedEndX; x++)
+    //         {
+    //             if (GlobalTileMap[x, yForC1] != 1 && GlobalTileMap[x, yForC2] != 1)
+    //             {
+
+    //                 // check if it is on a line segment for previous in the set. 
+
+
+
+
+    //                 // Find or create nodes and entrances
+    //                 var node1 = FindOrCreateNode(x, yForC1, c1);
+    //                 var node2 = FindOrCreateNode(x, yForC2, c2);
+    //                 entrances.Add(new Entrance(c1, c2, node1, node2)); // undirected graph
+    //                 entrances.Add(new Entrance(c2, c1, node2, node1)); // undirected graph
+    //             }
+    //         }
+    //     }
+
+    //     Debug.Log("Entrances added betwen: " + c1.bottomLeftPos.ToString() + " and " + c2.bottomLeftPos.ToString() + " : " + entrances.Count.ToString());
+
+    //     // clean up the entrances to only have 1 entrance between 2 clusters.
+
+
+
+
+
+
+
+
+
+
+    //     return entrances;
+    // }
+
+
+    private HashSet<Entrance> BuildEntrances(Cluster c1, Cluster c2, int maxGroupSize = 5) // optimized to build less entrances. 
+    {
         HashSet<Entrance> entrances = new HashSet<Entrance>();
 
-        // Check if the clusters are adjacent
-        if (!Adjacent(c1, c2))
-            return entrances;
+        // Ensure the clusters are adjacent
+        if (!Adjacent(c1, c2)) return entrances;
 
-        // Find the shared nodes between the two clusters
-        var sharedNodes = c1.Nodes.Intersect(c2.Nodes).ToList();
-        Debug.Log("Shared nodes: " + sharedNodes.Count);
+        List<Tuple<int, int>> potentialEntranceCoordinates = new List<Tuple<int, int>>();
 
+        // Determine shared border and orientation (horizontal or vertical adjacency)
+        bool isHorizontal = c1.bottomLeftPos.y == c2.bottomLeftPos.y && c1.topRightPos.y == c2.topRightPos.y;
+        int sharedStart = isHorizontal ? c1.bottomLeftPos.y : c1.bottomLeftPos.x;
+        int sharedEnd = isHorizontal ? c1.topRightPos.y : c1.topRightPos.x;
+        int lengthAlongBorder = sharedEnd - sharedStart + 1;
 
-        // Create entrances for each pair of shared nodes
-        for (int i = 0; i < sharedNodes.Count - 1; i++)
+        // Find all potential entrances along the shared border
+        for (int i = 0; i < lengthAlongBorder; i++)
         {
-            HPANode node1 = sharedNodes[i];
-            HPANode node2 = sharedNodes[i + 1];
+            int posAlongBorder = sharedStart + i;
+            int posC1 = isHorizontal ? c1.topRightPos.x : c1.topRightPos.y;
+            int posC2 = isHorizontal ? c2.bottomLeftPos.x : c2.bottomLeftPos.y;
 
-            // Create a new entrance
-            Entrance entrance = new Entrance(cluster1: c1, cluster2: c2, node1: node1, node2: node2);
-
-
-            // Add the entrance to the set of entrances
-            entrances.Add(entrance);
+            if (GlobalTileMap[isHorizontal ? posC1 : posAlongBorder, isHorizontal ? posAlongBorder : posC1] != 1 &&
+                GlobalTileMap[isHorizontal ? posC2 : posAlongBorder, isHorizontal ? posAlongBorder : posC2] != 1)
+            {
+                potentialEntranceCoordinates.Add(Tuple.Create(posAlongBorder, i));
+            }
         }
+
+        // Group adjacent coordinates into entrances, max size defined by maxGroupSize
+        for (int i = 0; i < potentialEntranceCoordinates.Count; i += maxGroupSize)
+        {
+            int groupSize = Math.Min(maxGroupSize, potentialEntranceCoordinates.Count - i);
+            int middleIndex = i + groupSize / 2;
+            Tuple<int, int> midPoint = potentialEntranceCoordinates[middleIndex];
+
+            int coord = midPoint.Item1;
+            int xForC1 = isHorizontal ? c1.topRightPos.x : coord;
+            int yForC1 = isHorizontal ? coord : c1.topRightPos.y;
+            int xForC2 = isHorizontal ? c2.bottomLeftPos.x : coord;
+            int yForC2 = isHorizontal ? coord : c2.bottomLeftPos.y;
+
+            // Find or create nodes at the central point of each group
+            var node1 = FindOrCreateNode(xForC1, yForC1, c1);
+            var node2 = FindOrCreateNode(xForC2, yForC2, c2);
+            entrances.Add(new Entrance(c1, c2, node1, node2));
+            entrances.Add(new Entrance(c2, c1, node2, node1));
+        }
+
+        Debug.Log("Entrances added between: " + c1.bottomLeftPos.ToString() + " and " + c2.bottomLeftPos.ToString() + " : " + entrances.Count.ToString());
 
         return entrances;
     }
+
+
+    public CompassDirection getClusterDirection(Cluster c1, Cluster c2)
+    {
+        // Calculate the centroids of both clusters
+        Vector2 c1Center = new Vector2((c1.bottomLeftPos.x + c1.topRightPos.x) / 2.0f, (c1.bottomLeftPos.y + c1.topRightPos.y) / 2.0f);
+        Vector2 c2Center = new Vector2((c2.bottomLeftPos.x + c2.topRightPos.x) / 2.0f, (c2.bottomLeftPos.y + c2.topRightPos.y) / 2.0f);
+
+        // Determine the direction based on the centroids
+        if (c2Center.x > c1Center.x) return CompassDirection.East;
+        if (c2Center.x < c1Center.x) return CompassDirection.West;
+        if (c2Center.y > c1Center.y) return CompassDirection.North;
+        if (c2Center.y < c1Center.y) return CompassDirection.South;
+
+        return CompassDirection.None;
+    }
+
+    private HPANode FindOrCreateNode(int x, int y, Cluster cluster)
+    {
+        Vector2Int position = new Vector2Int(x, y);
+        int level = cluster.Level;
+
+        // Check if a node at the given position and level already exists
+        if (NodesByLevel.ContainsKey(level) && NodesByLevel[level].ContainsKey(position))
+        {
+            // Node exists, return it
+            return NodesByLevel[level][position];
+        }
+        else
+        {
+            // Node does not exist, create a new one
+            int nCount = nodeCountByLevel[level];
+            HPANode newNode = new HPANode(
+                id: nCount, // You need to implement this method
+                cluster: cluster,
+                position: position,
+                level: level);
+            nodeCountByLevel[level] = nCount + 1;
+
+            // Assuming the node's constructor sets its initial properties
+
+            // Add the new node to the hierarchical structure
+            AddHPANode(newNode, level);
+
+            return newNode;
+        }
+    }
+
+
+
+
+
 
     public void AddLevelToGraph(int l)
     {
@@ -318,35 +440,46 @@ public class HPAStarGraphConstruction
 
     private Cluster CreateEdgesForCluster(Cluster cluster, int startX, int startY, int endX, int endY, int clusterSize)
     {
+        // Dictionary for quick node lookup based on positions within the cluster
+        Dictionary<Vector2Int, HPANode> nodeLookup = new Dictionary<Vector2Int, HPANode>();
+        foreach (var node in cluster.Nodes)
+        {
+            nodeLookup[new Vector2Int(node.Position.x, node.Position.y)] = node;
+        }
+
+        int[] dx = { 1, -1, 0, 0 }; // East, West, North, South
+        int[] dy = { 0, 0, 1, -1 };
 
         foreach (HPANode node in cluster.Nodes)
         {
             int x = node.Position.x;
             int y = node.Position.y;
 
-            int[] dx = { 0, 1, 0, -1 };
-            int[] dy = { 1, 0, -1, 0 };
-
             for (int direction = 0; direction < 4; direction++)
             {
                 int newX = x + dx[direction];
                 int newY = y + dy[direction];
+                Vector2Int newPosition = new Vector2Int(newX, newY);
 
+                // Ensure the new position is within the cluster bounds and the map tile at this position is walkable
                 if (newX >= startX && newX <= endX && newY >= startY && newY <= endY && GlobalTileMap[newX, newY] != 1)
                 {
-                    HPANode adjacentNode = cluster.Nodes.FirstOrDefault(n => n.Position.x == newX && n.Position.y == newY);
-                    if (adjacentNode != null)
+                    if (nodeLookup.TryGetValue(newPosition, out HPANode adjacentNode))
                     {
-                        HPAEdge edge = new HPAEdge
-                        (
-                            node1: node,
-                            node2: adjacentNode,
-                            weight: 1,
-                            level: cluster.Level,
-                            type: HPAEdgeType.INTRA
-                        );
+                        // Create an edge only if both current and adjacent positions are walkable
+                        if (GlobalTileMap[x, y] != 1 && GlobalTileMap[newX, newY] != 1)
+                        {
+                            HPAEdge edge = new HPAEdge
+                            (
+                                node1: node,
+                                node2: adjacentNode,
+                                weight: 1,  // Assuming uniform cost
+                                level: cluster.Level,
+                                type: HPAEdgeType.INTRA
+                            );
 
-                        cluster.Nodes.FirstOrDefault(n => n.Position == node.Position).Edges.Add(edge); // TODO: optimize this.
+                            node.Edges.Add(edge); // Add edge directly to the node's edges list
+                        }
                     }
                 }
             }
@@ -354,50 +487,18 @@ public class HPAStarGraphConstruction
         return cluster;
     }
 
-    private bool Adjacent(Cluster c1, Cluster c2)
+
+
+    public bool Adjacent(Cluster c1, Cluster c2)
     {
-        // Implementation to check if two clusters are adjacent
-        // This method should determine if there is a direct connection between the two clusters
-        // You can use your own criteria to define adjacency. 
-        // The clusters are adjacent if they share a common boundary
-        // Return true if the clusters are adjacent, false otherwise
-
-        // Check if the clusters are at the same level
-        if (c1.Level != c2.Level)
-            return false;
+        return c1.bottomLeftPos.x == c2.topRightPos.x + 1 || c1.topRightPos.x == c2.bottomLeftPos.x - 1 ||
+               c1.bottomLeftPos.y == c2.topRightPos.y + 1 || c1.topRightPos.y == c2.bottomLeftPos.y - 1;
 
 
-        if (c1.Nodes.Intersect(c2.Nodes).Count() > 0) return true;
 
-        return false;
-
-
-        // // Get the boundaries of the clusters
-        // int c1StartX = (int)c1.Nodes.Min(node => node.Position.x);
-        // int c1StartY = (int)c1.Nodes.Min(node => node.Position.y);
-        // int c1EndX = (int)c1.Nodes.Max(node => node.Position.x);
-        // int c1EndY = (int)c1.Nodes.Max(node => node.Position.y);
-
-        // int c2StartX = (int)c2.Nodes.Min(node => node.Position.x);
-        // int c2StartY = (int)c2.Nodes.Min(node => node.Position.y);
-        // int c2EndX = (int)c2.Nodes.Max(node => node.Position.x);
-        // int c2EndY = (int)c2.Nodes.Max(node => node.Position.y);
-
-        // // Check if the clusters share a common boundary
-        // if (c1StartX == c2EndX + 1 || c1EndX + 1 == c2StartX ||
-        //     c1StartY == c2EndY + 1 || c1EndY + 1 == c2StartY)
-        // {
-        //     return true;
-        // }
-
-        // return false;
 
 
     }
-
-
-
-
 
 
 
@@ -417,6 +518,7 @@ public class HPAStarGraphConstruction
         int nCount = nodeCountByLevel[c.Level];
         HPANode node = new HPANode(id: nCount, cluster: c, position: nodePos, level: c.Level);
         nodeCountByLevel[c.Level] = nCount + 1;
+
         // Return the created HPANode object
         return node;
     }
@@ -441,13 +543,11 @@ public class HPAStarGraphConstruction
         }
         else
         {
-            NodesByLevel[level][n.Position] = n;
-            // Handle the duplicate position - replace, ignore, or merge
-            // For example, to replace the existing node:
-            // NodesByLevel[level][n.Position] = n;
+            NodesByLevel[level][n.Position].Merge(n);
+
         }
     }
-    private double SearchForDistance(HPANode n1, HPANode n2, Cluster c)
+    private double SearchForDistance(HPANode n1, HPANode n2, Cluster c) // unsure if this should use A*, it is very slow if it do so...
     {
         // Implementation to search for the distance between two HPANodes within a cluster
         // This method should calculate and return the distance between the two HPANodes within the cluster
@@ -457,13 +557,19 @@ public class HPAStarGraphConstruction
 
         // Implement A* or another pathfinding algorithm to find the shortest path
         // This is a placeholder; you'll need to implement or integrate an actual pathfinding algorithm
-        List<HPANode> path = Astar.FindPath(n1, n2); // Adjust the FindPath method to work with your Astar implementation
+        //  List<HPANode> path = Astar.FindPath(n1, n2, HPAEdgeType.INTRA); // Adjust the FindPath method to work with your Astar implementation
 
         // Calculate the distance based on the path found
         // The distance calculation would depend on how your pathfinding algorithm represents paths
-        double distance = path != null ? CalculateDistance(path) : double.PositiveInfinity; // Implement CalculateDistance based on your needs
+        //  double distance = path != null ? CalculateDistance(path) : double.PositiveInfinity; // Implement CalculateDistance based on your needs
 
-        return distance;
+        if (n1.Cluster != c || n2.Cluster != c)
+        {
+            return double.PositiveInfinity;
+
+        }
+
+        return Vector2Int.Distance(n1.Position, n2.Position);
     }
 
     private double CalculateDistance(List<HPANode> path)
@@ -505,64 +611,6 @@ public class HPAStarGraphConstruction
 
 
     }
-
-
-    // Example of how you might convert a Vector2Int position to a matrix index
-    private int ConvertPositionToIndex(Vector2Int position)
-    {
-        // This conversion depends on how you decide to map positions to indices.
-        // For example, you could linearize the position by using the position.x and position.y
-        // to calculate a unique index for a flattened matrix or directly map them
-        // to 2D matrix coordinates if your structure supports it.
-
-        int maxWidth = GlobalTileMap.GetLength(0);
-
-
-
-
-        return position.x * maxWidth + position.y;
-    }
-
-
-
-    // public void AddHPAEdge(HPANode n1, HPANode n2, int level, double weight, HPAEdgeType type)
-    // {
-    //     // Implementation to add an HPAEdge between two HPANodes at the specified level
-    //     // This method should create an HPAEdge object and add it to the AdjacencyMatrices dictionary
-    //     // If the level key doesn't exist in the AdjacencyMatrices dictionary, create a new 2D array for that level
-    //     // Set the properties of the HPAEdge (Id, Node1, Node2, Weight, Level, Type)
-    //     // Add the HPAEdge to the adjacency matrix at the given level
-
-    //     // Create a new HPAEdge object
-    //     HPAEdge edge = new HPAEdge(
-    //         node1: n1,
-    //         node2: n2,
-    //         weight: weight,
-    //         level: level,
-    //         type: type
-    //     );
-
-    //     // Check if the level key exists in the AdjacencyMatrices dictionary
-    //     if (!AdjacencyMatrices.ContainsKey(level))
-    //     {
-    //         // // Create a new 2D array for the level
-    //         // int size = NodesByLevel[level].Count;
-    //         // Debug.Log("nodes by level Size: " + size);
-    //         // AdjacencyMatrices[level] = new HPAEdge[size, size];
-    //         throw new Exception("No level found in AdjacencyMatrices");
-    //     }
-
-    //     // Add the HPAEdge to the adjacency matrix at the given level
-
-
-
-
-
-
-
-    //     AdjacencyMatrices[level][index1, index2] = edge;
-    //     AdjacencyMatrices[level][index2, index1] = edge;
-    // }
 
 
     private HashSet<Entrance> GetEntrances(Cluster c1, Cluster c2)
@@ -630,20 +678,42 @@ public class HPAStarGraphConstruction
     {
         int level = c.Level;
 
-        foreach (HPANode node in c.Entrances.Select(e => e.Node1).Where(node => node != n))
+        // If the cluster might contain both Node1 and Node2 for its entrances,
+        // consider using a HashSet to avoid duplicate nodes if Node1 == Node2 in some cases.
+        HashSet<HPANode> borderNodes = new HashSet<HPANode>();
+        foreach (Entrance e in c.Entrances)
         {
+            if (e.Node1 != n) borderNodes.Add(e.Node1);
+            if (e.Node2 != n && e.Node2 != null) borderNodes.Add(e.Node2); // Add Node2 if it's used and valid
+        }
 
-            double d = SearchForDistance(n, node, c);
-            if (d < double.PositiveInfinity)
+        foreach (HPANode borderNode in borderNodes)
+        {
+            double distance = SearchForDistance(n, borderNode, c);
+            if (distance < double.PositiveInfinity)
             {
-                AddHPAEdge(n, node, weight: d, level: level, HPAEdgeType.INTRA); //TODO: unsure if Intra is corect.? 
+                AddHPAEdge(n, borderNode, distance, level, HPAEdgeType.INTER); // Confirm edge type based on usage
             }
-
         }
     }
 
+
     public void insertNode(HPANode s, int maxLevel) // start node and finish node. 
     {
+        if (!NodesByLevel[maxLevel].ContainsKey(s.Position))
+        {
+            NodesByLevel[maxLevel].Add(s.Position, s);
+        }
+        else
+        {
+            NodesByLevel[maxLevel][s.Position].Merge(s);
+        }
+        {
+
+        }
+
+        s = NodesByLevel[maxLevel][s.Position];
+
         for (int l = 1; l <= maxLevel; l++)
         {
             Cluster c = DetermineCluster(s, l);
@@ -651,19 +721,6 @@ public class HPAStarGraphConstruction
         }
 
         s.Level = maxLevel;
-
-
-        if (!NodesByLevel[maxLevel].ContainsKey(s.Position))
-        {
-            NodesByLevel[maxLevel].Add(s.Position, s);
-        }
-        else
-        {
-            NodesByLevel[maxLevel][s.Position] = s;
-        }
-        {
-
-        }
 
     }
 
@@ -688,6 +745,13 @@ public class HPAStarGraphConstruction
         insertNode(s, level);
         insertNode(g, level);
         List<HPANode> absPath = searchForPath(s.Position, g.Position, level);
+        if (absPath == null)
+        {
+
+            throw new Exception("No path found in hierarchicalSearch");
+            return null;
+
+        }
         List<HPANode> llPath = refinePath(absPath, level);
         //smPath = smoothPath(llPath);
         return llPath;
@@ -724,7 +788,7 @@ public class HPAStarGraphConstruction
 
 
 
-        List<HPANode> abstractPath = Astar.FindPath(start, goal);
+        List<HPANode> abstractPath = Astar.FindPath(start, goal, HPAEdgeType.INTER);
 
 
 
@@ -778,7 +842,7 @@ public class HPAStarGraphConstruction
         // Return the list of Vector2Int positions representing the local path
 
         // Example implementation using a placeholder A* algorithm
-        List<HPANode> localPath = Astar.FindPath(startNode, endNode);
+        List<HPANode> localPath = Astar.FindPath(startNode, endNode, HPAEdgeType.INTRA);
 
         return localPath;
     }

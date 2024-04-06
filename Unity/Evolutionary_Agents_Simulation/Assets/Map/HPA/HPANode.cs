@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
+using System.Linq;
 
 public class HPANode : IComparable<HPANode>
 {
@@ -49,7 +50,21 @@ public class HPANode : IComparable<HPANode>
         Edges = new List<HPAEdge>();
     }
 
-    // cast 
+
+    public void Merge(HPANode other)
+    {
+        // Assuming Id, Position, Cluster, and Level are invariant and should not change during merge
+        // Merge the edges from the other node into this one
+        foreach (var edge in other.Edges)
+        {
+            if (!Edges.Any(e => e.Id == edge.Id))
+            {
+                Edges.Add(edge);
+            }
+        }
+
+    }
+
 
 
 
