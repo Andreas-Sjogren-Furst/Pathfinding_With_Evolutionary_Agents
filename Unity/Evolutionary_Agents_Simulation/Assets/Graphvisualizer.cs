@@ -21,7 +21,7 @@ public class GraphVisualizer : MonoBehaviour
         CreateMaterials();
         CreateNodePrefab();
 
-        int maxSize = 20;
+        int maxSize = 40;
 
         int[,] tileMap = new int[maxSize, maxSize]; // Define your tile map
 

@@ -803,37 +803,102 @@ public class HPAStarGraphConstruction
 
     public List<HPANode> refinePath(List<HPANode> abstractPath, int level)
     {
+        if (abstractPath == null || abstractPath.Count == 0)
+        {
+            Debug.LogError("Abstract path is null or empty.");
+            return new List<HPANode>();  // Return an empty path as a safe default
+        }
+
         List<HPANode> refinedPath = new List<HPANode>();
 
-        // Iterate through each pair of consecutive HPANodes in the abstract path
         for (int i = 0; i < abstractPath.Count - 1; i++)
         {
-
             HPANode startNode = abstractPath[i];
             HPANode endNode = abstractPath[i + 1];
 
-            // Check if the start and end nodes are in the same cluster
+            // Ensure nodes are not null
+            if (startNode == null || endNode == null)
+            {
+                Debug.LogError($"Null node encountered in abstract path at indices {i} and {i + 1}.");
+                continue;  // Skip this iteration
+            }
+
+            if (startNode.Cluster == null || endNode.Cluster == null)
+            {
+                Debug.LogError("One of the nodes has a null cluster.");
+                continue;
+            }
+
+            // Handle nodes within the same cluster
             if (startNode.Cluster == endNode.Cluster)
             {
-                // If in the same cluster, find the local path within the cluster
                 List<HPANode> localPath = findLocalPath(startNode, endNode, startNode.Cluster);
+                if (localPath == null || localPath.Count == 0)
+                {
+                    Debug.LogError("Failed to find local path within cluster for nodes: " + startNode.Id + " to " + endNode.Id);
+                    continue;  // Skip adding this path
+                }
                 refinedPath.AddRange(localPath);
             }
             else
             {
-                // If in different clusters, find the path through the entrance
+                // Handle transition between different clusters
                 Entrance entrance = findEntrance(startNode.Cluster, endNode.Cluster);
-                List<HPANode> entrancePath = findLocalPath(startNode, entrance.Node1, startNode.Cluster);
-                refinedPath.AddRange(entrancePath);
-                refinedPath.Add(entrance.Node2);
+                if (entrance == null || entrance.Node1 == null || entrance.Node2 == null)
+                {
+                    Debug.LogError("No valid entrance or null nodes in entrance between clusters: " + startNode.Cluster.Id + " and " + endNode.Cluster.Id);
+                    continue;  // Skip this iteration
+                }
+
+                // Path to the entrance in the start cluster
+                List<HPANode> pathToEntrance = findLocalPath(startNode, entrance.Node1, startNode.Cluster);
+                if (pathToEntrance == null || pathToEntrance.Count == 0)
+                {
+                    Debug.LogError("Failed to find path to entrance for startNode.");
+                    continue;
+                }
+                refinedPath.AddRange(pathToEntrance);
+
+                // Path from the entrance in the end cluster to the end node
+                List<HPANode> pathFromEntrance = findLocalPath(entrance.Node2, endNode, endNode.Cluster);
+                if (pathFromEntrance == null || pathFromEntrance.Count == 0)
+                {
+                    Debug.LogError("Failed to find path from entrance for endNode.");
+                    continue;
+                }
+                if (pathFromEntrance.Count > 0 && pathFromEntrance.First() == entrance.Node2)
+                    pathFromEntrance.RemoveAt(0);  // Remove duplicate entrance node if present
+
+                refinedPath.AddRange(pathFromEntrance);
             }
         }
 
-        // Add the position of the last HPANode in the abstract path
-        refinedPath.Add(abstractPath[abstractPath.Count - 1]);
+        // Ensure the last node of the abstract path is included if not already present
+        if (refinedPath.LastOrDefault() != abstractPath.Last())
+        {
+            if (refinedPath.Count > 0 && refinedPath.Last().Cluster == abstractPath.Last().Cluster)
+            {
+                List<HPANode> finalSegment = findLocalPath(refinedPath.Last(), abstractPath.Last(), abstractPath.Last().Cluster);
+                if (finalSegment != null && finalSegment.Count > 0)
+                {
+                    if (finalSegment.First() == refinedPath.Last())
+                        finalSegment.RemoveAt(0);
+                    refinedPath.AddRange(finalSegment);
+                }
+                else
+                {
+                    Debug.LogError("No valid path to final node found.");
+                }
+            }
+            else
+            {
+                refinedPath.Add(abstractPath.Last());
+            }
+        }
 
         return refinedPath;
     }
+
 
     private List<HPANode> findLocalPath(HPANode startNode, HPANode endNode, Cluster cluster)
     {
