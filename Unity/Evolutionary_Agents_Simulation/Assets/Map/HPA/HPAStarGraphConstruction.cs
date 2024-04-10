@@ -92,7 +92,8 @@ public class HPAStarGraphConstruction
             // AddHPANode(n1, 1);
             // AddHPANode(n2, 1);
 
-            AddHPAEdge(E.Node1, E.Node2, 1, 1, HPAEdgeType.INTER); // optimize to only put 1 entrance in the middle. 
+            AddHPAEdge(E.Node1, E.Node2, 1, 1, HPAEdgeType.INTER);
+
 
         }
 
@@ -109,15 +110,18 @@ public class HPAStarGraphConstruction
             {
                 foreach (Entrance e2 in c.Entrances)
                 {
-                    if (e1.Node1.Position != e2.Node1.Position)
+                    if (e1.Id != e2.Id)
                     {
-                        double d = SearchForDistance(e1.Node1, e2.Node1, c);
+                        double d = SearchForDistance(e1.Node1, e2.Node1, c, HPAEdgeType.INTRA);
                         if (d < double.PositiveInfinity)
                         {
-                            AddHPAEdge(e1.Node1, e2.Node1, weight: 1, level: 1, HPAEdgeType.INTER);
+                            AddHPAEdge(e1.Node1, e2.Node1, d, 1, HPAEdgeType.INTER);
                         }
                     }
                 }
+
+
+
             }
         }
 
@@ -219,133 +223,210 @@ public class HPAStarGraphConstruction
         return clusters;
     }
 
-    // private HashSet<Entrance> BuildEntrances(Cluster c1, Cluster c2)
-    // {
-    //     HashSet<Entrance> entrances = new HashSet<Entrance>();
-
-    //     // Ensure the clusters are adjacent; Adjacent method remains unchanged
-    //     if (!Adjacent(c1, c2)) return entrances;
-
-    //     // Calculate shared borders for all possible adjacency cases
-    //     // Horizontal Adjacency (East-West or West-East)
-    //     if (c1.bottomLeftPos.y == c2.bottomLeftPos.y && c1.topRightPos.y == c2.topRightPos.y)
-    //     {
-    //         int sharedStartY = c1.bottomLeftPos.y;
-    //         int sharedEndY = c1.topRightPos.y;
-    //         // Determine which cluster is on the left
-    //         int xForC1 = c1.topRightPos.x == c2.bottomLeftPos.x - 1 ? c1.topRightPos.x : c1.bottomLeftPos.x - 1;
-    //         int xForC2 = xForC1 == c1.topRightPos.x ? c2.bottomLeftPos.x : c2.topRightPos.x;
-
-    //         for (int y = sharedStartY; y <= sharedEndY; y++)
-    //         {
-    //             if (GlobalTileMap[xForC1, y] != 1 && GlobalTileMap[xForC2, y] != 1)
-    //             {
-    //                 // Find or create nodes and entrances
-    //                 var node1 = FindOrCreateNode(xForC1, y, c1);
-    //                 var node2 = FindOrCreateNode(xForC2, y, c2);
-    //                 entrances.Add(new Entrance(c1, c2, node1, node2)); //  undirected graph
-    //                 entrances.Add(new Entrance(c2, c1, node2, node1)); // undirected graph
-    //             }
-    //         }
-    //     }
-    //     // Vertical Adjacency (North-South or South-North)
-    //     else if (c1.bottomLeftPos.x == c2.bottomLeftPos.x && c1.topRightPos.x == c2.topRightPos.x)
-    //     {
-    //         int sharedStartX = c1.bottomLeftPos.x;
-    //         int sharedEndX = c1.topRightPos.x;
-    //         // Determine which cluster is on the bottom
-    //         int yForC1 = c1.topRightPos.y == c2.bottomLeftPos.y - 1 ? c1.topRightPos.y : c1.bottomLeftPos.y - 1;
-    //         int yForC2 = yForC1 == c1.topRightPos.y ? c2.bottomLeftPos.y : c2.topRightPos.y;
-
-    //         for (int x = sharedStartX; x <= sharedEndX; x++)
-    //         {
-    //             if (GlobalTileMap[x, yForC1] != 1 && GlobalTileMap[x, yForC2] != 1)
-    //             {
-
-    //                 // check if it is on a line segment for previous in the set. 
-
-
-
-
-    //                 // Find or create nodes and entrances
-    //                 var node1 = FindOrCreateNode(x, yForC1, c1);
-    //                 var node2 = FindOrCreateNode(x, yForC2, c2);
-    //                 entrances.Add(new Entrance(c1, c2, node1, node2)); // undirected graph
-    //                 entrances.Add(new Entrance(c2, c1, node2, node1)); // undirected graph
-    //             }
-    //         }
-    //     }
-
-    //     Debug.Log("Entrances added betwen: " + c1.bottomLeftPos.ToString() + " and " + c2.bottomLeftPos.ToString() + " : " + entrances.Count.ToString());
-
-    //     // clean up the entrances to only have 1 entrance between 2 clusters.
-
-
-
-
-
-
-
-
-
-
-    //     return entrances;
-    // }
-
-
-    private HashSet<Entrance> BuildEntrances(Cluster c1, Cluster c2, int maxGroupSize = 5) // optimized to build less entrances. 
+    private HashSet<Entrance> BuildEntrances(Cluster c1, Cluster c2, int maxGroupSize = 10)
     {
-        HashSet<Entrance> entrances = new HashSet<Entrance>();
+        HashSet<Entrance> AllEntrances = new HashSet<Entrance>();
+        HashSet<Entrance> HorisontalEntrances = new HashSet<Entrance>();
+        HashSet<Entrance> VerticalEntrances = new HashSet<Entrance>();
 
-        // Ensure the clusters are adjacent
-        if (!Adjacent(c1, c2)) return entrances;
+        // Ensure the clusters are adjacent; Adjacent method remains unchanged
+        if (!Adjacent(c1, c2)) return AllEntrances;
 
-        List<Tuple<int, int>> potentialEntranceCoordinates = new List<Tuple<int, int>>();
-
-        // Determine shared border and orientation (horizontal or vertical adjacency)
-        bool isHorizontal = c1.bottomLeftPos.y == c2.bottomLeftPos.y && c1.topRightPos.y == c2.topRightPos.y;
-        int sharedStart = isHorizontal ? c1.bottomLeftPos.y : c1.bottomLeftPos.x;
-        int sharedEnd = isHorizontal ? c1.topRightPos.y : c1.topRightPos.x;
-        int lengthAlongBorder = sharedEnd - sharedStart + 1;
-
-        // Find all potential entrances along the shared border
-        for (int i = 0; i < lengthAlongBorder; i++)
+        // Calculate shared borders for all possible adjacency cases
+        // Horizontal Adjacency (East-West or West-East)
+        if (c1.bottomLeftPos.y == c2.bottomLeftPos.y && c1.topRightPos.y == c2.topRightPos.y)
         {
-            int posAlongBorder = sharedStart + i;
-            int posC1 = isHorizontal ? c1.topRightPos.x : c1.topRightPos.y;
-            int posC2 = isHorizontal ? c2.bottomLeftPos.x : c2.bottomLeftPos.y;
+            int sharedStartY = c1.bottomLeftPos.y;
+            int sharedEndY = c1.topRightPos.y;
+            // Determine which cluster is on the left
+            int xForC1 = c1.topRightPos.x == c2.bottomLeftPos.x - 1 ? c1.topRightPos.x : c1.bottomLeftPos.x - 1;
+            int xForC2 = xForC1 == c1.topRightPos.x ? c2.bottomLeftPos.x : c2.topRightPos.x;
 
-            if (GlobalTileMap[isHorizontal ? posC1 : posAlongBorder, isHorizontal ? posAlongBorder : posC1] != 1 &&
-                GlobalTileMap[isHorizontal ? posC2 : posAlongBorder, isHorizontal ? posAlongBorder : posC2] != 1)
+            for (int y = sharedStartY; y <= sharedEndY; y++)
             {
-                potentialEntranceCoordinates.Add(Tuple.Create(posAlongBorder, i));
+                if (GlobalTileMap[xForC1, y] != 1 && GlobalTileMap[xForC2, y] != 1)
+                {
+                    // Find or create nodes and entrances
+                    var node1 = FindOrCreateNode(xForC1, y, c1);
+                    var node2 = FindOrCreateNode(xForC2, y, c2);
+                    HorisontalEntrances.Add(new Entrance(c1, c2, node1, node2)); //  undirected graph
+                    HorisontalEntrances.Add(new Entrance(c2, c1, node2, node1)); // undirected graph
+                }
+            }
+        }
+        // Vertical Adjacency (North-South or South-North)
+        else if (c1.bottomLeftPos.x == c2.bottomLeftPos.x && c1.topRightPos.x == c2.topRightPos.x)
+        {
+            int sharedStartX = c1.bottomLeftPos.x;
+            int sharedEndX = c1.topRightPos.x;
+            // Determine which cluster is on the bottom
+            int yForC1 = c1.topRightPos.y == c2.bottomLeftPos.y - 1 ? c1.topRightPos.y : c1.bottomLeftPos.y - 1;
+            int yForC2 = yForC1 == c1.topRightPos.y ? c2.bottomLeftPos.y : c2.topRightPos.y;
+
+            for (int x = sharedStartX; x <= sharedEndX; x++)
+            {
+                if (GlobalTileMap[x, yForC1] != 1 && GlobalTileMap[x, yForC2] != 1)
+                {
+
+                    // check if it is on a line segment for previous in the set. 
+
+
+
+
+                    // Find or create nodes and entrances
+                    var node1 = FindOrCreateNode(x, yForC1, c1);
+                    var node2 = FindOrCreateNode(x, yForC2, c2);
+                    VerticalEntrances.Add(new Entrance(c1, c2, node1, node2)); // undirected graph
+                    VerticalEntrances.Add(new Entrance(c2, c1, node2, node1)); // undirected graph
+                }
             }
         }
 
-        // Group adjacent coordinates into entrances, max size defined by maxGroupSize
-        for (int i = 0; i < potentialEntranceCoordinates.Count; i += maxGroupSize)
+
+        // clean up the entrances to only have 1 entrance between 2 clusters.
+
+
+
+        AllEntrances.UnionWith(GroupAndMergeEntrances(HorisontalEntrances, false, maxGroupSize));
+        AllEntrances.UnionWith(GroupAndMergeEntrances(VerticalEntrances, true, maxGroupSize));
+
+        Debug.Log("Entrances added betwen: " + c1.bottomLeftPos.ToString() + " and " + c2.bottomLeftPos.ToString() + " : " + AllEntrances.Count.ToString());
+
+
+
+
+        return AllEntrances;
+    }
+
+
+    public HashSet<Entrance> GroupAndMergeEntrances(HashSet<Entrance> allEntrances, bool horizontalAlignment, int maxGroupSize = 10)
+    {
+        List<Entrance> entrances = allEntrances.ToList();
+        List<List<Entrance>> groups = new List<List<Entrance>>();
+        bool[] grouped = new bool[entrances.Count]; // Tracks which entrances have been grouped
+
+        for (int i = 0; i < entrances.Count; i++)
         {
-            int groupSize = Math.Min(maxGroupSize, potentialEntranceCoordinates.Count - i);
-            int middleIndex = i + groupSize / 2;
-            Tuple<int, int> midPoint = potentialEntranceCoordinates[middleIndex];
+            if (grouped[i]) continue; // Skip already grouped entrances
 
-            int coord = midPoint.Item1;
-            int xForC1 = isHorizontal ? c1.topRightPos.x : coord;
-            int yForC1 = isHorizontal ? coord : c1.topRightPos.y;
-            int xForC2 = isHorizontal ? c2.bottomLeftPos.x : coord;
-            int yForC2 = isHorizontal ? coord : c2.bottomLeftPos.y;
+            List<Entrance> currentGroup = new List<Entrance>();
+            currentGroup.Add(entrances[i]);
+            grouped[i] = true;
 
-            // Find or create nodes at the central point of each group
-            var node1 = FindOrCreateNode(xForC1, yForC1, c1);
-            var node2 = FindOrCreateNode(xForC2, yForC2, c2);
-            entrances.Add(new Entrance(c1, c2, node1, node2));
-            entrances.Add(new Entrance(c2, c1, node2, node1));
+            for (int j = 0; j < entrances.Count; j++)
+            {
+                if (i == j || grouped[j]) continue; // Skip self and already grouped entrances
+
+                var lastEntrance = currentGroup.Last().Node1;
+                var currentEntrance = entrances[j].Node1;
+
+                // Adjacency and walkability check
+                bool areAdjacent = CheckAdjacency(lastEntrance, currentEntrance, horizontalAlignment);
+                bool isWalkableBetween = IsWalkable(lastEntrance.Position, currentEntrance.Position);
+
+                if (areAdjacent && isWalkableBetween)
+                {
+                    currentGroup.Add(entrances[j]);
+                    grouped[j] = true;
+
+                    // If the group reaches max size, stop adding to this group
+                    if (currentGroup.Count >= maxGroupSize)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            // Add the formed group to the list of groups
+            groups.Add(currentGroup);
         }
 
-        Debug.Log("Entrances added between: " + c1.bottomLeftPos.ToString() + " and " + c2.bottomLeftPos.ToString() + " : " + entrances.Count.ToString());
+        // Merge each group to a single entrance, taking the median as representative
+        HashSet<Entrance> groupedEntrances = new HashSet<Entrance>();
+        foreach (var group in groups)
+        {
+            if (group.Count > 0)
+            {
+                groupedEntrances.Add(group[group.Count / 2]); // Take the median entrance as the representative
+            }
+        }
 
-        return entrances;
+        return groupedEntrances;
     }
+
+    private bool CheckAdjacency(HPANode node1, HPANode node2, bool horizontalAlignment)
+    {
+        if (horizontalAlignment)
+        {
+            return node1.Position.y == node2.Position.y && Math.Abs(node1.Position.x - node2.Position.x) == 1;
+        }
+        else
+        {
+            return node1.Position.x == node2.Position.x && Math.Abs(node1.Position.y - node2.Position.y) == 1;
+        }
+    }
+
+
+    private bool IsWalkable(Vector2Int pos1, Vector2Int pos2)
+    {
+        // Replace this with your method to check if there is a walkable path between two positions
+        return GlobalTileMap[pos1.x, pos1.y] != 1 && GlobalTileMap[pos2.x, pos2.y] != 1;
+    }
+
+
+    // private HashSet<Entrance> BuildEntrances(Cluster c1, Cluster c2, int maxGroupSize = 10) // optimized to build less entrances. 
+    // {
+    //     HashSet<Entrance> entrances = new HashSet<Entrance>();
+
+    //     // Ensure the clusters are adjacent
+    //     if (!Adjacent(c1, c2)) return entrances;
+
+    //     List<Tuple<int, int>> potentialEntranceCoordinates = new List<Tuple<int, int>>();
+
+    //     // Determine shared border and orientation (horizontal or vertical adjacency)
+    //     bool isHorizontal = c1.bottomLeftPos.y == c2.bottomLeftPos.y && c1.topRightPos.y == c2.topRightPos.y;
+    //     int sharedStart = isHorizontal ? c1.bottomLeftPos.y : c1.bottomLeftPos.x;
+    //     int sharedEnd = isHorizontal ? c1.topRightPos.y : c1.topRightPos.x;
+    //     int lengthAlongBorder = sharedEnd - sharedStart + 1;
+
+    //     // Find all potential entrances along the shared border
+    //     for (int i = 0; i < lengthAlongBorder; i++)
+    //     {
+    //         int posAlongBorder = sharedStart + i;
+    //         int posC1 = isHorizontal ? c1.topRightPos.x : c1.topRightPos.y;
+    //         int posC2 = isHorizontal ? c2.bottomLeftPos.x : c2.bottomLeftPos.y;
+
+    //         if (GlobalTileMap[isHorizontal ? posC1 : posAlongBorder, isHorizontal ? posAlongBorder : posC1] != 1 &&
+    //             GlobalTileMap[isHorizontal ? posC2 : posAlongBorder, isHorizontal ? posAlongBorder : posC2] != 1)
+    //         {
+    //             potentialEntranceCoordinates.Add(Tuple.Create(posAlongBorder, i));
+    //         }
+    //     }
+
+    //     // Group adjacent coordinates into entrances, max size defined by maxGroupSize
+    //     for (int i = 0; i < potentialEntranceCoordinates.Count; i += maxGroupSize)
+    //     {
+    //         int groupSize = Math.Min(maxGroupSize, potentialEntranceCoordinates.Count - i);
+    //         int middleIndex = i + groupSize / 2;
+    //         Tuple<int, int> midPoint = potentialEntranceCoordinates[middleIndex];
+
+    //         int coord = midPoint.Item1;
+    //         int xForC1 = isHorizontal ? c1.topRightPos.x : coord;
+    //         int yForC1 = isHorizontal ? coord : c1.topRightPos.y;
+    //         int xForC2 = isHorizontal ? c2.bottomLeftPos.x : coord;
+    //         int yForC2 = isHorizontal ? coord : c2.bottomLeftPos.y;
+
+    //         // Find or create nodes at the central point of each group
+    //         var node1 = FindOrCreateNode(xForC1, yForC1, c1);
+    //         var node2 = FindOrCreateNode(xForC2, yForC2, c2);
+    //         entrances.Add(new Entrance(c1, c2, node1, node2));
+    //         entrances.Add(new Entrance(c2, c1, node2, node1));
+    //     }
+
+    //     Debug.Log("Entrances added between: " + c1.bottomLeftPos.ToString() + " and " + c2.bottomLeftPos.ToString() + " : " + entrances.Count.ToString());
+
+    //     return entrances;
+    // }
 
 
     public CompassDirection getClusterDirection(Cluster c1, Cluster c2)
@@ -547,7 +628,7 @@ public class HPAStarGraphConstruction
 
         }
     }
-    private double SearchForDistance(HPANode n1, HPANode n2, Cluster c) // unsure if this should use A*, it is very slow if it do so...
+    private double SearchForDistance(HPANode n1, HPANode n2, Cluster c, HPAEdgeType edgeType = HPAEdgeType.INTRA) // unsure if this should use A*, it is very slow if it do so...
     {
         // Implementation to search for the distance between two HPANodes within a cluster
         // This method should calculate and return the distance between the two HPANodes within the cluster
@@ -557,11 +638,11 @@ public class HPAStarGraphConstruction
 
         // Implement A* or another pathfinding algorithm to find the shortest path
         // This is a placeholder; you'll need to implement or integrate an actual pathfinding algorithm
-        //  List<HPANode> path = Astar.FindPath(n1, n2, HPAEdgeType.INTRA); // Adjust the FindPath method to work with your Astar implementation
+        List<HPANode> path = Astar.FindPath(n1, n2, edgeType); // Adjust the FindPath method to work with your Astar implementation
 
         // Calculate the distance based on the path found
         // The distance calculation would depend on how your pathfinding algorithm represents paths
-        //  double distance = path != null ? CalculateDistance(path) : double.PositiveInfinity; // Implement CalculateDistance based on your needs
+        double distance = path != null ? CalculateDistance(path) : double.PositiveInfinity; // Implement CalculateDistance based on your needs
 
         if (n1.Cluster != c || n2.Cluster != c)
         {
@@ -569,7 +650,12 @@ public class HPAStarGraphConstruction
 
         }
 
-        return Vector2Int.Distance(n1.Position, n2.Position);
+        return distance;
+    }
+
+    private float Vector2IntDistance(Vector2Int a, Vector2Int b)
+    {
+        return Mathf.Sqrt(Mathf.Pow(a.x - b.x, 2) + Mathf.Pow(a.y - b.y, 2));
     }
 
     private double CalculateDistance(List<HPANode> path)
@@ -582,6 +668,10 @@ public class HPAStarGraphConstruction
 
         for (int i = 0; i < path.Count - 1; i++)
         {
+            if (path[i] == null || path[i + 1] == null)
+            {
+                return double.PositiveInfinity;
+            }
             distance += Vector2Int.Distance(path[i].Position, path[i + 1].Position);
         }
 
@@ -689,7 +779,7 @@ public class HPAStarGraphConstruction
 
         foreach (HPANode borderNode in borderNodes)
         {
-            double distance = SearchForDistance(n, borderNode, c);
+            double distance = SearchForDistance(n, borderNode, c, HPAEdgeType.INTRA);
             if (distance < double.PositiveInfinity)
             {
                 AddHPAEdge(n, borderNode, distance, level, HPAEdgeType.INTER); // Confirm edge type based on usage
