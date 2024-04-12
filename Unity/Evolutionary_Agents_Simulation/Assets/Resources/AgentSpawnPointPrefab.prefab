@@ -18,8 +18,8 @@ GameObject:
   - component: {fileID: -1372616293737970893}
   - component: {fileID: 8635417985597707425}
   m_Layer: 7
-  m_Name: Ant
-  m_TagString: Ant
+  m_Name: AgentSpawnPointPrefab
+  m_TagString: Agent
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
