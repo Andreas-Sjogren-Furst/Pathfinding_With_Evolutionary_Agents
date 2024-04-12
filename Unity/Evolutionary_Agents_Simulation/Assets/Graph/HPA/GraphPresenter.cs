@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class GraphVisualizer : MonoBehaviour
+public class GraphPresenter : MonoBehaviour
 {
     public float tileSize = 1.0f;  // Define your tile size
     public float nodeScale = 0.1f;

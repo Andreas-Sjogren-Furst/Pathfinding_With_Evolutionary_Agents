@@ -17,19 +17,21 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
 
-        mapController = new MapController(mapModel,tileConfig,wallConfig,checkPointConfig,spawnPointConfig);
+        mapController = new MapController(mapModel, tileConfig, wallConfig, checkPointConfig, spawnPointConfig);
+
+
     }
-    
+
     // Start is called before the first frame update
     void Start()
     {
         mapController.InitMap();
     }
 
-    
+
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
