@@ -298,8 +298,8 @@ MonoBehaviour:
   showIntraEdges: 1
   showInterEdges: 1
   nodePrefab: {fileID: 3474578016508092520, guid: 823cb89a3cdea406a9866d4e7d1e5dd2, type: 3}
-  intraEdgeMaterial: {fileID: 2100000, guid: 1fd6fb1bc1f094556a12c4a452b24fb5, type: 2}
-  interEdgeMaterial: {fileID: 2100000, guid: edf3f4707d65044e9a62d1450f067cda, type: 2}
+  intraEdgeMaterial: {fileID: 2100000, guid: 2edd948b783e146fb893d44a49d5eeac, type: 2}
+  interEdgeMaterial: {fileID: 2100000, guid: 1fd6fb1bc1f094556a12c4a452b24fb5, type: 2}
 --- !u!1 &310619917
 GameObject:
   m_ObjectHideFlags: 0

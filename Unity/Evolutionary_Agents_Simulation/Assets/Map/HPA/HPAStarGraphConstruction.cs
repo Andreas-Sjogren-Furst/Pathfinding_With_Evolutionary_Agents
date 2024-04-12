@@ -267,12 +267,6 @@ public class HPAStarGraphConstruction
             {
                 if (GlobalTileMap[x, yForC1] != 1 && GlobalTileMap[x, yForC2] != 1)
                 {
-
-                    // check if it is on a line segment for previous in the set. 
-
-
-
-
                     // Find or create nodes and entrances
                     var node1 = FindOrCreateNode(x, yForC1, c1);
                     var node2 = FindOrCreateNode(x, yForC2, c2);
@@ -348,8 +342,11 @@ public class HPAStarGraphConstruction
             if (group.Count > 0)
             {
                 groupedEntrances.Add(group[group.Count / 2]); // Take the median entrance as the representative
+
             }
         }
+
+        Debug.Log("Grouped entrances: " + groupedEntrances.Count);
 
         return groupedEntrances;
     }

@@ -16,4 +16,23 @@ public class Entrance
         Node1 = node1;
         Node2 = node2;
     }
+
+    // public override bool Equals(object obj)
+    // {
+    //     if (obj is Entrance other)
+    //     {
+    //         // Check if the entrances connect the same nodes in the same order
+    //         return Node1.Equals(other.Node1.Position) && Node2.Equals(other.Node2.Position);
+    //     }
+    //     return false;
+    // }
+
+    // public override int GetHashCode()
+    // {
+    //     int hash = 17;
+    //     // Use an order-dependent hash combination
+    //     hash = hash * 31 + Node1.Position.GetHashCode();
+    //     hash = hash * 31 + Node2.Position.GetHashCode();
+    //     return hash;
+    // }
 }

@@ -134,6 +134,7 @@ public class MMAS
         return _bestTourLength;
     }
 
+    // TODO: MMAS, dynamisk, hvis en edge forsvinder, kan man nemt compute det restende af turen. 
     public void Run(int maxIterations) // O(I*N^2) // The ants construct solutions concurrently. Avg. computation time of Berlin52 = 2.7 seconds on M1 Pro. 
     {
         for (int iteration = 0; iteration < maxIterations; iteration++)
@@ -145,7 +146,7 @@ public class MMAS
             System.Threading.Tasks.Parallel.For(0, _numAnts, i =>
             {
                 ants[i] = new Ant();
-                antTours[i] = BuildTour(ants[i], i); // O(N^2)
+                antTours[i] = BuildTour(ants[i], i); // O(N^2) // ybdersøg om deg(v)=d O(N*d)
                 antTourLengths[i] = CalculateTourLength(antTours[i]); // O(N)
             });
 
@@ -218,8 +219,8 @@ public class MMAS
         double random = new Random().NextDouble() * sum;
         double cumulativeProbability = 0.0;
 
-        for (int i = 0; i < _graph.Nodes.Count; i++)
-        {
+        for (int i = 0; i < _graph.Nodes.Count; i++) // sorterings algortime, til at sortere kummulerede sandsynligheder. 
+        { //  Så de større muligheder rammer først.
             if (!ant.TabuList.Contains(i))
             {
                 cumulativeProbability += probabilities[i];
