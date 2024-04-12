@@ -18,4 +18,8 @@ public class ObjectRemover : MonoBehaviour
             Destroy(obj);
         }
     }
+
+    public static void DestroyObject(GameObject Object){
+        Destroy(Object);
+    }
 }

@@ -113,7 +113,7 @@ public static class Astar
 
     private static bool PositionIsValid(Vector2Int position, MapObject[,] map) // all 0s are walkable, 1s are walls, 2s are checkpoints (which are walkable.). 
     {
-        return position.x >= 0 && position.x < map.GetLength(0) && position.y >= 0 && position.y < map.GetLength(1) && (map[position.x, position.y].Type != MapObject.ObjectType.Wall);
+        return position.x >= 0 && position.x < map.GetLength(0) && position.y >= 0;
     }
 
     private static NodeCell FindExistingNode(Vector2Int position, Dictionary<Vector2Int, NodeCell> openListLookup, Dictionary<Vector2Int, NodeCell> closedList)

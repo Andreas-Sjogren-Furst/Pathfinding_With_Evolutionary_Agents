@@ -1,5 +1,5 @@
 
-public static class CellularAutomata
+public class CellularAutomata
 {
    
     public static int[,] Create2DMap(MapModel mapModel){

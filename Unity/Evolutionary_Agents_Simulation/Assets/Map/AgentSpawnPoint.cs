@@ -4,15 +4,12 @@ using System.Security.Cryptography;
 using UnityEngine;
 
 public class AgentSpawnPoint : MapObject
-{
-    public static Vector2Int spawnPoint;
-    public AgentSpawnPoint(Vector2Int arrayPosition) : 
-    base(arrayPosition)
+{   
+    public AgentSpawnPoint Create(Vector2Int arrayPosition, SpawnPointConfig spawnPointConfig) 
     {
-        Type = ObjectType.AgentSpawnPoint;
-        Prefab = AssetManager.agentSpawnPointPrefab;
-        spawnPoint = arrayPosition;
-        Tag = AssetManager.agentSpawnPointPrefab.tag;
+        ArrayPosition = arrayPosition;
+        Object = Instantiate(spawnPointConfig.Prefab, ConvertArrayToMap(arrayPosition), Quaternion.identity);
+        AgentSpawnPoint agentSpawnPointComponent = Object.AddComponent<AgentSpawnPoint>();
+        return agentSpawnPointComponent;
     }
-
 }

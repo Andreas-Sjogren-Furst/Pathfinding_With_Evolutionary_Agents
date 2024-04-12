@@ -2,12 +2,11 @@ using UnityEngine;
 
 public class Tile : MapObject
 {
-
-   public Tile(Vector2Int arrayPosition) : 
-   base(arrayPosition)
+   public Tile Create(Vector2Int arrayPosition, TileConfig tileConfig) 
    {
-      Type = ObjectType.Tile;
-      Prefab = AssetManager.tilePrefab;
-      Tag = AssetManager.tilePrefab.tag;
+      ArrayPosition = arrayPosition;
+      Object = Instantiate(tileConfig.Prefab, ConvertArrayToMap(arrayPosition), Quaternion.identity);
+      Tile tileComponent = Object.AddComponent<Tile>();
+      return tileComponent;
    }
 }

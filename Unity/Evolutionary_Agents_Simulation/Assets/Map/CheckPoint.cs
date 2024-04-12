@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class CheckPoint : MapObject
 {
-    public CheckPoint(Vector2Int arrayPosition) :
-    base(arrayPosition)
+    public CheckPoint Create(Vector2Int arrayPosition, CheckPointConfig checkPointConfig) 
     {
-        Type = ObjectType.CheckPoint;
-        Prefab = AssetManager.checkPointPrefab;
-        Tag = AssetManager.checkPointPrefab.tag;
+        ArrayPosition = arrayPosition;
+        Object = Instantiate(checkPointConfig.Prefab, ConvertArrayToMap(arrayPosition), Quaternion.identity);
+        CheckPoint checkPointComponent = Object.AddComponent<CheckPoint>();
+        return checkPointComponent;
     }
 }

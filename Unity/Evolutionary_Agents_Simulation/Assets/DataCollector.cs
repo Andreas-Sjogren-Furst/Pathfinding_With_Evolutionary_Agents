@@ -9,7 +9,7 @@ public class DataCollector : MonoBehaviour
 
 {
     // Get the reference to the colonies. 
-    private ObjectDropper objectDropper;
+    /*private ObjectDropper objectDropper;
 
     // Boolean to collect data. 
 
@@ -44,7 +44,7 @@ public class DataCollector : MonoBehaviour
         foreach (var colonyObj in colonies)
         {
             ColonyBehavior colonyBehavior = colonyObj.GetComponent<ColonyBehavior>();
-            var ants = colonyBehavior.GetAnts(); // Assuming GetAnts returns a List<GameObject> of ants
+            var ants = new List<int>{2,2,3,2}; // Assuming GetAnts returns a List<GameObject> of ants
 
             ColonyData colonyData = new ColonyData
             {
@@ -80,5 +80,5 @@ public class DataCollector : MonoBehaviour
 
 
 
-    }
+    }*/
 }

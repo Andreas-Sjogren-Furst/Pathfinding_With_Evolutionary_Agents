@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class AssetManager : MonoBehaviour
+public class AssetManager : MonoBehaviour
 {
     public static GameObject tilePrefab;
     public static GameObject wallPrefab;

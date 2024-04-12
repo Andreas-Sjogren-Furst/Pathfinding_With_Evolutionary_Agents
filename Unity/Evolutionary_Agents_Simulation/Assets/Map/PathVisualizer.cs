@@ -54,7 +54,7 @@ public class PathVisualizer : MonoBehaviour
     {
         Debug.Log("Visualizing path with path length: " + path.Count);
 
-        StartVisualizingPath(path, transform.position, MapModel.TileSize);
+        //StartVisualizingPath(path, transform.position, MapModel.TileSize);
 
         return map;
     }

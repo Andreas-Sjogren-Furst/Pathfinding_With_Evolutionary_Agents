@@ -12,7 +12,7 @@ public class MapModelEditor : Editor
 
         if (GUILayout.Button("Generate Map"))
         {  
-            MapController.CreateMap(mapModel);
+            //MapController.CreateMap(mapModel);
         }
     }
 }
