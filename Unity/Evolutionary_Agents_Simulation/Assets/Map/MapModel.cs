@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 public class MapModel : ScriptableObject
 {
     [Range(0, 20)] public int NumberOfCheckPoints;
-    public static readonly int scaleFactor = 10;
+    public static readonly int scaleFactor = 1;
     [Range(0, 100)] public float Density;
     [Range(1, 30)] public int CellularIterations;
     [Range(1, 10)] public int CheckPointSpacing;

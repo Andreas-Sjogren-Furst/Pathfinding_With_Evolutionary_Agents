@@ -22,7 +22,7 @@ public class GraphVisualizer : MonoBehaviour
         Debug.Log("Start graph visualizer");
 
 
-        int maxSize = 100;
+        int maxSize = 30;
 
         int[,] tileMap = new int[maxSize, maxSize]; // Define your tile map
 
