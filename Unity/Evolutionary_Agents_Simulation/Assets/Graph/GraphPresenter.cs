@@ -38,11 +38,6 @@ public class GraphPresenter : MonoBehaviour
             }
         }
         graph = new HPAStarGraphConstruction(tileMap); // Make sure your graph is already created and populated
-
-
-
-
-
         graph.Preprocessing(1); // Specify the maximum level for preprocessing
 
         Vector2Int start = new Vector2Int(0, 0);
