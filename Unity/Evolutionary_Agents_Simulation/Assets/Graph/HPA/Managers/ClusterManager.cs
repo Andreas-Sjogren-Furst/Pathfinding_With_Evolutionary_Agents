@@ -9,12 +9,18 @@ public class ClusterManager : IClusterManager
     private readonly INodeManager _nodeManager;
     private readonly IGraphModel _graphModel;
 
+    private readonly IEdgeManager _edgeManager;
 
-    public ClusterManager(IGraphModel graphModel, INodeManager nodeManager)
+    private readonly IEntranceManager _entranceManager;
+
+
+    public ClusterManager(IGraphModel graphModel, INodeManager nodeManager, IEdgeManager edgeManager, IEntranceManager entranceManager)
     {
         _graphModel = graphModel;
 
         _nodeManager = nodeManager;
+        _edgeManager = edgeManager;
+        _entranceManager = entranceManager;
     }
 
     public HashSet<Cluster> BuildClusters(int level, int[,] globalTileMap)
@@ -54,7 +60,7 @@ public class ClusterManager : IClusterManager
                     }
                 }
 
-                cluster = CreateEdgesForCluster(cluster, startX, startY, endX, endY, clusterSize);
+                // cluster = CreateEdgesForCluster(cluster, startX, startY, endX, endY, clusterSize);
                 clusters.Add(cluster);
             }
         }
@@ -112,4 +118,46 @@ public class ClusterManager : IClusterManager
         }
         return null;
     }
+
+
+    public Cluster MergeClusters(Cluster c1, Cluster c2)
+    {
+        if (c1.Level != c2.Level)
+        {
+            return null;
+        }
+        Cluster mergedCluster = new Cluster(
+            bottomLeftPos: new Vector2Int(Math.Min(c1.bottomLeftPos.x, c2.bottomLeftPos.x), Math.Min(c1.bottomLeftPos.y, c2.bottomLeftPos.y)),
+            topRightPos: new Vector2Int(Math.Max(c1.topRightPos.x, c2.topRightPos.x), Math.Max(c1.topRightPos.y, c2.topRightPos.y)),
+            level: c1.Level,
+            hPANodes: new HashSet<HPANode>(),
+            entrances: new HashSet<Entrance>()
+        );
+
+        foreach (Entrance entrance in _entranceManager.GetEntrances(c1, c2))
+        {
+            HPANode n1 = _nodeManager.FindOrCreateNode(entrance.Node1.Position.x, entrance.Node1.Position.y, mergedCluster);
+            HPANode n2 = _nodeManager.FindOrCreateNode(entrance.Node2.Position.x, entrance.Node2.Position.y, mergedCluster);
+            if (mergedCluster.Contains(entrance.Node1.Position) && mergedCluster.Contains(entrance.Node2.Position))
+            {
+                _edgeManager.AddHPAEdge(n1, n2, entrance.Edge1.Weight, mergedCluster.Level, HPAEdgeType.INTRA); // either the edge is inside, or outside the cluster. 
+            }
+            else
+            {
+                mergedCluster.Entrances.Add(entrance);
+
+            }
+            _nodeManager.AddHPANode(n1, mergedCluster.Level);
+            _nodeManager.AddHPANode(n2, mergedCluster.Level);
+            mergedCluster.Nodes.Add(n1);
+            mergedCluster.Nodes.Add(n2);
+
+        }
+
+        return mergedCluster;
+    }
+
+
+
+
 }

@@ -12,5 +12,4 @@ public interface IHPAStar
     void AddLevelToGraph(int l);
     List<HPANode> HierarchicalSearch(Vector2Int start, Vector2Int goal, int level);
 
-
 }

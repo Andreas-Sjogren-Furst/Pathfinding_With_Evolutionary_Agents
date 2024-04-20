@@ -63,7 +63,7 @@ public class PathFinder : IPathFinder
                 Entrance entrance = FindEntrance(startNode.Cluster, endNode.Cluster);
                 if (entrance == null || entrance.Node1 == null || entrance.Node2 == null)
                 {
-                    Debug.LogError("No valid entrance or null nodes in entrance between clusters: " + startNode.Cluster.Id + " and " + endNode.Cluster.Id);
+                    Debug.LogError("No valid entrance or null nodes in entrance between clusters: " + startNode.Cluster.bottomLeftPos + " and " + endNode.Cluster.bottomLeftPos);
                     continue;
                 }
 
@@ -117,7 +117,6 @@ public class PathFinder : IPathFinder
     {
         if (startNode.Cluster != cluster || endNode.Cluster != cluster)
         {
-            Debug.LogError("Start and end nodes must be in the same cluster.");
             return null;
         }
 

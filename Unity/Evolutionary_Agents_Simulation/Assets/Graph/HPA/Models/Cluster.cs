@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Cluster
 {
-    public Guid Id { get; set; }
+    // public Guid Id { get; set; }
     public int Level { get; set; }
 
     public Vector2Int bottomLeftPos { get; set; }
@@ -29,7 +29,7 @@ public class Cluster
     {
 
 
-        Id = Guid.NewGuid();
+        // Id = Guid.NewGuid();
         Level = level;
         Nodes = hPANodes;
         Entrances = entrances;
@@ -86,6 +86,24 @@ public class Cluster
 
         return nodes;
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Cluster other)
+        {
+            return this.bottomLeftPos == other.bottomLeftPos && this.topRightPos == other.topRightPos;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        // Create a hash code that is based on the position.
+        // You might use a combination of x and y coordinates to do this.
+        return bottomLeftPos.GetHashCode() + topRightPos.GetHashCode();
+    }
+
+
 
 
     // private void setNodesFromCoordinate()

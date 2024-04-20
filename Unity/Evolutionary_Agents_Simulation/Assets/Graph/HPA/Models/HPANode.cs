@@ -40,14 +40,14 @@ public class HPANode : IComparable<HPANode>
 
 
 
-    public List<HPAEdge> Edges { get; set; }
+    public HashSet<HPAEdge> Edges { get; set; }
     public HPANode(int id, Cluster cluster, Vector2Int position, int level)
     {
         Id = id;
         Position = position;
         Cluster = cluster;
         Level = level;
-        Edges = new List<HPAEdge>();
+        Edges = new HashSet<HPAEdge>();
     }
 
 
@@ -57,12 +57,28 @@ public class HPANode : IComparable<HPANode>
         // Merge the edges from the other node into this one
         foreach (var edge in other.Edges)
         {
-            if (!Edges.Any(e => e.Id == edge.Id))
+            if (!Edges.Any(e => e.Node2 == edge.Node2))
             {
                 Edges.Add(edge);
             }
         }
 
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is HPANode other)
+        {
+            return this.Position == other.Position;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        // Create a hash code that is based on the position.
+        // You might use a combination of x and y coordinates to do this.
+        return Position.GetHashCode();
     }
 
 

@@ -139,7 +139,7 @@ public class EntranceManager : IEntranceManager
         {
             foreach (Entrance e2 in c2.Entrances)
             {
-                if (e1.Id == e2.Id)
+                if (e1 == e2)
                 {
                     commonEntrances.Add(e1);
                     break;
