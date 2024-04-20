@@ -120,42 +120,111 @@ public class ClusterManager : IClusterManager
     }
 
 
-    public Cluster MergeClusters(Cluster c1, Cluster c2)
+    public Cluster MergeClusters(List<Cluster> clustersToMerge, int level)
     {
-        if (c1.Level != c2.Level)
+
+
+        Cluster mergedCluster = new Cluster(level, new HashSet<HPANode>(), new HashSet<Entrance>(), new Vector2Int(int.MaxValue, int.MaxValue), new Vector2Int(int.MinValue, int.MinValue));
+        _graphModel.ClusterByLevel[level].Add(mergedCluster);
+
+        // Determine the boundaries of the new merged cluster
+        Vector2Int bottomLeft = new Vector2Int(clustersToMerge.Min(c => c.bottomLeftPos.x), clustersToMerge.Min(c => c.bottomLeftPos.y));
+        Vector2Int topRight = new Vector2Int(clustersToMerge.Max(c => c.topRightPos.x), clustersToMerge.Max(c => c.topRightPos.y));
+
+        mergedCluster.bottomLeftPos = bottomLeft;
+        mergedCluster.topRightPos = topRight;
+
+
+
+
+
+        // Merge all clusters
+        foreach (Cluster cluster in clustersToMerge)
         {
-            return null;
-        }
-        Cluster mergedCluster = new Cluster(
-            bottomLeftPos: new Vector2Int(Math.Min(c1.bottomLeftPos.x, c2.bottomLeftPos.x), Math.Min(c1.bottomLeftPos.y, c2.bottomLeftPos.y)),
-            topRightPos: new Vector2Int(Math.Max(c1.topRightPos.x, c2.topRightPos.x), Math.Max(c1.topRightPos.y, c2.topRightPos.y)),
-            level: c1.Level,
-            hPANodes: new HashSet<HPANode>(),
-            entrances: new HashSet<Entrance>()
-        );
-
-        foreach (Entrance entrance in _entranceManager.GetEntrances(c1, c2))
-        {
-            HPANode n1 = _nodeManager.FindOrCreateNode(entrance.Node1.Position.x, entrance.Node1.Position.y, mergedCluster);
-            HPANode n2 = _nodeManager.FindOrCreateNode(entrance.Node2.Position.x, entrance.Node2.Position.y, mergedCluster);
-            if (mergedCluster.Contains(entrance.Node1.Position) && mergedCluster.Contains(entrance.Node2.Position))
+            // Add all entrances
+            foreach (Entrance entrance in cluster.Entrances)
             {
-                _edgeManager.AddHPAEdge(n1, n2, entrance.Edge1.Weight, mergedCluster.Level, HPAEdgeType.INTRA); // either the edge is inside, or outside the cluster. 
-            }
-            else
-            {
-                mergedCluster.Entrances.Add(entrance);
 
+
+                HPANode n1 = _nodeManager.FindOrCreateNode(entrance.Node1.Position.x, entrance.Node1.Position.y, mergedCluster);
+                HPANode n2 = _nodeManager.FindOrCreateNode(entrance.Node2.Position.x, entrance.Node2.Position.y, mergedCluster);
+
+
+                if (clustersToMerge.Contains(entrance.Node1.Cluster) && clustersToMerge.Contains(entrance.Node2.Cluster)) // adding intra edges. 
+                {
+                    mergedCluster.Nodes.Add(n1);
+                    mergedCluster.Nodes.Add(n2);
+                }
+                else if (clustersToMerge.Contains(entrance.Node1.Cluster) && !clustersToMerge.Contains(entrance.Node2.Cluster)) // adding inter edges between clusters. 
+                {
+
+
+
+                    _edgeManager.AddHPAEdge(n1, n2, entrance.Edge1.Weight, level, HPAEdgeType.INTER);
+
+                    Entrance entrance1 = new Entrance(n1.Cluster, n2.Cluster, n1, n2); //TODO: check if entrance should be reversed? 
+                    Entrance entrance2 = new Entrance(n2.Cluster, n1.Cluster, n2, n1);
+
+
+                    mergedCluster.Entrances.Add(entrance1);
+                    mergedCluster.Entrances.Add(entrance2);
+                    _graphModel.EntrancesByLevel[level].Add(entrance1);
+                    _graphModel.EntrancesByLevel[level].Add(entrance2);
+                    mergedCluster.Nodes.Add(n1); // only add the node inside the cluster to the merged cluster.
+
+                }
+
+                // update the cluster references of the nodes. 
+
+                if (mergedCluster.Contains(n1.Position))
+                {
+                    n1.Cluster = mergedCluster;
+
+                }
+                if (mergedCluster.Contains(n2.Position))
+                {
+                    n2.Cluster = mergedCluster;
+
+                }
             }
-            _nodeManager.AddHPANode(n1, mergedCluster.Level);
-            _nodeManager.AddHPANode(n2, mergedCluster.Level);
-            mergedCluster.Nodes.Add(n1);
-            mergedCluster.Nodes.Add(n2);
+
 
         }
 
+
+
+
+
+        // Create the new merged cluster
         return mergedCluster;
     }
+
+
+
+    public Cluster IncreaseSingleClusterLevel(Cluster c)
+    {
+        Cluster newCluster = new Cluster(c.Level + 1, new HashSet<HPANode>(), new HashSet<Entrance>(), c.bottomLeftPos, c.topRightPos);
+        _graphModel.ClusterByLevel[c.Level + 1].Add(newCluster);
+
+        foreach (HPANode n in c.Nodes)
+        {
+            HPANode newNode = _nodeManager.FindOrCreateNode(n.Position.x, n.Position.y, newCluster);
+            newNode.Merge(n);
+            newCluster.Nodes.Add(newNode);
+        }
+
+        foreach (Entrance e in c.Entrances)
+        {
+            HPANode n1 = _nodeManager.FindOrCreateNode(e.Node1.Position.x, e.Node1.Position.y, newCluster);
+            HPANode n2 = _nodeManager.FindOrCreateNode(e.Node2.Position.x, e.Node2.Position.y, newCluster);
+            Entrance newEntrance = new Entrance(newCluster, newCluster, n1, n2);
+            newCluster.Entrances.Add(newEntrance);
+            _graphModel.EntrancesByLevel[c.Level + 1].Add(newEntrance);
+        }
+
+        return newCluster;
+    }
+
 
 
 
