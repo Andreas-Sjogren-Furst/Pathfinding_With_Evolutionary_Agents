@@ -191,7 +191,7 @@ public class HPAStar : IHPAStar
 
         foreach (Cluster cluster in _graphModel.ClusterByLevel[l])
         {
-            Debug.Log("Cluster " + cluster.bottomLeftPos + " has " + cluster.Entrances.Count + " entrances at coordinates ");
+            // Debug.Log("Cluster " + cluster.bottomLeftPos + " has " + cluster.Entrances.Count + " entrances at coordinates ");
 
             foreach (Entrance e1 in cluster.Entrances)
             {
