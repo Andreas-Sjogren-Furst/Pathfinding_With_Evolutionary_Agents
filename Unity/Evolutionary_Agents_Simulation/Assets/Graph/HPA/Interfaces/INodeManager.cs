@@ -8,5 +8,5 @@ public interface INodeManager
     void insertCheckpoint(Vector2Int s, int maxLevel);
 
     HPANode GetNodeByPosition(Vector2Int position, int level);
-
+    void RemoveNode(HPANode node);
 }

@@ -68,7 +68,10 @@ public class HPAStar : IHPAStar
 
         foreach (Cluster c in _graphModel.ClusterByLevel[1])
         {
-            _clusterManager.CreateEdgesForCluster(c, c.bottomLeftPos.x, c.bottomLeftPos.y, c.topRightPos.x, c.topRightPos.y, 10);
+            foreach (HPANode n in c.Nodes)
+            {
+                _clusterManager.CreateEdgesForCluster(c, n.Position);
+            }
             foreach (Entrance e1 in c.Entrances)
             {
                 foreach (Entrance e2 in c.Entrances)
@@ -250,24 +253,22 @@ public class HPAStar : IHPAStar
     public void DynamicallyAddHPANode(Vector2Int position, Boolean isFinalNodeInCluster = false)
     {
         Cluster cluster = _clusterManager.DetermineCluster(position, 1);
-        Debug.Log("found cluster " + cluster.bottomLeftPos + " " + cluster.topRightPos);
+        //  Debug.Log("found cluster " + cluster.bottomLeftPos + " " + cluster.topRightPos);
         cluster.isFinalized = isFinalNodeInCluster;
         HPANode discoveredNode = _nodeManager.FindOrCreateNode(position.x, position.y, cluster);
         cluster.Nodes.Add(discoveredNode);
 
-        updateRelevantEdges(cluster, position);
-        if (!cluster.isFinalized)
+        _clusterManager.CreateEdgesForCluster(cluster, position, true);
+        if (cluster.isFinalized)
         {
-            // Debug.Log("Adding node at " + position);
-
-            _clusterManager.CreateEdgesForCluster(cluster, cluster.bottomLeftPos.x, cluster.bottomLeftPos.y, cluster.topRightPos.x, cluster.topRightPos.y, 10);
-
-            // build the adjenct clusters
             foreach (Cluster cNeighbor in _graphModel.ClusterByLevel[1])
             {
-                if (Adjacent(cluster, cNeighbor))
+                if (Adjacent(cluster, cNeighbor) && cNeighbor.isFinalized)
                 {
+                    // Debug.Log("Finalized cluster");
+
                     HashSet<Entrance> entrances = _entranceManager.BuildEntrances(cluster, cNeighbor);
+                    // Debug.Log("Entrances " + entrances.Count);
                     cluster.Entrances.UnionWith(entrances);
                     cNeighbor.Entrances.UnionWith(entrances);
                     if (!_graphModel.EntrancesByLevel.ContainsKey(1))
@@ -275,35 +276,38 @@ public class HPAStar : IHPAStar
                         _graphModel.EntrancesByLevel.Add(1, new HashSet<Entrance>());
                     }
                     _graphModel.EntrancesByLevel[1].UnionWith(entrances);
+                    cluster.Entrances.UnionWith(entrances); // TODO: check if this is needed
                 }
             }
         }
 
+
     }
 
-    private void updateRelevantEdges(Cluster cluster, Vector2Int newNodePosition)
+    public void DynamicallyRemoveHPANode(Vector2Int position)
     {
-        foreach (var direction in new Vector2Int[] { new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1) })
+        Cluster cluster = _clusterManager.DetermineCluster(position, 1);
+        HPANode nodeToRemove = _nodeManager.GetNodeByPosition(position, 1);
+
+        if (cluster.isOnBorder(position) && cluster.isFinalized)
         {
-            Vector2Int adjacentPosition = newNodePosition + direction;
-            if (cluster.Contains(adjacentPosition) && _graphModel.NodesByLevel[1].ContainsKey(adjacentPosition))
+            Entrance entrance = cluster.Entrances.FirstOrDefault(e => e.Node1.Position == position || e.Node2.Position == position);
+
+            if ((entrance?.Node1 != null && entrance.Node1 == nodeToRemove) || (entrance?.Node2 != null && entrance.Node2 == nodeToRemove))
             {
-                _edgeManager.AddHPAEdge(_graphModel.NodesByLevel[1][newNodePosition], _graphModel.NodesByLevel[1][adjacentPosition], 1, 1, HPAEdgeType.INTRA);
+                _entranceManager.RemoveEntrance(entrance); // only remove if it is an entrance. 
             }
-            else if (!cluster.Contains(adjacentPosition) && _graphModel.NodesByLevel[1].ContainsKey(adjacentPosition))
-            {
-                Cluster adjacentCluster = _clusterManager.DetermineCluster(adjacentPosition, 1);
-
-                if (adjacentCluster.isOnBorder(adjacentPosition))
-                { // if the other node is on the border, we create a inter edge TOOD: perhaps we should create entrance instead. 
-                    _edgeManager.AddHPAEdge(_graphModel.NodesByLevel[1][newNodePosition], _graphModel.NodesByLevel[1][adjacentPosition], 1, 1, HPAEdgeType.INTER);
-                }
 
 
-
-            }
         }
+
+        _edgeManager.UpdateEdgesFromRemovedNode(nodeToRemove);
+        cluster.Nodes.Remove(nodeToRemove);
+        _nodeManager.RemoveNode(nodeToRemove);
+
     }
+
+
 
 
 

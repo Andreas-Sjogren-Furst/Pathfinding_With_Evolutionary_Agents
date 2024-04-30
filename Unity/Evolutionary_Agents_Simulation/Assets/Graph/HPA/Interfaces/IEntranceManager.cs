@@ -13,5 +13,7 @@ public interface IEntranceManager
     HashSet<Entrance> GroupAndMergeEntrances(HashSet<Entrance> allEntrances, bool horizontalAlignment, int maxGroupSize = 10);
     HashSet<Entrance> GetEntrances(Cluster c1, Cluster c2);
 
+    void RemoveEntrance(Entrance entrance);
+
 
 }

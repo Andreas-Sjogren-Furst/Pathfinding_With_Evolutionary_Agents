@@ -68,42 +68,67 @@ public class ClusterManager : IClusterManager
         return clusters;
     }
 
-    public Cluster CreateEdgesForCluster(Cluster cluster, int startX, int startY, int endX, int endY, int clusterSize)
+    // public Cluster CreateEdgesForCluster(Cluster cluster, int startX, int startY, int endX, int endY, int clusterSize)
+    // {
+    //     Dictionary<Vector2Int, HPANode> nodeLookup = new Dictionary<Vector2Int, HPANode>();
+    //     foreach (var node in cluster.Nodes)
+    //     {
+    //         nodeLookup[new Vector2Int(node.Position.x, node.Position.y)] = node;
+    //     }
+
+    //     int[] dx = { 1, -1, 0, 0 };
+    //     int[] dy = { 0, 0, 1, -1 };
+
+    //     foreach (HPANode node in cluster.Nodes)
+    //     {
+    //         int x = node.Position.x;
+    //         int y = node.Position.y;
+
+    //         for (int direction = 0; direction < 4; direction++)
+    //         {
+    //             int newX = x + dx[direction];
+    //             int newY = y + dy[direction];
+    //             Vector2Int newPosition = new Vector2Int(newX, newY);
+
+    //             if (newX >= startX && newX <= endX && newY >= startY && newY <= endY && nodeLookup.TryGetValue(newPosition, out HPANode adjacentNode))
+    //             {
+    //                 HPAEdge edge = new HPAEdge(
+    //                     node1: node,
+    //                     node2: adjacentNode,
+    //                     weight: 1,
+    //                     level: cluster.Level,
+    //                     type: HPAEdgeType.INTRA
+    //                 );
+    //                 node.Edges.Add(edge);
+    //             }
+    //         }
+    //     }
+
+    //     return cluster;
+    // }
+
+    public Cluster CreateEdgesForCluster(Cluster cluster, Vector2Int newNodePosition, Boolean dynamicallyAddInterEdges = false) // kan skiftes ud med createEdgeForCluster, men et parameter skal ændres ift. om den også skal lave inter.
     {
-        Dictionary<Vector2Int, HPANode> nodeLookup = new Dictionary<Vector2Int, HPANode>();
-        foreach (var node in cluster.Nodes)
+        foreach (var direction in new Vector2Int[] { new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1) })
         {
-            nodeLookup[new Vector2Int(node.Position.x, node.Position.y)] = node;
-        }
-
-        int[] dx = { 1, -1, 0, 0 };
-        int[] dy = { 0, 0, 1, -1 };
-
-        foreach (HPANode node in cluster.Nodes)
-        {
-            int x = node.Position.x;
-            int y = node.Position.y;
-
-            for (int direction = 0; direction < 4; direction++)
+            Vector2Int adjacentPosition = newNodePosition + direction;
+            if (cluster.Contains(adjacentPosition) && _graphModel.NodesByLevel[1].ContainsKey(adjacentPosition))
             {
-                int newX = x + dx[direction];
-                int newY = y + dy[direction];
-                Vector2Int newPosition = new Vector2Int(newX, newY);
+                _edgeManager.AddHPAEdge(_graphModel.NodesByLevel[1][newNodePosition], _graphModel.NodesByLevel[1][adjacentPosition], 1, 1, HPAEdgeType.INTRA);
+            }
+            else if (!cluster.Contains(adjacentPosition) && _graphModel.NodesByLevel[1].ContainsKey(adjacentPosition))
+            {
+                Cluster adjacentCluster = DetermineCluster(adjacentPosition, 1);
 
-                if (newX >= startX && newX <= endX && newY >= startY && newY <= endY && nodeLookup.TryGetValue(newPosition, out HPANode adjacentNode))
-                {
-                    HPAEdge edge = new HPAEdge(
-                        node1: node,
-                        node2: adjacentNode,
-                        weight: 1,
-                        level: cluster.Level,
-                        type: HPAEdgeType.INTRA
-                    );
-                    node.Edges.Add(edge);
+                if (dynamicallyAddInterEdges && adjacentCluster.isOnBorder(adjacentPosition))
+                { // if the other node is on the border, we create a inter edge TOOD: perhaps we should create entrance instead. 
+                    _edgeManager.AddHPAEdge(_graphModel.NodesByLevel[1][newNodePosition], _graphModel.NodesByLevel[1][adjacentPosition], 1, 1, HPAEdgeType.INTER);
                 }
+
+
+
             }
         }
-
         return cluster;
     }
 

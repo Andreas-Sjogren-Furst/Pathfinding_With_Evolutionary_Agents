@@ -14,4 +14,6 @@ public interface IHPAStar
 
     public void DynamicallyAddHPANode(Vector2Int position, Boolean isFinalNodeInCluster = false);
 
+    public void DynamicallyRemoveHPANode(Vector2Int position);
+
 }

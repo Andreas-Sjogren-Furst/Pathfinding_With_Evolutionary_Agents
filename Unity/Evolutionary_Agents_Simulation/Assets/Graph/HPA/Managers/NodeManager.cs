@@ -85,6 +85,14 @@ public class NodeManager : INodeManager
         return null; // Return null if no node is found at the given position and level
     }
 
+    public void RemoveNode(HPANode node)
+    {
+        if (_graphModel.NodesByLevel.ContainsKey(node.Level))
+        {
+            _graphModel.NodesByLevel[node.Level].Remove(node.Position);
+        }
+    }
+
 
 
     private Cluster DetermineCluster(Vector2Int nPos, int level)
@@ -99,6 +107,8 @@ public class NodeManager : INodeManager
         }
         return null; // Or handle differently if your application expects every node to fit within a cluster.
     }
+
+
 
 
 }

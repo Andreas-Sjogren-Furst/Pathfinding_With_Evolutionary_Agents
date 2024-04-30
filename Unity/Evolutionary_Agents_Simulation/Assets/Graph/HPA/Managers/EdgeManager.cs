@@ -20,6 +20,39 @@ public class EdgeManager : IEdgeManager
         node2.Edges.Add(edge2);
     }
 
+    public HPAEdge[] UpdateEdgesFromRemovedNode(HPANode n)
+    {
+        // Convert edges to an array or list to safely modify the collection during iteration
+        HPAEdge[] edges = n.Edges.ToArray();
+
+        foreach (HPAEdge edge in edges)
+        {
+            // Remove the edge from the node being deleted
+            if (edge.Node1 != null)
+            {
+                edge.Node1.Edges.Remove(edge);
+                // Also remove the reciprocal edge from Node2 if it's not null
+                var reciprocal = edge.Node2.Edges.FirstOrDefault(e => e.Node2 == edge.Node1);
+                if (reciprocal != null)
+                {
+                    edge.Node2.Edges.Remove(reciprocal);
+                }
+            }
+            if (edge.Node2 != null)
+            {
+                edge.Node2.Edges.Remove(edge);
+                // Similarly, remove the reciprocal edge from Node1
+                var reciprocal = edge.Node1.Edges.FirstOrDefault(e => e.Node2 == edge.Node2);
+                if (reciprocal != null)
+                {
+                    edge.Node1.Edges.Remove(reciprocal);
+                }
+            }
+        }
+        return edges;
+    }
+
+
     public void ConnectToBorder(HPANode n, Cluster c)
     {
         int level = c.Level;
