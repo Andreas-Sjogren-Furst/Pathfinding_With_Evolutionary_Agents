@@ -18,6 +18,8 @@ public class Cluster
     public HashSet<HPANode> NodesTop { get { return getNodesBasedOnDirection(CompassDirection.North); } }
     public HashSet<HPANode> NodesBottom { get { return getNodesBasedOnDirection(CompassDirection.South); } }
 
+    public Boolean isFinalized { get; set; } = false;
+
 
 
     public int ClusterLengthInTile { get { return topRightPos.x - bottomLeftPos.x; } }
@@ -25,7 +27,7 @@ public class Cluster
 
     public HashSet<Entrance> Entrances { get; set; }
 
-    public Cluster(int level, HashSet<HPANode> hPANodes, HashSet<Entrance> entrances, Vector2Int bottomLeftPos, Vector2Int topRightPos)
+    public Cluster(int level, HashSet<HPANode> hPANodes, HashSet<Entrance> entrances, Vector2Int bottomLeftPos, Vector2Int topRightPos, bool isFinalized = false)
     {
 
 
@@ -36,9 +38,15 @@ public class Cluster
 
         this.bottomLeftPos = bottomLeftPos;
         this.topRightPos = topRightPos;
+        this.isFinalized = isFinalized;
 
 
 
+    }
+
+    public bool isOnBorder(Vector2Int position)
+    {
+        return position.x == bottomLeftPos.x || position.x == topRightPos.x || position.y == bottomLeftPos.y || position.y == topRightPos.y;
     }
 
     public bool Contains(Vector2Int position)

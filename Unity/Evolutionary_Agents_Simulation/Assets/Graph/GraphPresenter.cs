@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class GraphPresenter : MonoBehaviour
 {
@@ -35,9 +36,12 @@ public class GraphPresenter : MonoBehaviour
         {
             for (int j = 0; j < maxSize; j++)
             {
-                tileMap[i, j] = 0;
+                tileMap[i, j] = 1;
             }
         }
+
+
+
 
         // Create instances of the necessary classes
         _pathFinder = new PathFinder();
@@ -49,6 +53,23 @@ public class GraphPresenter : MonoBehaviour
         IHPAStar HPAStar = new HPAStar(_graphModel, clusterManager, _nodeManager, entranceManager, edgeManager, _pathFinder);
 
         HPAStar.Preprocessing(visualizeLevel);
+
+        for (int i = 0; i < maxSize / 3; i++)
+        {
+            for (int j = 0; j < maxSize / 3; j++)
+            {
+                HPAStar.DynamicallyAddHPANode(new Vector2Int(i, j));
+            }
+        }
+
+        // finalize cluster 
+        Cluster first = _graphModel.ClusterByLevel[1].First();
+        first.isFinalized = true;
+        HPAStar.DynamicallyAddHPANode(first.Nodes.First().Position, true);
+
+
+
+
 
         Vector2Int start = new Vector2Int(0, 0);
         Vector2Int goal = new Vector2Int(maxSize - 1, maxSize - 1);

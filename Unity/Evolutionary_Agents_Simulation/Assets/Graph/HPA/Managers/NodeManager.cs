@@ -55,6 +55,8 @@ public class NodeManager : INodeManager
         }
     }
 
+
+
     public void insertCheckpoint(Vector2Int sPos, int maxLevel) // start node and finish node. 
     {
         Cluster c = DetermineCluster(sPos, maxLevel);
