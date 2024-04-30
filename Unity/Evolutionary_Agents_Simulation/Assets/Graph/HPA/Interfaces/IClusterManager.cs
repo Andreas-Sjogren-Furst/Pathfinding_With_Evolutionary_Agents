@@ -12,6 +12,6 @@ public interface IClusterManager
 
     Cluster IncreaseSingleClusterLevel(Cluster cluster);
 
-    Cluster DetermineCluster(HPANode n, int level);
+    Cluster DetermineCluster(Vector2Int n, int level);
 
 }

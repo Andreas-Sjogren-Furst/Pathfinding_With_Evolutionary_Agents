@@ -107,11 +107,11 @@ public class ClusterManager : IClusterManager
         return cluster;
     }
 
-    public Cluster DetermineCluster(HPANode n, int level)
+    public Cluster DetermineCluster(Vector2Int n, int level)
     {
         foreach (Cluster cluster in _graphModel.ClusterByLevel[level])
         {
-            if (cluster.Contains(n.Position))
+            if (cluster.Contains(n))
             {
                 return cluster;
             }

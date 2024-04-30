@@ -63,9 +63,7 @@ public class HPAStar : IHPAStar
     {
         foreach (Entrance e in _graphModel.EntrancesByLevel[1])
         {
-            Cluster c1 = e.Cluster1;
-            Cluster c2 = e.Cluster2;
-            _edgeManager.AddHPAEdge(e.Node1, e.Node2, 1, 1, HPAEdgeType.INTER);
+            _edgeManager.AddHPAEdge(e.Node1, e.Node2, 1, 1, HPAEdgeType.INTER); // adding inter edges between nodes that consists an entrance (2 connected nodes).
         }
 
         foreach (Cluster c in _graphModel.ClusterByLevel[1])
@@ -235,6 +233,19 @@ public class HPAStar : IHPAStar
         return refinedPath;
     }
 
+    public void insertNodeGlobally(Vector2Int pos, int maxLevel)
+    {
+
+        // iterate through levels
+        for (int i = 1; i <= maxLevel; i++)
+        {
+
+            // Implement algorithm to update the graph dynamically across all levels. 
+
+
+        }
+    }
+
 
 
     private bool Adjacent(Cluster c1, Cluster c2)
@@ -242,4 +253,6 @@ public class HPAStar : IHPAStar
         return c1.bottomLeftPos.x == c2.topRightPos.x + 1 || c1.topRightPos.x == c2.bottomLeftPos.x - 1 ||
                c1.bottomLeftPos.y == c2.topRightPos.y + 1 || c1.topRightPos.y == c2.bottomLeftPos.y - 1;
     }
+
+
 }

@@ -57,21 +57,8 @@ public class NodeManager : INodeManager
 
     public void insertCheckpoint(Vector2Int sPos, int maxLevel) // start node and finish node. 
     {
-
-
-        // if (!_graphModel.NodesByLevel[maxLevel].ContainsKey(sPos))
-        // {
         Cluster c = DetermineCluster(sPos, maxLevel);
         HPANode node = FindOrCreateNode(sPos.x, sPos.y, c);
-        // }
-        // else
-        // {
-        //     _graphModel.NodesByLevel[maxLevel][sPos].Merge(sPos);
-        // }
-        // {
-
-        // }
-
 
         for (int l = 1; l <= maxLevel; l++)
         {
@@ -110,8 +97,6 @@ public class NodeManager : INodeManager
         }
         return null; // Or handle differently if your application expects every node to fit within a cluster.
     }
-
-
 
 
 }
