@@ -267,16 +267,7 @@ public class HPAStar : IHPAStar
                 {
                     // Debug.Log("Finalized cluster");
 
-                    HashSet<Entrance> entrances = _entranceManager.BuildEntrances(cluster, cNeighbor);
-                    // Debug.Log("Entrances " + entrances.Count);
-                    cluster.Entrances.UnionWith(entrances);
-                    cNeighbor.Entrances.UnionWith(entrances);
-                    if (!_graphModel.EntrancesByLevel.ContainsKey(1))
-                    {
-                        _graphModel.EntrancesByLevel.Add(1, new HashSet<Entrance>());
-                    }
-                    _graphModel.EntrancesByLevel[1].UnionWith(entrances);
-                    cluster.Entrances.UnionWith(entrances); // TODO: check if this is needed
+                    AddEntrancesBetweenClusters(cluster, cNeighbor);
                 }
             }
         }
@@ -288,14 +279,23 @@ public class HPAStar : IHPAStar
     {
         Cluster cluster = _clusterManager.DetermineCluster(position, 1);
         HPANode nodeToRemove = _nodeManager.GetNodeByPosition(position, 1);
+        Boolean _rebuildEntrances = false;
+
 
         if (cluster.isOnBorder(position) && cluster.isFinalized)
         {
-            Entrance entrance = cluster.Entrances.FirstOrDefault(e => e.Node1.Position == position || e.Node2.Position == position);
+            var matchingEntrances = cluster.Entrances
+                .Where(e => e.Node1.Position == position || e.Node2.Position == position)
+                .ToList();  // ToList to materialize the query immediately if necessary
 
-            if ((entrance?.Node1 != null && entrance.Node1 == nodeToRemove) || (entrance?.Node2 != null && entrance.Node2 == nodeToRemove))
+            foreach (Entrance entrance in matchingEntrances) //TODO: remove entrances. 
             {
-                _entranceManager.RemoveEntrance(entrance); // only remove if it is an entrance. 
+
+                if ((entrance?.Node1 != null && entrance.Node1 == nodeToRemove) || (entrance?.Node2 != null && entrance.Node2 == nodeToRemove))
+                {
+                    _entranceManager.RemoveEntrance(entrance); // only remove if it is an entrance. 
+                    _rebuildEntrances = true;
+                }
             }
 
 
@@ -305,6 +305,31 @@ public class HPAStar : IHPAStar
         cluster.Nodes.Remove(nodeToRemove);
         _nodeManager.RemoveNode(nodeToRemove);
 
+        if (_rebuildEntrances)
+        {
+            foreach (Cluster cNeighbor in _graphModel.ClusterByLevel[1])
+            {
+                if (Adjacent(cluster, cNeighbor) && cNeighbor.isFinalized)
+                {
+                    AddEntrancesBetweenClusters(cluster, cNeighbor);
+                }
+            }
+        }
+
+    }
+
+
+    private void AddEntrancesBetweenClusters(Cluster cluster, Cluster cNeighbor)
+    {
+        HashSet<Entrance> entrances = _entranceManager.BuildEntrances(cluster, cNeighbor);
+        // Debug.Log("Entrances " + entrances.Count);
+        // cluster.Entrances.UnionWith(entrances);
+        // cNeighbor.Entrances.UnionWith(entrances);
+        if (!_graphModel.EntrancesByLevel.ContainsKey(1))
+        {
+            _graphModel.EntrancesByLevel.Add(1, new HashSet<Entrance>());
+        }
+        _graphModel.EntrancesByLevel[1].UnionWith(entrances);
     }
 
 

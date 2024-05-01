@@ -258,7 +258,7 @@ GameObject:
   - component: {fileID: 198698201}
   - component: {fileID: 198698202}
   m_Layer: 0
-  m_Name: GraphPresenter
+  m_Name: graphView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -303,7 +303,7 @@ MonoBehaviour:
   intraEdgeMaterial: {fileID: 2100000, guid: 2edd948b783e146fb893d44a49d5eeac, type: 2}
   interEdgeMaterial: {fileID: 2100000, guid: 1fd6fb1bc1f094556a12c4a452b24fb5, type: 2}
   clusterMaterial: {fileID: 2100000, guid: edf3f4707d65044e9a62d1450f067cda, type: 2}
-  visualizeLevel: 3
+  visualizeLevel: 1
 --- !u!1 &310619917
 GameObject:
   m_ObjectHideFlags: 0

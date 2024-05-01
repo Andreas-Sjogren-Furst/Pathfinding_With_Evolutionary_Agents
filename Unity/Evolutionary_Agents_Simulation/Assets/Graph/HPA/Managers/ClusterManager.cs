@@ -23,7 +23,7 @@ public class ClusterManager : IClusterManager
         _entranceManager = entranceManager;
     }
 
-    public HashSet<Cluster> BuildClusters(int level, int[,] globalTileMap)
+    public HashSet<Cluster> BuildClusters(int level, MapObject[,] globalTileMap)
     {
         HashSet<Cluster> clusters = new HashSet<Cluster>();
         int clusterSize = 10 * level;
@@ -52,7 +52,7 @@ public class ClusterManager : IClusterManager
                 {
                     for (int y = startY; y <= endY; y++)
                     {
-                        if (globalTileMap[x, y] != 1)
+                        if (globalTileMap[x, y].Type != MapObject.ObjectType.Wall)
                         {
                             HPANode newNode = _nodeManager.FindOrCreateNode(x, y, cluster);
                             cluster.Nodes.Add(newNode);

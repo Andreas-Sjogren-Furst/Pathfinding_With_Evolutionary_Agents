@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-public class GraphPresenter : MonoBehaviour
+public class HPAGraphView : MonoBehaviour
 {
     public float tileSize = 1.0f;
     public float nodeScale = 0.1f;
@@ -23,83 +23,14 @@ public class GraphPresenter : MonoBehaviour
 
     public int visualizeLevel = 1;
 
-    private IGraphModel _graphModel;
-    private IPathFinder _pathFinder;
-    private INodeManager _nodeManager;
-
     void Start()
     {
-        Debug.Log("Start graph visualizer");
-        int maxSize = 100;
-        int[,] tileMap = new int[maxSize, maxSize];
-        for (int i = 0; i < maxSize; i++)
-        {
-            for (int j = 0; j < maxSize; j++)
-            {
-                tileMap[i, j] = 0;
-            }
-        }
-
-
-
-
-        // Create instances of the necessary classes
-        _pathFinder = new PathFinder();
-        _graphModel = new GraphModel(tileMap);
-        IEdgeManager edgeManager = new EdgeManager(_pathFinder);
-        _nodeManager = new NodeManager(_graphModel, edgeManager);
-        IEntranceManager entranceManager = new EntranceManager(_graphModel, _nodeManager);
-        IClusterManager clusterManager = new ClusterManager(_graphModel, _nodeManager, edgeManager, entranceManager);
-        IHPAStar HPAStar = new HPAStar(_graphModel, clusterManager, _nodeManager, entranceManager, edgeManager, _pathFinder);
-
-        HPAStar.Preprocessing(visualizeLevel);
-
-        // for (int i = 0; i < maxSize / 3; i++)
-        // {
-        //     for (int j = 0; j < maxSize / 3; j++)
-        //     {
-        //         tileMap[i, j] = 0;
-        //         HPAStar.DynamicallyAddHPANode(new Vector2Int(i, j), false);
-        //     }
-        // }
-
-        // // finalize cluster 
-        // foreach (Cluster cluster in _graphModel.ClusterByLevel[1])
-        // {
-        //     cluster.isFinalized = true;
-        // }
-        // Cluster first = _graphModel.ClusterByLevel[1].First();
-        // first.isFinalized = true;
-        // HPAStar.DynamicallyAddHPANode(first.Nodes.First().Position, true);
-
-
-        for (int i = 5; i < maxSize / 4; i++)
-        {
-            for (int j = 5; j < maxSize / 4; j++)
-            {
-                tileMap[i, j] = 1;
-                HPAStar.DynamicallyRemoveHPANode(new Vector2Int(i, j));
-            }
-        }
-
-
-
-
-
-        Vector2Int start = new Vector2Int(0, 0);
-        Vector2Int goal = new Vector2Int(maxSize - 1, maxSize - 1);
-
-        // List<HPANode> nodes = HPAStar.HierarchicalSearch(start, goal, 1);
-        // List<HPANode> nodes = HPAStar.HierarchicalSearch(new Vector2Int(15, 11), new Vector2Int(29, 4), 1);
-
-        // foreach (HPANode node in nodes)
-        // {
-        //     Debug.Log(node.Position);
-        // }
-        DrawGraph();
+        Debug.Log("Started HPAGraphView");
     }
 
-    void DrawGraph()
+
+
+    public void DrawGraph(IGraphModel _graphModel)
     {
         if (_graphModel.ClusterByLevel.TryGetValue(visualizeLevel, out var clusters))
         {
@@ -107,6 +38,8 @@ public class GraphPresenter : MonoBehaviour
             {
                 foreach (Cluster cluster in clusters)
                 {
+                    if (cluster == null) Debug.LogError("Cluster is null");
+                    if (transform.position == null) Debug.LogError("Transform is null");
                     Vector3 bottomLeft = transform.position + new Vector3(cluster.bottomLeftPos.x * tileSize, 0, cluster.bottomLeftPos.y * tileSize);
                     Vector3 topRight = transform.position + new Vector3(cluster.topRightPos.x * tileSize, 0, cluster.topRightPos.y * tileSize);
                     Vector3 topLeft = transform.position + new Vector3(cluster.bottomLeftPos.x * tileSize, 0, cluster.topRightPos.y * tileSize);
