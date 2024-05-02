@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Codice.Client.Common.GameUI;
 using UnityEngine;
 
 
@@ -72,21 +73,10 @@ public class HPAStar : IHPAStar
             {
                 _clusterManager.CreateEdgesForCluster(c, n.Position);
             }
-            foreach (Entrance e1 in c.Entrances)
-            {
-                foreach (Entrance e2 in c.Entrances)
-                {
-                    if (e1.Node1 != e2.Node1)
-                    {
-                        double d = _pathFinder.CalculateDistance(_pathFinder.FindLocalPath(e1.Node1, e2.Node1, c)); //TODO: safe path in memory in special path class? 
-                        if (d < double.PositiveInfinity)
-                        {
-                            _edgeManager.AddHPAEdge(e1.Node1, e2.Node1, d, 1, HPAEdgeType.INTER);
-                        }
-                    }
-                }
-            }
+            BuildInterEdgesBetweenEntrances(c);
         }
+
+
     }
 
 
@@ -267,16 +257,7 @@ public class HPAStar : IHPAStar
                 {
                     // Debug.Log("Finalized cluster");
 
-                    HashSet<Entrance> entrances = _entranceManager.BuildEntrances(cluster, cNeighbor);
-                    // Debug.Log("Entrances " + entrances.Count);
-                    cluster.Entrances.UnionWith(entrances);
-                    cNeighbor.Entrances.UnionWith(entrances);
-                    if (!_graphModel.EntrancesByLevel.ContainsKey(1))
-                    {
-                        _graphModel.EntrancesByLevel.Add(1, new HashSet<Entrance>());
-                    }
-                    _graphModel.EntrancesByLevel[1].UnionWith(entrances);
-                    cluster.Entrances.UnionWith(entrances); // TODO: check if this is needed
+                    AddEntrancesBetweenClusters(cluster, cNeighbor);
                 }
             }
         }
@@ -288,23 +269,100 @@ public class HPAStar : IHPAStar
     {
         Cluster cluster = _clusterManager.DetermineCluster(position, 1);
         HPANode nodeToRemove = _nodeManager.GetNodeByPosition(position, 1);
+        // Boolean _rebuildEntrances = false;
+        Cluster NeighborCluster = null;
 
+
+        // Check if the node is on the border and the cluster is finalized
         if (cluster.isOnBorder(position) && cluster.isFinalized)
         {
-            Entrance entrance = cluster.Entrances.FirstOrDefault(e => e.Node1.Position == position || e.Node2.Position == position);
-
-            if ((entrance?.Node1 != null && entrance.Node1 == nodeToRemove) || (entrance?.Node2 != null && entrance.Node2 == nodeToRemove))
+            // Collect entrances that need to be removed
+            var entrancesToRemove = new List<Entrance>();
+            foreach (Entrance entrance in cluster.Entrances)
             {
-                _entranceManager.RemoveEntrance(entrance); // only remove if it is an entrance. 
+                if ((entrance?.Node1 != null && entrance.Node1 == nodeToRemove) ||
+                    (entrance?.Node2 != null && entrance.Node2 == nodeToRemove))
+                {
+                    entrancesToRemove.Add(entrance);
+                }
             }
 
+            NeighborCluster = entrancesToRemove[0].Cluster2;
+            if (NeighborCluster.Equals(cluster))
+            {
+                NeighborCluster = entrancesToRemove[0].Cluster1;
+            }
 
+            // Remove the collected entrances
+            foreach (Entrance entrance in entrancesToRemove)
+            {
+                _entranceManager.RemoveEntrance(entrance);
+                // Also, check and remove corresponding entrances from the adjacent cluster
+                var adjacentEntrancesToRemove = new List<Entrance>();
+                foreach (Entrance e in entrance.Cluster2.Entrances)
+                {
+                    if (e.Node1.Position == position || e.Node2.Position == position)
+                    {
+                        adjacentEntrancesToRemove.Add(e);
+                    }
+                }
+
+                foreach (Entrance e in adjacentEntrancesToRemove)
+                {
+                    _entranceManager.RemoveEntrance(e);
+                }
+
+            }
         }
 
         _edgeManager.UpdateEdgesFromRemovedNode(nodeToRemove);
         cluster.Nodes.Remove(nodeToRemove);
         _nodeManager.RemoveNode(nodeToRemove);
 
+        if (NeighborCluster != null)
+        {
+            Debug.Log("Rebuilding entrances between clusters");
+            AddEntrancesBetweenClusters(cluster, NeighborCluster);
+        }
+
+    }
+
+
+    private void AddEntrancesBetweenClusters(Cluster cluster, Cluster cNeighbor)
+    {
+        HashSet<Entrance> entrances = _entranceManager.BuildEntrances(cluster, cNeighbor);
+        // Debug.Log("Entrances " + entrances.Count);
+        // cluster.Entrances.UnionWith(entrances);
+        // cNeighbor.Entrances.UnionWith(entrances);
+        if (!_graphModel.EntrancesByLevel.ContainsKey(1))
+        {
+            _graphModel.EntrancesByLevel.Add(1, new HashSet<Entrance>());
+        }
+        cluster.Entrances.UnionWith(entrances);
+        cNeighbor.Entrances.UnionWith(entrances);
+        _graphModel.EntrancesByLevel[1].UnionWith(entrances);
+
+        BuildInterEdgesBetweenEntrances(cluster); // TODO: It is not nescarry to rebuilt all interedges again, but so important. 
+        BuildInterEdgesBetweenEntrances(cNeighbor);
+    }
+
+
+    private void BuildInterEdgesBetweenEntrances(Cluster c) // 
+    {
+        foreach (Entrance e1 in c.Entrances)
+        {
+            foreach (Entrance e2 in c.Entrances)
+            {
+                if (e1.Node1 != e2.Node1)
+                {
+                    double d = _pathFinder.CalculateDistance(_pathFinder.FindLocalPath(e1.Node1, e2.Node1, c)); //TODO: safe path in memory in special path class? 
+                    if (d < double.PositiveInfinity)
+                    {
+                        _edgeManager.AddHPAEdge(e1.Node1, e2.Node1, d, 1, HPAEdgeType.INTER);
+                    }
+                }
+            }
+        }
     }
 
 

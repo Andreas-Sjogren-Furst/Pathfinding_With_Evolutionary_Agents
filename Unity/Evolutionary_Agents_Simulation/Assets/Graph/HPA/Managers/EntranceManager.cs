@@ -158,10 +158,17 @@ public class EntranceManager : IEntranceManager
 
     public void RemoveEntrance(Entrance entrance)
     {
-        _graphModel.EntrancesByLevel[entrance.Node1.Level].Remove(entrance);
+        bool existsInCluster1 = entrance.Cluster1.Entrances.Contains(entrance);
+        bool existsInCluster2 = entrance.Cluster2.Entrances.Contains(entrance);
+        bool existsInLevel = _graphModel.EntrancesByLevel[entrance.Node1.Level].Contains(entrance);
+
+        Debug.Log($"Existence in Cluster1: {existsInCluster1}, Cluster2: {existsInCluster2}, Level: {existsInLevel}");
+
         entrance.Cluster1.Entrances.Remove(entrance);
         entrance.Cluster2.Entrances.Remove(entrance);
+        _graphModel.EntrancesByLevel[entrance.Node1.Level].Remove(entrance);
     }
+
 
     private bool Adjacent(Cluster c1, Cluster c2)
     {

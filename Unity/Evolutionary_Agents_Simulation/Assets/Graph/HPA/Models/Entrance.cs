@@ -23,17 +23,23 @@ public class Entrance
 
     public override bool Equals(object obj)
     {
-        if (obj is Entrance other)
-        {
-            // Check if the entrances connect the same nodes in the same order
-            return Node1.Equals(other.Node1.Position) && Node2.Equals(other.Node2.Position);
-        }
-        return false;
+        if (obj == null || GetType() != obj.GetType())
+            return false;
+
+        Entrance other = (Entrance)obj;
+        return (Node1.Equals(other.Node1) && Node2.Equals(other.Node2)) || (Node1.Equals(other.Node2) && Node2.Equals(other.Node1));
     }
 
     public override int GetHashCode()
     {
-        return Node1.GetHashCode();
-
+        // Use unchecked to prevent overflow exceptions
+        unchecked
+        {
+            // Choose two different prime numbers to avoid collisions between different fields
+            int hash = 17;
+            hash = hash * 23 + Node1.GetHashCode();
+            hash = hash * 23 + Node2.GetHashCode();
+            return hash;
+        }
     }
 }

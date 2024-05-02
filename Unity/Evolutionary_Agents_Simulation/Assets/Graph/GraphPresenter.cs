@@ -54,17 +54,31 @@ public class GraphPresenter : MonoBehaviour
 
         HPAStar.Preprocessing(visualizeLevel);
 
-        Cluster c = _graphModel.ClusterByLevel[1].First();
 
-        foreach (Cluster cluster in _graphModel.ClusterByLevel[1])
-        {
-            foreach (Entrance entrance in c.Entrances)
-            {
-                Debug.Log("total entrances" + c.Entrances.Count);
-                Debug.Log(entrance.Node1.Position);
-                Debug.Log(entrance.Node2.Position);
-            }
-        }
+
+
+
+
+        Cluster c1 = clusterManager.DetermineCluster(new Vector2Int(9, 5), visualizeLevel);
+        Debug.Log("total entrances in cluster" + c1.Entrances.Count);
+        c1.isFinalized = true;
+        tileMap[9, 5] = 1;
+        HPAStar.DynamicallyRemoveHPANode(new Vector2Int(9, 5));
+
+        Debug.Log("total entrances in cluster" + c1.Entrances.Count);
+
+
+        // Cluster c = _graphModel.ClusterByLevel[1].First();
+
+        // foreach (Cluster cluster in _graphModel.ClusterByLevel[1])
+        // {
+        //     foreach (Entrance entrance in c.Entrances)
+        //     {
+        //         Debug.Log("total entrances" + c.Entrances.Count);
+        //         Debug.Log(entrance.Node1.Position);
+        //         Debug.Log(entrance.Node2.Position);
+        //     }
+        // }
 
 
 
