@@ -54,6 +54,21 @@ public class GraphPresenter : MonoBehaviour
 
         HPAStar.Preprocessing(visualizeLevel);
 
+        Cluster c = _graphModel.ClusterByLevel[1].First();
+
+        foreach (Cluster cluster in _graphModel.ClusterByLevel[1])
+        {
+            foreach (Entrance entrance in c.Entrances)
+            {
+                Debug.Log("total entrances" + c.Entrances.Count);
+                Debug.Log(entrance.Node1.Position);
+                Debug.Log(entrance.Node2.Position);
+            }
+        }
+
+
+
+
         // for (int i = 0; i < maxSize / 3; i++)
         // {
         //     for (int j = 0; j < maxSize / 3; j++)
@@ -73,14 +88,14 @@ public class GraphPresenter : MonoBehaviour
         // HPAStar.DynamicallyAddHPANode(first.Nodes.First().Position, true);
 
 
-        for (int i = 5; i < maxSize / 4; i++)
-        {
-            for (int j = 5; j < maxSize / 4; j++)
-            {
-                tileMap[i, j] = 1;
-                HPAStar.DynamicallyRemoveHPANode(new Vector2Int(i, j));
-            }
-        }
+        // for (int i = 5; i < maxSize / 4; i++)
+        // {
+        //     for (int j = 5; j < maxSize / 4; j++)
+        //     {
+        //         tileMap[i, j] = 1;
+        //         HPAStar.DynamicallyRemoveHPANode(new Vector2Int(i, j));
+        //     }
+        // }
 
 
 

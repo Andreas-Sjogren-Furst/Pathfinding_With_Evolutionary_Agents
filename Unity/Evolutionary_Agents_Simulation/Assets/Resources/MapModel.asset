@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MapModel
   m_EditorClassIdentifier: 
   NumberOfCheckPoints: 0
-  Density: 0
+  Density: 45.7
   CellularIterations: 1
   CheckPointSpacing: 1
   ErosionLimit: 1
