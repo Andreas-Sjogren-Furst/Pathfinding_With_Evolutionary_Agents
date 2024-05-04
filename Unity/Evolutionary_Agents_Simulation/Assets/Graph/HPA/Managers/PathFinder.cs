@@ -143,15 +143,15 @@ public class PathFinder : IPathFinder
             else
             {
                 // Attempt to use precomputed path in HPAInterEdge
-                HPAInterEdge interEdge = FindInterEdge(startNode, endNode);
-                if (interEdge != null && interEdge.IntraPaths != null)
+                HPAPath interEdge = FindInterEdge(startNode, endNode);
+                if (interEdge != null && interEdge != null && interEdge.path.Count > 0)
                 {
-                    refinedPath.AddRange(interEdge.IntraPaths);
+                    refinedPath.AddRange(interEdge);
                 }
                 else
                 {
-                    // Debug.LogError("No valid HPAInterEdge or local path found between clusters.");
-                    continue;
+                    HPAPath localPath = FindLocalPath(startNode, endNode, startNode.Cluster);
+                    refinedPath.AddRange(localPath);
                 }
             }
         }
@@ -188,13 +188,13 @@ public class PathFinder : IPathFinder
         return localPath;
     }
 
-    private HPAInterEdge FindInterEdge(HPANode start, HPANode end)
+    private HPAPath FindInterEdge(HPANode start, HPANode end)
     {
         foreach (var edge in start.Edges)
         {
             if (edge is HPAInterEdge interEdge && (interEdge.Node1 == end || interEdge.Node2 == end))
             {
-                return interEdge;
+                return interEdge.IntraPaths;
             }
         }
         return null;

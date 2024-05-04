@@ -162,7 +162,7 @@ public class EntranceManager : IEntranceManager
         bool existsInCluster2 = entrance.Cluster2.Entrances.Contains(entrance);
         bool existsInLevel = _graphModel.EntrancesByLevel[entrance.Node1.Level].Contains(entrance);
 
-        Debug.Log($"Existence in Cluster1: {existsInCluster1}, Cluster2: {existsInCluster2}, Level: {existsInLevel}");
+        // Debug.Log($"Existence in Cluster1: {existsInCluster1}, Cluster2: {existsInCluster2}, Level: {existsInLevel}");
 
         entrance.Cluster1.Entrances.Remove(entrance);
         entrance.Cluster2.Entrances.Remove(entrance);

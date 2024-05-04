@@ -52,10 +52,10 @@ public class PathfindingTest
         Debug.Log("Nodes Explored: " + hpaPath4.NodesExplored);
 
 
-        HPAPath hpaPath2 = EffiencyInNodeExploration(tileMap, start, end, 3, RefinePath: true);
-        Debug.Log("HPA STAR: ");
-        Debug.Log("Path Length: " + hpaPath2.path.Count);
-        Debug.Log("Nodes Explored: " + hpaPath2.NodesExplored);
+        // HPAPath hpaPath2 = EffiencyInNodeExploration(tileMap, start, end, 3, RefinePath: true);
+        // Debug.Log("HPA STAR: ");
+        // Debug.Log("Path Length: " + hpaPath2.path.Count);
+        // Debug.Log("Nodes Explored: " + hpaPath2.NodesExplored);
 
 
 
