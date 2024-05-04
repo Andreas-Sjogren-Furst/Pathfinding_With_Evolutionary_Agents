@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Codice.Client.Common.GameUI;
 using UnityEngine;
@@ -64,7 +65,13 @@ public class HPAStar : IHPAStar
     {
         foreach (Entrance e in _graphModel.EntrancesByLevel[1])
         {
-            _edgeManager.AddHPAEdge(e.Node1, e.Node2, 1, 1, HPAEdgeType.INTER); // adding inter edges between nodes that consists an entrance (2 connected nodes).
+            List<HPANode> hpaPath = new List<HPANode>
+            {
+                e.Node1,
+                e.Node2
+            };
+
+            _edgeManager.AddHPAEdge(e.Node1, e.Node2, 1, 1, HPAEdgeType.INTER, IntraPath: new HPAPath(hpaPath)); // adding inter edges between nodes that consists an entrance (2 connected nodes).
         }
 
         foreach (Cluster c in _graphModel.ClusterByLevel[1])
@@ -84,7 +91,7 @@ public class HPAStar : IHPAStar
     {
         if (!_graphModel.ClusterByLevel.ContainsKey(l - 1))
         {
-            Debug.LogError("Previous level does not exist, cannot build level " + l);
+            // Debug.LogError("Previous level does not exist, cannot build level " + l);
             return;
         }
 
@@ -133,6 +140,7 @@ public class HPAStar : IHPAStar
         {
             for (int j = 0; j < numClustersPerSide; j++)
             {
+                // Debug.Log(" row " + i + " col " + j);
                 Cluster oldCluster = oldClusters[i * numClustersPerSide + j];
                 _clusterManager.IncreaseSingleClusterLevel(oldCluster);
             }
@@ -143,6 +151,7 @@ public class HPAStar : IHPAStar
         {
             for (int i = 0; i < fullBlocksPerSide * clustersToMergePerSide; i++)
             {
+                // Debug.Log(" row " + i + " col " + j);
                 Cluster oldCluster = oldClusters[i * numClustersPerSide + j];
                 _clusterManager.IncreaseSingleClusterLevel(oldCluster);
             }
@@ -156,6 +165,8 @@ public class HPAStar : IHPAStar
             {
                 for (int j = fullBlocksPerSide * clustersToMergePerSide; j < numClustersPerSide; j++)
                 {
+                    // Debug.Log(" row " + i + " col " + j);
+
                     Cluster oldCluster = oldClusters[i * numClustersPerSide + j];
                     _clusterManager.IncreaseSingleClusterLevel(oldCluster);
                 }
@@ -163,7 +174,7 @@ public class HPAStar : IHPAStar
 
         }
 
-        Debug.Log("Added level " + l + " with " + _graphModel.ClusterByLevel[l].Count + " clusters.");
+        // Debug.Log("Added level " + l + " with " + _graphModel.ClusterByLevel[l].Count + " clusters.");
 
 
         // convert previous inter edges to intra 
@@ -192,7 +203,7 @@ public class HPAStar : IHPAStar
 
                     if (e1 != e2) //e1.Node1.Cluster == e2.Node1.Cluster && e1.Node1.Cluster == cluster && e2.Node1.Cluster == cluster && e1.Node1 != e2.Node1)
                     {
-                        double d = _pathFinder.CalculateDistance(_pathFinder.FindLocalPath(e1.Node1, e2.Node2, cluster)); //TODO: safe path in memory in special path class? 
+                        double d = _pathFinder.FindLocalPath(e1.Node1, e2.Node2, cluster)?.Length ?? double.PositiveInfinity; //TODO: safe path in memory in special path class? 
                         if (d < double.PositiveInfinity)
                         {
                             _edgeManager.AddHPAEdge(e1.Node1, e2.Node2, 1, l, HPAEdgeType.INTER);
@@ -202,11 +213,11 @@ public class HPAStar : IHPAStar
             }
         }
 
-        Debug.Log("Added level " + l + " with " + _graphModel.ClusterByLevel[l].Count + " clusters.");
+        // Debug.Log("Added level " + l + " with " + _graphModel.ClusterByLevel[l].Count + " clusters.");
     }
 
 
-    public List<HPANode> HierarchicalSearch(Vector2Int start, Vector2Int goal, int level)
+    public HPAPath HierarchicalSearch(Vector2Int start, Vector2Int goal, int level)
     {
 
         _nodeManager.insertCheckpoint(start, level);
@@ -215,15 +226,27 @@ public class HPAStar : IHPAStar
         HPANode TempStart = _nodeManager.GetNodeByPosition(start, level);
         HPANode TempGoal = _nodeManager.GetNodeByPosition(goal, level);
 
-        List<HPANode> abstractPath = _pathFinder.FindAbstractPath(TempStart, TempGoal, level);
+        HPAPath abstractPath = _pathFinder.FindAbstractPath(TempStart, TempGoal, level);
         if (abstractPath == null)
         {
             return null;
         }
 
-        List<HPANode> refinedPath = _pathFinder.RefinePath(abstractPath, level);
+        HPAPath refinedPath = _pathFinder.RefinePath(abstractPath, level);
         // Optional: Smoothing the path if needed
         return refinedPath;
+    }
+
+    public HPAPath HierarchicalAbstractSearch(Vector2Int start, Vector2Int goal, int level)
+    {
+        _nodeManager.insertCheckpoint(start, level);
+        _nodeManager.insertCheckpoint(goal, level);
+
+        HPANode TempStart = _nodeManager.GetNodeByPosition(start, level);
+        HPANode TempGoal = _nodeManager.GetNodeByPosition(goal, level);
+
+        HPAPath abstractPath = _pathFinder.FindAbstractPath(TempStart, TempGoal, level);
+        return abstractPath;
     }
 
     public void insertNodeGlobally(Vector2Int pos, int maxLevel)
@@ -355,10 +378,11 @@ public class HPAStar : IHPAStar
             {
                 if (e1.Node1 != e2.Node1)
                 {
-                    double d = _pathFinder.CalculateDistance(_pathFinder.FindLocalPath(e1.Node1, e2.Node1, c)); //TODO: safe path in memory in special path class? 
+                    HPAPath path = _pathFinder.FindLocalPath(e1.Node1, e2.Node1, c);
+                    double d = path?.Length ?? double.PositiveInfinity; //TODO: safe path in memory in special path class? 
                     if (d < double.PositiveInfinity)
                     {
-                        _edgeManager.AddHPAEdge(e1.Node1, e2.Node1, d, 1, HPAEdgeType.INTER);
+                        _edgeManager.AddHPAEdge(e1.Node1, e2.Node1, d, 1, HPAEdgeType.INTER, IntraPath: path);
                     }
                 }
             }

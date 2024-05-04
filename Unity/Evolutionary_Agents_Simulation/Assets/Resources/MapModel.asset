@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: MapModel
   m_EditorClassIdentifier: 
   NumberOfCheckPoints: 0
-  Density: 45.7
+  Density: 0
   CellularIterations: 1
   CheckPointSpacing: 1
-  ErosionLimit: 1
+  ErosionLimit: 0
   MapNumber: 0
   RandomSeed: 175
-  mapWidth: 30
-  mapHeight: 30
+  mapWidth: 5
+  mapHeight: 5
   CheckPoints: []
   SpawnPoint: {fileID: 0}

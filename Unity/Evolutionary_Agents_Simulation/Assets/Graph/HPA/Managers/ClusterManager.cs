@@ -228,27 +228,80 @@ public class ClusterManager : IClusterManager
 
     public Cluster IncreaseSingleClusterLevel(Cluster c)
     {
-        Cluster newCluster = new Cluster(c.Level + 1, new HashSet<HPANode>(), new HashSet<Entrance>(), c.bottomLeftPos, c.topRightPos);
+        // Debug.Log("Increasing cluster level from " + c.Level);
+
+        // Assuming new boundaries might need calculation or adjustment
+        Vector2Int newBottomLeft = c.bottomLeftPos; // These might need to be recalculated
+        Vector2Int newTopRight = c.topRightPos;     // These might need to be recalculated
+
+        Cluster newCluster = new Cluster(c.Level + 1, new HashSet<HPANode>(), new HashSet<Entrance>(), newBottomLeft, newTopRight);
         _graphModel.ClusterByLevel[c.Level + 1].Add(newCluster);
 
         foreach (HPANode n in c.Nodes)
         {
-            HPANode newNode = _nodeManager.FindOrCreateNode(n.Position.x, n.Position.y, newCluster);
-            newNode.Merge(n);
-            newCluster.Nodes.Add(newNode);
+            // Check if node should logically continue to the next level cluster
+            if (c.Contains(n.Position))
+            {
+                HPANode newNode = _nodeManager.FindOrCreateNode(n.Position.x, n.Position.y, newCluster);
+                TransferEdges(n, newNode, newCluster);
+                newCluster.Nodes.Add(newNode);
+            }
+            else
+            {
+                // Debug.Log($"Node at {n.Position} is outside the new cluster bounds and won't be transferred.");
+            }
         }
 
-        foreach (Entrance e in c.Entrances)
-        {
-            HPANode n1 = _nodeManager.FindOrCreateNode(e.Node1.Position.x, e.Node1.Position.y, newCluster);
-            HPANode n2 = _nodeManager.FindOrCreateNode(e.Node2.Position.x, e.Node2.Position.y, newCluster);
-            Entrance newEntrance = new Entrance(newCluster, newCluster, n1, n2);
-            newCluster.Entrances.Add(newEntrance);
-            _graphModel.EntrancesByLevel[c.Level + 1].Add(newEntrance);
-        }
+        TransferEntrances(c, newCluster);
 
         return newCluster;
     }
+
+    private void TransferEdges(HPANode originalNode, HPANode newNode, Cluster newCluster)
+    {
+        foreach (var edge in originalNode.Edges)
+        {
+            HPANode node2 = _nodeManager.FindOrCreateNode(edge.Node2.Position.x, edge.Node2.Position.y, newCluster);
+            if (!newNode.Edges.Any(e => e.Node2 == node2))
+            {
+                _edgeManager.AddHPAEdge(newNode, node2, edge.Weight, newCluster.Level, edge.Type, IntraPath: edge is HPAInterEdge ? ((HPAInterEdge)edge).IntraPaths : null);
+                // Debug.Log($"Edge transferred from {newNode.Position} to {node2.Position} at new level {newCluster.Level}");
+            }
+        }
+    }
+
+    private void TransferEntrances(Cluster originalCluster, Cluster newCluster)
+    {
+        foreach (Entrance e in originalCluster.Entrances)
+        {
+            // Assume IsNodeOnBoundary is a new method to check if the node is at the boundary of the cluster
+            if (IsNodeOnBoundary(e.Node1, newCluster) || IsNodeOnBoundary(e.Node2, newCluster))
+            {
+                HPANode n1 = _nodeManager.FindOrCreateNode(e.Node1.Position.x, e.Node1.Position.y, newCluster);
+                HPANode n2 = _nodeManager.FindOrCreateNode(e.Node2.Position.x, e.Node2.Position.y, newCluster);
+                Entrance newEntrance = new Entrance(newCluster, newCluster, n1, n2);
+                newCluster.Entrances.Add(newEntrance);
+                _graphModel.EntrancesByLevel[newCluster.Level].Add(newEntrance);
+                // Debug.Log("Entrance transferred to new level.");
+            }
+            else
+            {
+                // Debug.Log($"Entrance between {e.Node1.Position} and {e.Node2.Position} not valid for new cluster at level {newCluster.Level}. Nodes may not be on boundary.");
+            }
+        }
+    }
+
+    private bool IsNodeOnBoundary(HPANode node, Cluster cluster)
+    {
+        return (node.Position.x == cluster.bottomLeftPos.x || node.Position.x == cluster.topRightPos.x ||
+                node.Position.y == cluster.bottomLeftPos.y || node.Position.y == cluster.topRightPos.y);
+    }
+
+
+
+
+
+
 
 
 

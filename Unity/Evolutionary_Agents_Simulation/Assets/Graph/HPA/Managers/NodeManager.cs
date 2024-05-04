@@ -57,20 +57,49 @@ public class NodeManager : INodeManager
 
 
 
-    public void insertCheckpoint(Vector2Int sPos, int maxLevel) // start node and finish node. 
+    public void insertCheckpoint(Vector2Int sPos, int maxLevel)
     {
-        Cluster c = DetermineCluster(sPos, maxLevel);
-        HPANode node = FindOrCreateNode(sPos.x, sPos.y, c);
+        // Dictionary to store paths obtained at each level for use in the next level
+        Dictionary<int, List<HPAPath>> levelPaths = new Dictionary<int, List<HPAPath>>();
 
         for (int l = 1; l <= maxLevel; l++)
         {
-            Cluster cTemp = DetermineCluster(sPos, l);
-            _edgeManager.ConnectToBorder(node, cTemp);
+            // Determine the cluster for the current level
+            Cluster currentCluster = DetermineCluster(sPos, l);
+            // Find or create a node at this level in the determined cluster
+            HPANode checkPointNode = FindOrCreateNode(sPos.x, sPos.y, currentCluster);
+
+            // If paths from the previous level exist, use them to add intra edges
+            if (levelPaths.ContainsKey(l))
+            {
+                List<HPAPath> previousPaths = levelPaths[l];
+                foreach (HPAPath path in previousPaths)
+                {
+                    Vector2Int borderPosition = path.path.Last().Position;
+                    HPANode borderNode = FindOrCreateNode(borderPosition.x, borderPosition.y, currentCluster);
+                    if (borderNode.Cluster != currentCluster)
+                    {
+                        // Debug.LogError("Border node cluster does not match current cluster");
+                        continue;
+                    }
+                    _edgeManager.AddHPAEdge(checkPointNode, borderNode, path.Length, l, HPAEdgeType.INTRA);
+                    // _edgeManager.AddHPAEdge(checkPointNode, borderNode, path.Length, l, HPAEdgeType.INTER, path);
+
+                }
+            }
+
+            // Connect to border and store new paths for the next level
+            List<HPAPath> newPaths = _edgeManager.ConnectToBorder(checkPointNode, currentCluster);
+            if (l < maxLevel)  // Only store paths if there is a next level to process
+            {
+                levelPaths[l + 1] = newPaths;
+            }
+
+            // Optionally, manage cluster nodes
+            currentCluster.Nodes.Add(checkPointNode);
         }
-
-        node.Level = maxLevel;
-
     }
+
 
     public HPANode GetNodeByPosition(Vector2Int position, int level)
     {

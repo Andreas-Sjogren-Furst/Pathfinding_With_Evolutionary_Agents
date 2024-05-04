@@ -1,15 +1,25 @@
 
 public class CellularAutomata
 {
-   
-    public static int[,] Create2DMap(MapModel mapModel){
+
+    public static int[,] Create2DMap(MapModel mapModel)
+    {
         int[,] map2D = new int[mapModel.mapHeight, mapModel.mapWidth];
         map2D = GenerateNoise(map2D, mapModel.Density);
         map2D = CellularAutomaton(map2D, mapModel.CellularIterations, mapModel.ErosionLimit);
         return map2D;
     }
 
-    public static int[,] Erode(int[,] map, int erosionLimit){
+    public static int[,] Create2DMap(InitCustomMaps initCustomMaps)
+    {
+        int[,] map2D = new int[initCustomMaps.size, initCustomMaps.size];
+        map2D = GenerateNoise(map2D, initCustomMaps.density);
+        map2D = CellularAutomaton(map2D, initCustomMaps.cellularIterations, initCustomMaps.erosionLimit);
+        return map2D;
+    }
+
+    public static int[,] Erode(int[,] map, int erosionLimit)
+    {
         return CellularAutomaton(map, 1, erosionLimit);
     }
 
@@ -24,7 +34,8 @@ public class CellularAutomata
                 int randomValue = UnityEngine.Random.Range(0, 101); // Generate a random value
                 map[i, j] = randomValue > density ? 0 : 1; // Assign floor or wall based on density.
             }
-        } return map;
+        }
+        return map;
     }
 
     private static int[,] CellularAutomaton(int[,] map, int cellularIterations, int erosionLimit)
@@ -65,6 +76,7 @@ public class CellularAutomata
                     map[j, k] = neighborWallCount > erosionLimit ? 1 : 0; // Update based on neighbor count
                 }
             }
-        } return map;
+        }
+        return map;
     }
 }

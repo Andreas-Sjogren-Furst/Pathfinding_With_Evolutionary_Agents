@@ -38,97 +38,97 @@ public static class Astar
         new Vector2Int(0, 1),   // Up
       };
 
-    // public static List<Vector2Int> FindPath(Vector2Int start, Vector2Int end, int[,] map)
-    // {
+    public static (List<Vector2Int> Path, int NodesExplored) FindPath(Vector2Int start, Vector2Int end, int[,] map) // level 0, to find path directly on map without clusters. 
+    {
 
-    //     // Directions for 4 possible movements
-
-
-    //     FibonacciHeapPriorityQueue<NodeCell> openList; // for constant time to get the lowest fCost node
+        // Directions for 4 possible movements
 
 
-    //     Dictionary<Vector2Int, NodeCell> closedList;
-
-    //     openList = new FibonacciHeapPriorityQueue<NodeCell>(SortDirection.Ascending); // TODO: change to Priority queue with fibonaci heap. 
-    //     Dictionary<Vector2Int, NodeCell> openListLookup = new Dictionary<Vector2Int, NodeCell>();  // for constant time lookup
+        FibonacciHeapPriorityQueue<NodeCell> openList; // for constant time to get the lowest fCost node
 
 
-    //     closedList = new Dictionary<Vector2Int, NodeCell>();
+        Dictionary<Vector2Int, NodeCell> closedList;
 
-    //     NodeCell startNode = new NodeCell(start);
-    //     openList.Enqueue(startNode);
-    //     openListLookup.Add(startNode.Position, startNode);
-
+        openList = new FibonacciHeapPriorityQueue<NodeCell>(SortDirection.Ascending); // TODO: change to Priority queue with fibonaci heap. 
+        Dictionary<Vector2Int, NodeCell> openListLookup = new Dictionary<Vector2Int, NodeCell>();  // for constant time lookup
 
 
-    //     while (openList.Count > 0) // N 
-    //     {
-    //         Debug.Log("OpenList: " + openList.Count);
-    //         // for (int i = 1; i < openList.Count; i++) // N
-    //         // {
+        closedList = new Dictionary<Vector2Int, NodeCell>();
 
-    //         //     if (openList[i].fCost < currentNode.fCost || (openList[i].fCost == currentNode.fCost && openList[i].hCost < currentNode.hCost))
-    //         //     // if cost is lower or if f cost is equal and hCost is lower
-    //         //     {
-    //         //         currentNode = openList[i];
-    //         //     }
-    //         // }
-
-    //         NodeCell currentNode = openList.Dequeue();
-    //         openListLookup.Remove(currentNode.Position);
-
-    //         if (closedList.ContainsKey(currentNode.Position))
-    //         {
-    //             closedList[currentNode.Position] = currentNode;
-    //         }
-    //         else
-    //         {
-    //             closedList.Add(currentNode.Position, currentNode);
-
-    //         }
+        NodeCell startNode = new NodeCell(start);
+        openList.Enqueue(startNode);
+        openListLookup.Add(startNode.Position, startNode);
 
 
-    //         if (currentNode.Position == end) // N
-    //         {
 
-    //             return RetracePath(startNode, currentNode); ;
-    //         }
+        while (openList.Count > 0) // N 
+        {
+            // Debug.Log("OpenList: " + openList.Count);
+            // for (int i = 1; i < openList.Count; i++) // N
+            // {
 
-    //         foreach (Vector2Int direction in directions)  // 8
-    //         {
-    //             Vector2Int neighborPos = currentNode.Position + direction;
-    //             if (!PositionIsValid(neighborPos, map)) continue;
+            //     if (openList[i].fCost < currentNode.fCost || (openList[i].fCost == currentNode.fCost && openList[i].hCost < currentNode.hCost))
+            //     // if cost is lower or if f cost is equal and hCost is lower
+            //     {
+            //         currentNode = openList[i];
+            //     }
+            // }
 
-    //             NodeCell neighbor = FindExistingNode(neighborPos, openListLookup, closedList); // constant time lookup
+            NodeCell currentNode = openList.Dequeue();
+            openListLookup.Remove(currentNode.Position);
 
-    //             if (neighbor == null)
-    //             {
-    //                 //  Debug.Log("Creating new node at " + neighborPos + " from " + currentNode.position + " with gCost: " + currentNode.gCost + " and hCost: " + GetDistance(neighborPos, end) + " and fCost: " + (currentNode.gCost + GetDistance(neighborPos, end)) + " and parent: " + currentNode.position);
-    //                 neighbor = new NodeCell(neighborPos);
-    //             }
+            if (closedList.ContainsKey(currentNode.Position))
+            {
+                closedList[currentNode.Position] = currentNode;
+            }
+            else
+            {
+                closedList.Add(currentNode.Position, currentNode);
 
-    //             if (closedList.ContainsKey(neighbor.Position)) continue;
-
-    //             int newCostToNeighbor = currentNode.gCost + GetDistance(currentNode.Position, neighbor.Position);
-    //             if (newCostToNeighbor < neighbor.gCost || !openListLookup.ContainsKey(neighbor.Position)) // constant time lookup
-    //             {
-    //                 neighbor.gCost = newCostToNeighbor;
-    //                 neighbor.hCost = GetDistance(neighbor.Position, end);
-    //                 neighbor.parent = currentNode;
-
-    //                 if (!openListLookup.ContainsKey(neighbor.Position))
-    //                 {
-    //                     openList.Enqueue(neighbor);
-    //                     openListLookup.Add(neighbor.Position, neighbor);
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return null;
-    // }
+            }
 
 
-    public static List<HPANode> FindPath(HPANode start, HPANode end, HPAEdgeType edgeType = HPAEdgeType.INTRA)
+            if (currentNode.Position == end) // N
+            {
+
+                return (RetracePath(startNode, currentNode), closedList.Count);
+            }
+
+            foreach (Vector2Int direction in directions)  // 8
+            {
+                Vector2Int neighborPos = currentNode.Position + direction;
+                if (!PositionIsValid(neighborPos, map)) continue;
+
+                NodeCell neighbor = FindExistingNode(neighborPos, openListLookup, closedList); // constant time lookup
+
+                if (neighbor == null)
+                {
+                    //  Debug.Log("Creating new node at " + neighborPos + " from " + currentNode.position + " with gCost: " + currentNode.gCost + " and hCost: " + GetDistance(neighborPos, end) + " and fCost: " + (currentNode.gCost + GetDistance(neighborPos, end)) + " and parent: " + currentNode.position);
+                    neighbor = new NodeCell(neighborPos);
+                }
+
+                if (closedList.ContainsKey(neighbor.Position)) continue;
+
+                int newCostToNeighbor = currentNode.gCost + GetDistance(currentNode.Position, neighbor.Position);
+                if (newCostToNeighbor < neighbor.gCost || !openListLookup.ContainsKey(neighbor.Position)) // constant time lookup
+                {
+                    neighbor.gCost = newCostToNeighbor;
+                    neighbor.hCost = GetDistance(neighbor.Position, end);
+                    neighbor.parent = currentNode;
+
+                    if (!openListLookup.ContainsKey(neighbor.Position))
+                    {
+                        openList.Enqueue(neighbor);
+                        openListLookup.Add(neighbor.Position, neighbor);
+                    }
+                }
+            }
+        }
+        return (null, closedList.Count);
+    }
+
+
+    public static HPAPath FindPath(HPANode start, HPANode end, HPAEdgeType edgeType = HPAEdgeType.INTRA)
     {
         var openList = new FibonacciHeapPriorityQueue<HPANode>(SortDirection.Ascending);
         var openListLookup = new Dictionary<Vector2Int, HPANode>();
@@ -176,7 +176,9 @@ public static class Astar
 
             if (currentNode.Position == end.Position)
             {
-                return RetracePath(start, currentNode);
+                HPAPath hpaPath = new HPAPath(RetracePath(start, currentNode));
+                hpaPath.NodesExplored = closedList.Count;
+                return hpaPath;
             }
 
             foreach (HPAEdge edge in currentNode.Edges)

@@ -23,6 +23,8 @@ public class GraphPresenter : MonoBehaviour
 
     public int visualizeLevel = 1;
 
+    public bool visualizePath = true;
+
     private IGraphModel _graphModel;
     private IPathFinder _pathFinder;
     private INodeManager _nodeManager;
@@ -59,13 +61,19 @@ public class GraphPresenter : MonoBehaviour
 
 
 
-        Cluster c1 = clusterManager.DetermineCluster(new Vector2Int(9, 5), visualizeLevel);
-        Debug.Log("total entrances in cluster" + c1.Entrances.Count);
-        c1.isFinalized = true;
-        tileMap[9, 5] = 1;
-        HPAStar.DynamicallyRemoveHPANode(new Vector2Int(9, 5));
+        // Cluster c1 = clusterManager.DetermineCluster(new Vector2Int(9, 5), visualizeLevel);
+        // Debug.Log("total entrances in cluster" + c1.Entrances.Count);
+        // c1.isFinalized = true;
+        // tileMap[9, 5] = 1;
+        // HPAStar.DynamicallyRemoveHPANode(new Vector2Int(9, 5));
 
-        Debug.Log("total entrances in cluster" + c1.Entrances.Count);
+        // Debug.Log("total entrances in cluster" + c1.Entrances.Count);
+
+        // HPAPath hpaPath = HPAStar.HierarchicalSearch(new Vector2Int(0, 0), new Vector2Int(99, 99), 1);
+
+        // Debug.Log("Path Length: " + hpaPath.Length);
+        // Debug.Log("Nodes Explored: " + hpaPath.NodesExplored);
+
 
 
         // Cluster c = _graphModel.ClusterByLevel[1].First();
@@ -115,22 +123,51 @@ public class GraphPresenter : MonoBehaviour
 
 
 
-        Vector2Int start = new Vector2Int(0, 0);
-        Vector2Int goal = new Vector2Int(maxSize - 1, maxSize - 1);
+        Vector2Int goal = new Vector2Int(0, 0);
+        Vector2Int start = new Vector2Int(maxSize - 3, maxSize - 3);
 
-        // List<HPANode> nodes = HPAStar.HierarchicalSearch(start, goal, 1);
+        // HPAPath nodes = HPAStar.HierarchicalSearch(start, goal, 1);
+        // HPAPath nodes2 = HPAStar.HierarchicalAbstractSearch(start, goal, visualizeLevel);
+        Cluster c4 = clusterManager.DetermineCluster(goal, visualizeLevel);
+
+        // _nodeManager.FindOrCreateNode(goal.x, goal.y, c4);
+
+        // _nodeManager.insertCheckpoint(start, visualizeLevel);
+        // _nodeManager.insertCheckpoint(goal, visualizeLevel);
+
+        HPAPath path = HPAStar.HierarchicalAbstractSearch(start, goal, visualizeLevel);
+        Debug.Log("Path Length: " + path.Length);
+        Debug.Log("Nodes Explored: " + path.NodesExplored);
+
+        HPAPath path2 = HPAStar.HierarchicalSearch(start, goal, visualizeLevel);
+        Debug.Log("Path Length: " + path2.Length);
+        Debug.Log("Nodes Explored: " + path2.NodesExplored);
+
+
+
+
+        // Debug.Log("Path Length: " + nodes2.path.Count);
         // List<HPANode> nodes = HPAStar.HierarchicalSearch(new Vector2Int(15, 11), new Vector2Int(29, 4), 1);
 
         // foreach (HPANode node in nodes)
         // {
         //     Debug.Log(node.Position);
         // }
-        DrawGraph();
+        if (visualizePath)
+        {
+            drawPath(path);
+        }
+
+        if (visualizePath)
+        {
+            drawPath(path2);
+        }
+        DrawGraph(visualizeLevel);
     }
 
-    void DrawGraph()
+    void DrawGraph(int level)
     {
-        if (_graphModel.ClusterByLevel.TryGetValue(visualizeLevel, out var clusters))
+        if (_graphModel.ClusterByLevel.TryGetValue(level, out var clusters))
         {
             if (showClusters)
             {
@@ -167,7 +204,7 @@ public class GraphPresenter : MonoBehaviour
         }
         else
         {
-            Debug.Log($"No data available for level {visualizeLevel}");
+            Debug.Log($"No data available for level {level}");
         }
     }
 
@@ -176,6 +213,16 @@ public class GraphPresenter : MonoBehaviour
         GameObject nodeObj = Instantiate(nodePrefab, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
         nodeObj.transform.localScale = Vector3.one * nodeScale * tileSize;
         nodeObj.SetActive(true);
+    }
+
+    void drawPath(HPAPath path)
+    {
+        for (int i = 0; i < path.path.Count - 1; i++)
+        {
+            Vector3 start = transform.position + new Vector3(path.path[i].Position.x * tileSize, 0, path.path[i].Position.y * tileSize);
+            Vector3 end = transform.position + new Vector3(path.path[i + 1].Position.x * tileSize, 0, path.path[i + 1].Position.y * tileSize);
+            DrawLine(start, end, intraEdgeMaterial);
+        }
     }
 
     void drawEntrances(Cluster cluster)

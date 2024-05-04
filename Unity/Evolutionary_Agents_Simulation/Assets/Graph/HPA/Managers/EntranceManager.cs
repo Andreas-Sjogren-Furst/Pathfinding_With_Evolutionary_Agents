@@ -44,7 +44,7 @@ public class EntranceManager : IEntranceManager
             {
                 if (IsWalkable(new Vector2Int(xForC1, y), new Vector2Int(xForC2, y)))
                 {
-                    Debug.Log("Building entrances between clusters " + c1.bottomLeftPos + " and " + c2.bottomLeftPos);
+                    // Debug.Log("Building entrances between clusters " + c1.bottomLeftPos + " and " + c2.bottomLeftPos);
 
                     var node1 = _nodeManager.FindOrCreateNode(xForC1, y, c1);
                     var node2 = _nodeManager.FindOrCreateNode(xForC2, y, c2);
@@ -65,7 +65,7 @@ public class EntranceManager : IEntranceManager
             {
                 if (IsWalkable(new Vector2Int(x, yForC1), new Vector2Int(x, yForC2)))
                 {
-                    Debug.Log("Building entrances between clusters " + c1.bottomLeftPos + " and " + c2.bottomLeftPos);
+                    // Debug.Log("Building entrances between clusters " + c1.bottomLeftPos + " and " + c2.bottomLeftPos);
 
                     var node1 = _nodeManager.FindOrCreateNode(x, yForC1, c1);
                     var node2 = _nodeManager.FindOrCreateNode(x, yForC2, c2);

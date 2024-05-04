@@ -8,8 +8,11 @@ public class InitCustomMaps
     public readonly int checkPointSpacing;
     public readonly int erosionLimit;
     public readonly int randomSeed;
-    public InitCustomMaps(int density, int numberOfCheckPoints, int tileSize, int cellularIterations,
-                          int checkPointSpacing, int erosionLimit, int randomSeed)
+
+    public readonly int size = 100;
+
+    public InitCustomMaps(int density, int numberOfCheckPoints, int cellularIterations,
+                          int checkPointSpacing, int erosionLimit, int randomSeed, int size = 100)
     {
         this.density = density;
         this.numberOfCheckPoints = numberOfCheckPoints;

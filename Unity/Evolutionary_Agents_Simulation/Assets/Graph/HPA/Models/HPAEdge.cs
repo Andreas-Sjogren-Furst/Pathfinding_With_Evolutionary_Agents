@@ -1,6 +1,8 @@
 
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 public class HPAEdge
 {
@@ -32,8 +34,21 @@ public class HPAEdge
     {
         // Create a hash code that is based on the position.
         // You might use a combination of x and y coordinates to do this.
-        return Node1.GetHashCode() + Node2.GetHashCode();
+        return Node1.GetHashCode() + Node2.GetHashCode() + Level.GetHashCode() + Type.GetHashCode();
     }
 
+}
+
+public class HPAInterEdge : HPAEdge
+{
+    public HPAPath IntraPaths { get; set; }
+
+    public HPAInterEdge(HPANode node1, HPANode node2, double weight, int level, HPAPath IntraPath)
+        : base(node1, node2, weight, level, HPAEdgeType.INTER)
+    {
+        IntraPaths = IntraPath;
+    }
+
+    // You can override methods or add new ones specific to inter-cluster edges
 }
 public enum HPAEdgeType { INTER, INTRA }
