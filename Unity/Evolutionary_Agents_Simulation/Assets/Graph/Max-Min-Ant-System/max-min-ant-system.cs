@@ -167,6 +167,11 @@ public class MMAS
     private Node[] _bestTour;
     private double _bestTourLength;
 
+    private double previousPheromoneSum = 0;
+    private const double convergenceThreshold = 0.0001; // Threshold to determine convergence
+    private const int convergenceCountRequired = 10; // Number of consecutive iterations required for convergence
+    private int convergenceCount = 0;
+
 
     private int GetPheromoneKey(Node source, Node destination)
     {
@@ -258,7 +263,39 @@ public class MMAS
 
             UpdatePheromones(antTours, antTourLengths); // O(N^2)
             ApplyPheromoneTrailLimits(); // O(N^2)
+
+            // check convergence. 
+
+            double currentPheromoneSum = SumAllPheromones();
+            if (Math.Abs(currentPheromoneSum - previousPheromoneSum) <= convergenceThreshold)
+            {
+                convergenceCount++;
+                if (convergenceCount >= convergenceCountRequired)
+                {
+                    UnityEngine.Debug.Log("Convergence reached after " + iteration + " iterations.");
+                    break; // Early stopping
+                }
+            }
+            else
+            {
+                convergenceCount = 0; // Reset if changes are above the threshold
+            }
+            previousPheromoneSum = currentPheromoneSum;
+
+
         }
+
+    }
+
+
+    private double SumAllPheromones()
+    {
+        double sum = 0;
+        foreach (var pheromone in _pheromones.Values)
+        {
+            sum += pheromone;
+        }
+        return sum;
     }
 
 
