@@ -273,7 +273,7 @@ public class MMAS
                 if (convergenceCount >= convergenceCountRequired)
                 {
                     UnityEngine.Debug.Log("Convergence reached after " + iteration + " iterations.");
-                    break; // Early stopping
+                    break; // Early stopping, this signifcanlty increased the speed of the algorithm from 5 sec to 0.5 sec
                 }
             }
             else
