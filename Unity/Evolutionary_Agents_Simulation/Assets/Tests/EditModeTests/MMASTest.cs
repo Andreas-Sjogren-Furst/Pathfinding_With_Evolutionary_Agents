@@ -32,13 +32,13 @@ public class MMASTest
         mmas.SetGraph(graph);
         mmas.Run(maxIterations);
 
-        int[] bestTour = mmas.GetBestTour();
+        Node[] bestTour = mmas.GetBestTour();
         double bestTourLength = mmas.GetBestTourLength();
 
-        UnityEngine.Debug.Log("Best Tour: " + string.Join(" -> ", bestTour));
-        UnityEngine.Debug.Log("Best Tour Length: " + bestTourLength + " (calculated again: " + CalculateTourLength(bestTour, graph) + ")");
+        // UnityEngine.Debug.Log("Best Tour: " + string.Join(" -> ", bestTour));
+        UnityEngine.Debug.Log("Best Tour Length: " + bestTourLength + " (calculated again: " + optimalTourLength + ")");
 
-        Assert.AreEqual(bestTourLength, CalculateTourLength(bestTour, graph)); // Ensure the bestTourLength is calculated correctly. 
+        Assert.AreEqual((int)bestTourLength, (int)optimalTourLength); // Ensure the bestTourLength is calculated correctly. 
 
         // Assert the results
         Assert.AreEqual(optimalTour.Length, bestTour.Length);
@@ -62,7 +62,7 @@ public class MMASTest
     private Graph ReadTSPFile(string filePath)
     {
         UnityEngine.Debug.Log("Reading Nodes from TSP file");
-        Graph graph = new Graph(52);
+        Graph graph = new Graph();
         string[] lines = File.ReadAllLines(filePath);
         int dimension = 0;
         bool readingNodes = false;
@@ -91,7 +91,7 @@ public class MMASTest
                     int id = int.Parse(parts[0]) - 1;
                     double x = double.Parse(parts[1]);
                     double y = double.Parse(parts[2]);
-                    //UnityEngine.Debug.Log("Node: " + id + " (" + x + ", " + y + ")");
+                    // UnityEngine.Debug.Log("Node: " + id + " (" + x + ", " + y + ")");
                     graph.AddNode(new Node(id, x, y));
                 }
             }
@@ -160,8 +160,10 @@ public class MMASTest
         double length = 0.0;
         for (int i = 0; i < tour.Length - 1; i++)
         {
+            Node node1 = graph.Nodes[tour[i]];
+            Node node2 = graph.Nodes[tour[i + 1]];
             // Access the distance between consecutive nodes directly from the adjacency matrix
-            double distance = graph.AdjacencyMatrix[tour[i], tour[i + 1]];
+            double distance = graph.getEdge(node1, node2);
             if (distance < System.Double.MaxValue)
             {
                 length += distance;
@@ -174,8 +176,11 @@ public class MMASTest
             }
         }
 
+        Node lastNode = graph.Nodes[tour[tour.Length - 1]];
+        Node firstNode = graph.Nodes[tour[0]];
+
         // Add the distance from the last node back to the first node to complete the tour
-        double distanceToFirst = graph.AdjacencyMatrix[tour[tour.Length - 1], tour[0]];
+        double distanceToFirst = graph.getEdge(lastNode, firstNode);
         if (distanceToFirst < System.Double.MaxValue)
         {
             length += distanceToFirst;

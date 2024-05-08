@@ -123,6 +123,55 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &15548609
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 15548611}
+  - component: {fileID: 15548610}
+  m_Layer: 0
+  m_Name: MMASVisualizer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &15548610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 15548609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65a3d478fcf504a6ca58241c270004cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nodePrefab: {fileID: 3474578016508092520, guid: 823cb89a3cdea406a9866d4e7d1e5dd2, type: 3}
+  edgeMaterial: {fileID: 2100000, guid: 1fd6fb1bc1f094556a12c4a452b24fb5, type: 2}
+  tourMaterial: {fileID: 2100000, guid: 2edd948b783e146fb893d44a49d5eeac, type: 2}
+  showVisualization: 0
+  checkpoints: 5
+--- !u!4 &15548611
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 15548609}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &178090566
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,7 +342,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileSize: 1
   nodeScale: 0.1
-  showClusters: 1
+  showClusters: 0
   showIntraEdges: 0
   showInterEdges: 0
   showNodes: 0
@@ -304,7 +353,7 @@ MonoBehaviour:
   interEdgeMaterial: {fileID: 2100000, guid: 1fd6fb1bc1f094556a12c4a452b24fb5, type: 2}
   clusterMaterial: {fileID: 2100000, guid: edf3f4707d65044e9a62d1450f067cda, type: 2}
   visualizeLevel: 1
-  visualizePath: 1
+  visualizePath: 0
 --- !u!1 &310619917
 GameObject:
   m_ObjectHideFlags: 0
@@ -667,3 +716,4 @@ SceneRoots:
   - {fileID: 310619922}
   - {fileID: 1743635984}
   - {fileID: 198698201}
+  - {fileID: 15548611}
