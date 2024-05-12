@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class AntVision
+public class AgentVision
 {
     public void ClearVision(ref List<Vector3> detectbleObjects){
         detectbleObjects.Clear();

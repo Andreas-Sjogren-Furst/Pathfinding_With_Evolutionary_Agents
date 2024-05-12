@@ -2,13 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager
 {
     [SerializeField] private MapModel mapModel;
-    [SerializeField] private TileConfig tileConfig;
-    [SerializeField] private WallConfig wallConfig;
-    [SerializeField] private CheckPointConfig checkPointConfig;
-    [SerializeField] private SpawnPointConfig spawnPointConfig;
 
 
     private MapController mapController;
