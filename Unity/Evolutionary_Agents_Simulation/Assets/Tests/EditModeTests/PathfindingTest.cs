@@ -18,8 +18,8 @@ public class PathfindingTest
     {
         // Create instances of the necessary classes
 
-        InitCustomMaps mapModel = new InitCustomMaps(density: 0, numberOfCheckPoints: 0, cellularIterations: 0, checkPointSpacing: 10, erosionLimit: 4, randomSeed: 0);
-        int[,] tileMap = CellularAutomata.Create2DMap(mapModel);
+        InitCustomMaps mapModel = new InitCustomMaps(density: 0, numberOfCheckPoints: 0, cellularIterations: 0, height: 50, width: 50);
+        int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height,mapModel.width,mapModel.density,mapModel.cellularIterations,4);
 
 
         Vector2Int start = new Vector2Int(0, 0);

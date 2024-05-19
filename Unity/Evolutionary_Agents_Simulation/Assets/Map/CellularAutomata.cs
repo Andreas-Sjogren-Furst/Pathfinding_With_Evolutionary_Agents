@@ -2,19 +2,11 @@
 public class CellularAutomata
 {
 
-    public static int[,] Create2DMap(MapModel mapModel)
+    public static int[,] Create2DMap(int height, int width, float density, int iterations, int erosionLimit)
     {
-        int[,] map2D = new int[mapModel.mapHeight, mapModel.mapWidth];
-        map2D = GenerateNoise(map2D, mapModel.Density);
-        map2D = CellularAutomaton(map2D, mapModel.CellularIterations, mapModel.ErosionLimit);
-        return map2D;
-    }
-
-    public static int[,] Create2DMap(InitCustomMaps initCustomMaps)
-    {
-        int[,] map2D = new int[initCustomMaps.size, initCustomMaps.size];
-        map2D = GenerateNoise(map2D, initCustomMaps.density);
-        map2D = CellularAutomaton(map2D, initCustomMaps.cellularIterations, initCustomMaps.erosionLimit);
+        int[,] map2D = new int[height, width];
+        map2D = GenerateNoise(map2D, density);
+        map2D = CellularAutomaton(map2D, iterations, erosionLimit);
         return map2D;
     }
 

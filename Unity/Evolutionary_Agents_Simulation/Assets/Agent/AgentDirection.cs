@@ -1,5 +1,5 @@
 
-public class AntDirection
+public class AgentDirection
 {
     public enum Direction {
         UP,

@@ -4,7 +4,7 @@ using UnityEditor;
 [CustomEditor(typeof(MapModel))]
 public class MapModelEditor : Editor
 {
-    public override void OnInspectorGUI()
+    /*public override void OnInspectorGUI()
     {
         base.OnInspectorGUI(); // Draw the default inspector
 
@@ -14,5 +14,5 @@ public class MapModelEditor : Editor
         {  
             //MapController.CreateMap(mapModel);
         }
-    }
+    }*/
 }

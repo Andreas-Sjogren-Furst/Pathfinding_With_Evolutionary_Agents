@@ -2,11 +2,9 @@ using UnityEngine;
 
 public class Wall : MapObject
 {
-    public Wall Create(Vector2Int arrayPosition, WallConfig wallConfig) 
+    public Wall(Vector2Int arrayPosition) 
     {
         ArrayPosition = arrayPosition;
-        Object = Instantiate(wallConfig.Prefab, ConvertArrayToMap(arrayPosition), Quaternion.identity);
-        Wall wallComponent = Object.AddComponent<Wall>();
-        return wallComponent;
+        Type = ObjectType.Wall;
     }
 }

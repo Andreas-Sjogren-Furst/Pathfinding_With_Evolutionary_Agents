@@ -1,10 +1,11 @@
 
 public class State
 {
-    public enum AntState {
-        Exploring,
-        FollowingPheromones,
-        GetFood,
-        ReturningToColony
+    public enum ExploringState {
+        //TODO : Implement names of the different algorithms
+
+        Algo1,
+        Algo2,
+        Algo3
     };
 }
