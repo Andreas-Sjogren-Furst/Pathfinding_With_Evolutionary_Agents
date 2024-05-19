@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Codice.Client.BaseCommands;
@@ -6,8 +7,10 @@ using UnityEngine;
 public class ScreenViewModel
 {
     public MapObject[,] Map;
-    //TODO: public Agent[] Agents;
-    //TODO: public Graph graph;
+    public Agent[] Agents;
+    public GraphModel graph;
+    public bool showGraph;
+    public bool showCheckPoint;
+    public bool showSpawnPoint;
 
-    //TODO: Flags
 }

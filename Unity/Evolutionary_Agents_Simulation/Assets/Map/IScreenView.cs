@@ -4,7 +4,6 @@ using UnityEngine;
 
 public interface IScreenView
 {
-    void Draw(){}
+    void Draw();
     
-
 }   

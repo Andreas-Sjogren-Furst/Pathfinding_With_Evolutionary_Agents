@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WebView : MonoBehaviour
+public class WebView : MonoBehaviour, IScreenView
 {
 
-    [SerializeField] private TileConfig tileConfig;
-    [SerializeField] private WallConfig wallConfig;
-    [SerializeField] private CheckPointConfig checkPointConfig;
-    [SerializeField] private SpawnPointConfig spawnPointConfig;
+    public GameObject wallPrefab;
+    public GameObject tilePrefab;
+    public GameObject checkPointPrefab;
+    public GameObject spawnPointPrefab;
+    public GameObject agentPrefab;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -19,5 +21,9 @@ public class WebView : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void Draw(){
+        //TODO implement
     }
 }
