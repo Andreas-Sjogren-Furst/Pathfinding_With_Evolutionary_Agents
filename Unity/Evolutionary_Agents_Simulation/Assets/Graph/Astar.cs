@@ -74,7 +74,7 @@ public static class Astar
             //     }
             // }
 
-            NodeCell currentNode = openList.Dequeue();
+            NodeCell currentNode = openList.Dequeue(); // log n. 
             openListLookup.Remove(currentNode.Position);
 
             if (closedList.ContainsKey(currentNode.Position))
