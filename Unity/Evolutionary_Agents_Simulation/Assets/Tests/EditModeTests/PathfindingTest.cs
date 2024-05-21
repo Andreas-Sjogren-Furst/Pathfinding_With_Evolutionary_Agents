@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using UnityEngine;
@@ -16,40 +17,52 @@ public class PathfindingTest
     [Test]
     public void PathfindingTestSimplePasses()
     {
+
+        RunHPASimulation(
+            iterations: 50,
+            densityRange: (min: 50, max: 65),
+            checkPointsRange: (min: 1, max: 5),
+            cellularIterationsRange: (min: 3, max: 10),
+            heightRange: (min: 100, max: 100),
+            widthRange: (min: 100, max: 100)
+        );
         // Create instances of the necessary classes
 
-        InitCustomMaps mapModel = new InitCustomMaps(density: 0, numberOfCheckPoints: 0, cellularIterations: 0, height: 50, width: 50);
-        int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height,mapModel.width,mapModel.density,mapModel.cellularIterations,4);
+
+        // InitCustomMaps mapModel = new InitCustomMaps(density: 0, numberOfCheckPoints: 0, cellularIterations: 0, height: 100, width: 100);
 
 
-        Vector2Int start = new Vector2Int(0, 0);
-        Vector2Int end = new Vector2Int(99, 99);
+        // int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.cellularIterations, 4);
 
 
-
-        HPAPath hpaPath = EffiencyInNodeExploration(tileMap, start, end, 1, RefinePath: false);
-
-        Debug.Log("HPA STAR Abstract level 1 : ");
-
-        Debug.Log("Path Length: " + hpaPath.path.Count);
-        Debug.Log("Nodes Explored: " + hpaPath.NodesExplored);
-
-
-        HPAPath hpaPath3 = EffiencyInNodeExploration(tileMap, start, end, 2, RefinePath: false);
-
-        Debug.Log("HPA STAR Abstract level 2 : ");
-
-        Debug.Log("Path Length: " + hpaPath3.path.Count);
-        Debug.Log("Nodes Explored: " + hpaPath3.NodesExplored);
+        // Vector2Int start = new Vector2Int(0, 0);
+        // Vector2Int end = new Vector2Int(mapModel.height - 1, mapModel.width - 1);
 
 
 
-        HPAPath hpaPath4 = EffiencyInNodeExploration(tileMap, start, end, 3, RefinePath: false);
+        // HPAPath hpaPath = EffiencyInNodeExploration(tileMap, start, end, 1, RefinePath: false);
 
-        Debug.Log("HPA STAR Abstract level 3 : ");
+        // Debug.Log("HPA STAR Abstract level 1 : ");
 
-        Debug.Log("Path Length: " + hpaPath4.path.Count);
-        Debug.Log("Nodes Explored: " + hpaPath4.NodesExplored);
+        // Debug.Log("Path Length: " + hpaPath.path.Count);
+        // Debug.Log("Nodes Explored: " + hpaPath.NodesExplored);
+
+
+        // HPAPath hpaPath3 = EffiencyInNodeExploration(tileMap, start, end, 2, RefinePath: false);
+
+        // Debug.Log("HPA STAR Abstract level 2 : ");
+
+        // Debug.Log("Path Length: " + hpaPath3.path.Count);
+        // Debug.Log("Nodes Explored: " + hpaPath3.NodesExplored);
+
+
+
+        // HPAPath hpaPath4 = EffiencyInNodeExploration(tileMap, start, end, 3, RefinePath: false);
+
+        // Debug.Log("HPA STAR Abstract level 3 : ");
+
+        // Debug.Log("Path Length: " + hpaPath4.path.Count);
+        // Debug.Log("Nodes Explored: " + hpaPath4.NodesExplored);
 
 
         // HPAPath hpaPath2 = EffiencyInNodeExploration(tileMap, start, end, 3, RefinePath: true);
@@ -63,12 +76,12 @@ public class PathfindingTest
 
 
 
-        Debug.Log("A* : ");
+        // Debug.Log("A* : ");
 
-        (List<Vector2Int> Path, int NodesExplored) Apath = Astar.FindPath(start, end, tileMap);
+        // (List<Vector2Int> Path, int NodesExplored) Apath = Astar.FindPath(start, end, tileMap);
 
-        Debug.Log("Path Length: " + Apath.Path.Count);
-        Debug.Log("Nodes Explored: " + Apath.NodesExplored);
+        // Debug.Log("Path Length: " + Apath.Path.Count);
+        // Debug.Log("Nodes Explored: " + Apath.NodesExplored);
 
 
 
@@ -97,7 +110,61 @@ public class PathfindingTest
     }
 
 
-    public HPAPath EffiencyInNodeExploration(int[,] tileMap, Vector2Int start, Vector2Int end, int maxLevel, Boolean RefinePath = false)
+    private static void RunHPASimulation(int iterations, (int min, int max) densityRange, (int min, int max) checkPointsRange, (int min, int max) cellularIterationsRange, (int min, int max) heightRange, (int min, int max) widthRange)
+    {
+        var random = new System.Random();
+        var results = new List<string> { "Iteration,Density,CheckPoints,CellularIterations,Height,Width,PathLength_Level1,NodesExplored_Level1,PathLength_Level2,NodesExplored_Level2,PathLength_Level3,NodesExplored_Level3,PathLength_AStar,NodesExplored_AStar" };
+
+        for (int i = 0; i < iterations; i++)
+        {
+
+            int density = random.Next(densityRange.min, densityRange.max);
+            int numberOfCheckPoints = random.Next(checkPointsRange.min, checkPointsRange.max);
+            int cellularIterations = random.Next(cellularIterationsRange.min, cellularIterationsRange.max);
+            int height = random.Next(heightRange.min, heightRange.max);
+            int width = random.Next(widthRange.min, widthRange.max);
+
+            InitCustomMaps mapModel = new InitCustomMaps(density: density, numberOfCheckPoints: numberOfCheckPoints, cellularIterations: cellularIterations, height: height, width: width);
+            int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.cellularIterations, 4);
+            Vector2Int start = new Vector2Int(10, 10);
+            Vector2Int end = new Vector2Int(mapModel.height - 10, mapModel.width - 10);
+
+            // HPA* Pathfinding at different abstraction levels
+            HPAPath hpaPath1 = EffiencyInNodeExploration(tileMap, start, end, 1, RefinePath: false);
+            HPAPath hpaPath2 = EffiencyInNodeExploration(tileMap, start, end, 2, RefinePath: false);
+            HPAPath hpaPath3 = EffiencyInNodeExploration(tileMap, start, end, 3, RefinePath: false);
+
+            // A* Pathfinding
+            (List<Vector2Int> Path, int NodesExplored) Apath = Astar.FindPath(start, end, tileMap);
+
+
+
+            string result = $"{i + 1}," +
+                       $"{density}," +
+                       $"{numberOfCheckPoints}," +
+                       $"{cellularIterations}," +
+                       $"{height}," +
+                       $"{width}," +
+                       $"{(hpaPath1?.path?.Count ?? 0)}," +
+                       $"{(hpaPath1?.NodesExplored ?? 0)}," +
+                       $"{(hpaPath2?.path?.Count ?? 0)}," +
+                       $"{(hpaPath2?.NodesExplored ?? 0)}," +
+                       $"{(hpaPath3?.path?.Count ?? 0)}," +
+                       $"{(hpaPath3?.NodesExplored ?? 0)}," +
+                       $"{(Apath.Path?.Count ?? 0)}," +
+                       $"{(Apath.NodesExplored)}";
+
+            results.Add(result);
+        }
+
+        string filePath = Path.Combine(Application.dataPath, "simulation_results_hpa.csv");
+        File.WriteAllLines(filePath, results);
+        Debug.Log($"Results saved to {filePath}");
+
+    }
+
+
+    public static HPAPath EffiencyInNodeExploration(int[,] tileMap, Vector2Int start, Vector2Int end, int maxLevel, Boolean RefinePath = false)
     {
         PathFinder _pathFinder = new PathFinder();
         GraphModel _graphModel = new GraphModel(tileMap);
