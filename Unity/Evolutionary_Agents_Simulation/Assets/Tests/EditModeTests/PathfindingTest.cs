@@ -19,12 +19,13 @@ public class PathfindingTest
     {
 
         RunHPASimulation(
-            iterations: 50,
-            densityRange: (min: 50, max: 65),
+            iterations: 100,
+            densityRange: (min: 45, max: 65),
             checkPointsRange: (min: 1, max: 5),
-            cellularIterationsRange: (min: 3, max: 10),
+            cellularIterationsRange: (min: 10, max: 10),
             heightRange: (min: 100, max: 100),
-            widthRange: (min: 100, max: 100)
+            widthRange: (min: 100, max: 100),
+            name: "density"
         );
         // Create instances of the necessary classes
 
@@ -110,7 +111,7 @@ public class PathfindingTest
     }
 
 
-    private static void RunHPASimulation(int iterations, (int min, int max) densityRange, (int min, int max) checkPointsRange, (int min, int max) cellularIterationsRange, (int min, int max) heightRange, (int min, int max) widthRange)
+    private static void RunHPASimulation(int iterations, (int min, int max) densityRange, (int min, int max) checkPointsRange, (int min, int max) cellularIterationsRange, (int min, int max) heightRange, (int min, int max) widthRange, string name)
     {
         var random = new System.Random();
         var results = new List<string> { "Iteration,Density,CheckPoints,CellularIterations,Height,Width,PathLength_Level1,NodesExplored_Level1,PathLength_Level2,NodesExplored_Level2,PathLength_Level3,NodesExplored_Level3,PathLength_AStar,NodesExplored_AStar" };
@@ -139,6 +140,7 @@ public class PathfindingTest
 
 
 
+
             string result = $"{i + 1}," +
                        $"{density}," +
                        $"{numberOfCheckPoints}," +
@@ -156,8 +158,9 @@ public class PathfindingTest
 
             results.Add(result);
         }
+        name = "simulation_results_hpa_" + name + ".csv";
 
-        string filePath = Path.Combine(Application.dataPath, "simulation_results_hpa.csv");
+        string filePath = Path.Combine(Application.dataPath, name);
         File.WriteAllLines(filePath, results);
         Debug.Log($"Results saved to {filePath}");
 
@@ -193,3 +196,4 @@ public class PathfindingTest
 
 
 }
+
