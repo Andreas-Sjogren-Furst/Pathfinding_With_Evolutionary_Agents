@@ -1,8 +1,7 @@
 
-public class GameManager
-{
-
-    
+public class MyGameManager
+{    
+    // Se custom maps inde i InitCustomMaps filen
     private MapController mapController;
     private HPAStar hpaStar;
     private AgentController agentController;
@@ -10,3 +9,4 @@ public class GameManager
     //Run backend here
     
 }
+

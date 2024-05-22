@@ -4,6 +4,7 @@ using UnityEngine;
 
 public interface IScreenView
 {
-    void Draw();
+    void RenderMap(MapObject[,] Map, List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint);
+
     
 }   
