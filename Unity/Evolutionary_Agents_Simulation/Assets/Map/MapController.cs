@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Codice.CM.WorkspaceServer.Tree;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 public class MapController
 {
@@ -9,24 +10,28 @@ public class MapController
 
     public MapController(MapModel mapModel){
         this.mapModel = mapModel;
+        Initialise();
     }
 
-    public void Initialise(){
-        mapModel.SpawnPoint = GenerateSpawnPoint(mapModel.Width, mapModel.Height);
-        mapModel.CheckPoints = GenerateCheckPoints(mapModel.AmountOfCheckPoints, mapModel.Width, mapModel.Height);
-        List<MapObject> objects = new(){mapModel.SpawnPoint,mapModel.SpawnPoint};
-        int[,] map2D = CellularAutomata.Create2DMap(mapModel.Height, mapModel.Width, mapModel.Density, mapModel.CellularIterations, mapModel.ErosionLimit);
-        map2D = RemoveWallsAroundObjects(map2D, objects, mapModel.CheckPointSpacing);
-        mapModel.Map = CreateMap3D(map2D);
+    private void Initialise(){
+        mapModel.checkPoints = GenerateCheckPoints(mapModel.numberOfCheckPoints, mapModel.width, mapModel.height);
+        List<MapObject> objects = new(){mapModel.spawnPoint,mapModel.spawnPoint};
+        int[,] map2D = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, mapModel.erosionLimit);
+        map2D = RemoveWallsAroundObjects(map2D, objects, mapModel.checkPointSpacing);
+        mapModel.map = CreateMap3D(map2D);
     }
 
-    public void SetCustomMap(InitCustomMaps customMap){
-        mapModel.AmountOfCheckPoints = customMap.numberOfCheckPoints;
-        mapModel.Density = customMap.density;
-        mapModel.CellularIterations = customMap.cellularIterations;
-        mapModel.Width = customMap.width;
-        mapModel.Height = customMap.height;
-        mapModel.RandomSeed = customMap.randomSeed;
+    public MapModel GetMapModel(){
+        return mapModel;
+    }
+
+    public void ChangeMapParameters(MapModel customMap){
+        mapModel.numberOfCheckPoints = customMap.numberOfCheckPoints;
+        mapModel.density = customMap.density;
+        mapModel.iterations = customMap.iterations;
+        mapModel.width = customMap.width;
+        mapModel.height = customMap.height;
+        mapModel.randomSeed = customMap.randomSeed;
     }
 
     private int[,] InitialiseSpawnPoint(AgentSpawnPoint spawnPoint, int[,] map2D){
@@ -57,33 +62,20 @@ public class MapController
     
     public void AddCheckpoints(List<CheckPoint> checkPoints){
         foreach(CheckPoint checkPoint in checkPoints){
-            mapModel.CheckPoints.Add(checkPoint);
+            mapModel.checkPoints.Add(checkPoint);
         }
     }
-    public MapModel ChangeSpawnPoint(MapModel mapModel,AgentSpawnPoint agentSpawnPoint){
-        mapModel.SpawnPoint = agentSpawnPoint;
+    public MapModel ChangeSpawnPoint(MapModel mapModel, AgentSpawnPoint agentSpawnPoint){
+        mapModel.spawnPoint = agentSpawnPoint;
         return mapModel;
-    }
-
-    private AgentSpawnPoint GenerateSpawnPoint(int width, int height){
-        int xPos = Random.Range(0, width + 1);
-        int zPos = Random.Range(0, height + 1);
-        Vector2Int spawnPoint = new(xPos, zPos);
-        return new AgentSpawnPoint(spawnPoint);
-    }
-    
-
-    public void ChangeMapParameters(MapModel newMapModel){
-        mapModel.Density = newMapModel.Density;
-        mapModel.AmountOfCheckPoints = newMapModel.AmountOfCheckPoints;
-        mapModel.CellularIterations = newMapModel.CellularIterations;
-        mapModel.RandomSeed = newMapModel.RandomSeed;
     }
     
     private MapObject[,] CreateMap3D(int[,] map2D){
-        MapObject[,] Map3D = new MapObject[map2D.GetLength(0), map2D.GetLength(1)];
-        for(int i = 0; i < map2D.GetLength(0); i++){
-            for(int j = 0; j < map2D.GetLength(1); j++)
+        int width = map2D.GetLength(0);
+        int height = map2D.GetLength(1);
+        MapObject[,] Map3D = new MapObject[height, width];
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++)
                 Map3D[i,j] = CreateObjectFromType(map2D[i,j],i,j);
         } return Map3D;
     }
@@ -115,8 +107,8 @@ public class MapController
         List<CheckPoint> checkPoints = new();
         for (int i = 0; i < numberOfCheckPoints; i++)
         {
-            int xPos = Random.Range(0, width + 1);
-            int yPos = Random.Range(0, height + 1);
+            int xPos = Random.Range(0, width);
+            int yPos = Random.Range(0, height);
             CheckPoint checkPoint = new(new Vector2Int(xPos,yPos));
             checkPoints.Add(checkPoint);
         } return checkPoints;

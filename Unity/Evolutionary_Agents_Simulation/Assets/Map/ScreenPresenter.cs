@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class ScreenPresenter : IGamePresenter
 {
-    private ScreenViewModel screenViewModel;
-    ScreenPresenter(ScreenViewModel screenViewModel){
-        this.screenViewModel = screenViewModel;
+    MapModel mapModel;
+    AgentModel agentModel;
+    IGraphModel graphModel;
+    public ScreenPresenter(MyGameManager myGameManager){
+        mapModel = myGameManager.mapController.mapModel;
+        agentModel = myGameManager.agentController.agentModel;
+        graphModel = myGameManager.graphController._graphModel;
     }
-    public void SetViewModel(MapModel mapModel, AgentModel agentModel, GraphModel graphModel){
-        screenViewModel.Map = mapModel.Map;
-        screenViewModel.Agents = agentModel.agents;
-        screenViewModel.graph = graphModel;
-    }
-
-    public ScreenViewModel ReturnViewModel(){
+    
+    public ScreenViewModel PackageData(){
+        ScreenViewModel screenViewModel = new(mapModel.map,agentModel.agents,graphModel, mapModel.checkPoints,mapModel.spawnPoint);
         return screenViewModel;
     }
 }

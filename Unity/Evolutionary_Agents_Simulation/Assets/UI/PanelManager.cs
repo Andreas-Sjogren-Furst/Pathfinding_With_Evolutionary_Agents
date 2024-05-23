@@ -22,10 +22,4 @@ public class PanelManager : MonoBehaviour
     void OnSubmit(){
         
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

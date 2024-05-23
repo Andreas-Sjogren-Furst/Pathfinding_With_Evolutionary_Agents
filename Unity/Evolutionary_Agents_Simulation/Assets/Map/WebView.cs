@@ -2,22 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using Codice.Client.BaseCommands;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WebView : MonoBehaviour, IScreenView
 {
 
+    // Game Objects prefabs
     public GameObject wallPrefab;
     public GameObject tilePrefab;
     public GameObject checkPointPrefab;
     public GameObject spawnPointPrefab;
     public GameObject agentPrefab;
+    public GameObject nodePrefab;
+    public GameObject entrancePrefab;
+    public Material intraEdgeMaterial;
+    public Material interEdgeMaterial;
+    public Material clusterMaterial;
 
+    // Local variables
     private GameObject[,] InstantiatedMap;
+    private List<GameObject> InstantiatedGraph;
+    private readonly int tileSize = 1;
+    private readonly float nodeScale = 0.1f;
+
+    // Presenter
+    private ScreenPresenter screenPresenter;
     
-    // Start is called before the first frame update
     void Start()
     {
-        
+        MyGameManager myGameManager = new();
+        screenPresenter = new(myGameManager);
+        RenderMap(screenPresenter.PackageData());
     }
 
     // Update is called once per frame
@@ -26,10 +41,14 @@ public class WebView : MonoBehaviour, IScreenView
         
     }
 
-    public void RenderMap(MapObject[,] Map, List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
-        ClearMap(InstantiatedMap);
+    public void RenderMap(ScreenViewModel screenViewModel){
+        MapObject[,] map = screenViewModel.map;
+        List<CheckPoint> checkPoints = screenViewModel.checkPoints;
+        AgentSpawnPoint spawnPoint = screenViewModel.spawnPoint;
 
-        foreach(MapObject mapObject in Map){
+        ClearMap(InstantiatedMap);
+        InstantiatedMap = new GameObject[map.GetLength(1),map.GetLength(0)];
+        foreach(MapObject mapObject in map){
             Vector3Int worldPosition = ConvertVector2DTo3D(mapObject.ArrayPosition);
             int i = mapObject.ArrayPosition.x;
             int j = mapObject.ArrayPosition.y;
@@ -64,7 +83,7 @@ public class WebView : MonoBehaviour, IScreenView
         InstantiatedMap[i,j] = Instantiate(spawnPointPrefab,worldPosition,Quaternion.identity);
     }   
     private Vector3Int ConvertVector2DTo3D(Vector2Int arrayPosition){
-        return new Vector3Int(arrayPosition.x,arrayPosition.y,0);
+        return new Vector3Int(arrayPosition.x,0,arrayPosition.y);
     }
 
     private void ClearMap(GameObject[,] InstantiatedMap){
@@ -73,4 +92,91 @@ public class WebView : MonoBehaviour, IScreenView
             Destroy(mapObject);
         }
     }
+
+
+    // Graph begins
+    void DrawGraph(int level, ScreenViewModel screenViewModel) {
+        IGraphModel graph = screenViewModel.graph;
+        if (graph.ClusterByLevel.TryGetValue(level, out var clusters))
+        {
+            
+            foreach (Cluster cluster in clusters)
+            {
+                Vector3 bottomLeft = transform.position + new Vector3(cluster.bottomLeftPos.x * tileSize, 0, cluster.bottomLeftPos.y * tileSize);
+                Vector3 topRight = transform.position + new Vector3(cluster.topRightPos.x * tileSize, 0, cluster.topRightPos.y * tileSize);
+                Vector3 topLeft = transform.position + new Vector3(cluster.bottomLeftPos.x * tileSize, 0, cluster.topRightPos.y * tileSize);
+                Vector3 bottomRight = transform.position + new Vector3(cluster.topRightPos.x * tileSize, 0, cluster.bottomLeftPos.y * tileSize);
+                DrawLine(bottomLeft, topLeft, clusterMaterial);
+                DrawLine(topLeft, topRight, clusterMaterial);
+                DrawLine(topRight, bottomRight, clusterMaterial);
+                DrawLine(bottomRight, bottomLeft, clusterMaterial);
+                DrawEntrances(cluster);
+                foreach (var node in cluster.Nodes)
+                {
+                    DrawNode(node);
+                    DrawEdges(node, HPAEdgeType.INTRA);
+                    DrawEdges(node, HPAEdgeType.INTER);
+                }
+                
+            }
+        }
+        else
+        {
+            Debug.Log($"No data available for level {level}");
+        }
+    }
+
+    void DrawNode(HPANode node)
+    {
+        GameObject nodeObj = Instantiate(nodePrefab, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
+        nodeObj.transform.localScale = Vector3.one * nodeScale * tileSize;
+        nodeObj.SetActive(true);
+        InstantiatedGraph.Add(nodeObj);
+    }
+
+    void DrawPath(HPAPath path)
+    {
+        for (int i = 0; i < path.path.Count - 1; i++)
+        {
+            Vector3 start = transform.position + new Vector3(path.path[i].Position.x * tileSize, 0, path.path[i].Position.y * tileSize);
+            Vector3 end = transform.position + new Vector3(path.path[i + 1].Position.x * tileSize, 0, path.path[i + 1].Position.y * tileSize);
+            DrawLine(start, end, intraEdgeMaterial);
+        }
+    }
+
+    void DrawEntrances(Cluster cluster)
+    {
+        foreach (Entrance entrance in cluster.Entrances)
+        {
+            GameObject entranceObj = Instantiate(entrancePrefab, transform.position + new Vector3(entrance.Node1.Position.x * tileSize, 0, entrance.Node1.Position.y * tileSize), Quaternion.identity);
+            entranceObj.transform.localScale = Vector3.one * nodeScale * tileSize;
+            entranceObj.SetActive(true);
+            InstantiatedGraph.Add(entranceObj);
+        }
+    }
+
+    void DrawEdges(HPANode node, HPAEdgeType edgeType)
+    {
+        foreach (HPAEdge edge in node.Edges)
+        {
+            if (edge.Type != edgeType) continue;
+            Vector3 start = transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize);
+            Vector3 end = transform.position + new Vector3(edge.Node2.Position.x * tileSize, 0, edge.Node2.Position.y * tileSize);
+            DrawLine(start, end, edgeType == HPAEdgeType.INTRA ? intraEdgeMaterial : interEdgeMaterial);
+        }
+    }
+
+
+
+    void DrawLine(Vector3 start, Vector3 end, Material material)
+    {
+        GameObject lineObj = new GameObject("Edge");
+        LineRenderer lr = lineObj.AddComponent<LineRenderer>();
+        lr.material = material;
+        lr.startWidth = 0.05f * tileSize;
+        lr.endWidth = 0.05f * tileSize;
+        lr.SetPositions(new Vector3[] { start, end });
+        InstantiatedGraph.Add(lineObj);
+    }
+
 }

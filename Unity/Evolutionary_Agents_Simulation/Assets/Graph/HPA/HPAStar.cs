@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class HPAStar : IHPAStar
 {
-    private readonly IGraphModel _graphModel;
+    public readonly IGraphModel _graphModel;
     private readonly IClusterManager _clusterManager;
     private readonly INodeManager _nodeManager;
     private readonly IEntranceManager _entranceManager;

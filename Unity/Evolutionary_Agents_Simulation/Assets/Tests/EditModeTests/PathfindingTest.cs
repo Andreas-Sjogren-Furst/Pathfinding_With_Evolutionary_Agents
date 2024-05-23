@@ -124,15 +124,17 @@ public class PathfindingTest
             int height = random.Next(heightRange.min, heightRange.max);
             int width = random.Next(widthRange.min, widthRange.max);
 
-            InitCustomMaps mapModel = new InitCustomMaps(density: density, numberOfCheckPoints: numberOfCheckPoints, cellularIterations: cellularIterations, height: height, width: width);
-            int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.cellularIterations, 4);
+            int randomSeed = random.Next();
+            MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize : height, randomSeed : randomSeed);
+            int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, 4);
+            MapObject[,] map = CellularAutomata.Convert2DTo3D(tileMap);
             Vector2Int start = new Vector2Int(10, 10);
             Vector2Int end = new Vector2Int(mapModel.height - 10, mapModel.width - 10);
 
             // HPA* Pathfinding at different abstraction levels
-            HPAPath hpaPath1 = EffiencyInNodeExploration(tileMap, start, end, 1, RefinePath: false);
-            HPAPath hpaPath2 = EffiencyInNodeExploration(tileMap, start, end, 2, RefinePath: false);
-            HPAPath hpaPath3 = EffiencyInNodeExploration(tileMap, start, end, 3, RefinePath: false);
+            HPAPath hpaPath1 = EffiencyInNodeExploration(map, start, end, 1, RefinePath: false);
+            HPAPath hpaPath2 = EffiencyInNodeExploration(map, start, end, 2, RefinePath: false);
+            HPAPath hpaPath3 = EffiencyInNodeExploration(map, start, end, 3, RefinePath: false);
 
             // A* Pathfinding
             (List<Vector2Int> Path, int NodesExplored) Apath = Astar.FindPath(start, end, tileMap);
@@ -164,7 +166,7 @@ public class PathfindingTest
     }
 
 
-    public static HPAPath EffiencyInNodeExploration(int[,] tileMap, Vector2Int start, Vector2Int end, int maxLevel, Boolean RefinePath = false)
+    public static HPAPath EffiencyInNodeExploration(MapObject[,] tileMap, Vector2Int start, Vector2Int end, int maxLevel, Boolean RefinePath = false)
     {
         PathFinder _pathFinder = new PathFinder();
         GraphModel _graphModel = new GraphModel(tileMap);
