@@ -179,35 +179,13 @@ public class WebView : MonoBehaviour, IScreenView
 
     private void DrawLine(Vector3 start, Vector3 end, Material material)
     {
-        /*GameObject lineObj = new GameObject("Edge");
-        LineRenderer lr = lineObj.AddComponent<LineRenderer>();
-        lr.material = material;
-        lr.startWidth = 0.05f * tileSize;
-        lr.endWidth = 0.05f * tileSize;
-        lr.SetPositions(new Vector3[] { start, end });
-        InstantiatedGraph.Add(lineObj);*/
-
-
         GameObject lineObj = new GameObject("Edge");
-        Debug.Log(lineObj == null ? "lineObj is null" : "lineObj is not null");
-
         LineRenderer lr = lineObj.AddComponent<LineRenderer>();
-        Debug.Log(lr == null ? "lr is null" : "lr is not null");
-
         lr.material = material;
-        Debug.Log(material == null ? "material is null" : "material is not null");
-
         lr.startWidth = 0.05f * tileSize;
         lr.endWidth = 0.05f * tileSize;
-
         lr.SetPositions(new Vector3[] { start, end });
-        Debug.Log(start == null ? "start is null" : "start is not null");
-        Debug.Log(end == null ? "end is null" : "end is not null");
-
         InstantiatedGraph.Add(lineObj);
-        Debug.Log(lineObj == null ? "lineObj is null" : "lineObj is added to InstantiatedGraph");
-        Debug.Log(InstantiatedGraph == null ? "InstantiatedGraph is null" : "InstantiatedGraph is not null");
-
     }
 
 }
