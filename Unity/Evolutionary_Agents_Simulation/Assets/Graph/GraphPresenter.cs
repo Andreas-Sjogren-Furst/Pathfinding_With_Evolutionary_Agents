@@ -31,34 +31,7 @@ public class GraphPresenter : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Start graph visualizer");
-        int maxSize = 100;
-        int[,] tileMap = new int[maxSize, maxSize];
-        for (int i = 0; i < maxSize; i++)
-        {
-            for (int j = 0; j < maxSize; j++)
-            {
-                tileMap[i, j] = 0;
-            }
-        }
-
-
-
-
-        // Create instances of the necessary classes
-        _pathFinder = new PathFinder();
-        _graphModel = new GraphModel(tileMap);
-        IEdgeManager edgeManager = new EdgeManager(_pathFinder);
-        _nodeManager = new NodeManager(_graphModel, edgeManager);
-        IEntranceManager entranceManager = new EntranceManager(_graphModel, _nodeManager);
-        IClusterManager clusterManager = new ClusterManager(_graphModel, _nodeManager, edgeManager, entranceManager);
-        IHPAStar HPAStar = new HPAStar(_graphModel, clusterManager, _nodeManager, entranceManager, edgeManager, _pathFinder);
-
-        HPAStar.Preprocessing(visualizeLevel);
-
-
-
-
+        
 
 
         // Cluster c1 = clusterManager.DetermineCluster(new Vector2Int(9, 5), visualizeLevel);
@@ -123,7 +96,7 @@ public class GraphPresenter : MonoBehaviour
 
 
 
-        Vector2Int goal = new Vector2Int(0, 0);
+       /* Vector2Int goal = new Vector2Int(0, 0);
         Vector2Int start = new Vector2Int(maxSize - 3, maxSize - 3);
 
         // HPAPath nodes = HPAStar.HierarchicalSearch(start, goal, 1);
@@ -141,7 +114,7 @@ public class GraphPresenter : MonoBehaviour
 
         HPAPath path2 = HPAStar.HierarchicalSearch(start, goal, visualizeLevel);
         Debug.Log("Path Length: " + path2.Length);
-        Debug.Log("Nodes Explored: " + path2.NodesExplored);
+        Debug.Log("Nodes Explored: " + path2.NodesExplored);*/
 
 
 
@@ -153,7 +126,7 @@ public class GraphPresenter : MonoBehaviour
         // {
         //     Debug.Log(node.Position);
         // }
-        if (visualizePath)
+        /*if (visualizePath)
         {
             drawPath(path);
         }
@@ -162,7 +135,7 @@ public class GraphPresenter : MonoBehaviour
         {
             drawPath(path2);
         }
-        DrawGraph(visualizeLevel);
+        DrawGraph(visualizeLevel);*/
     }
 
     void DrawGraph(int level)

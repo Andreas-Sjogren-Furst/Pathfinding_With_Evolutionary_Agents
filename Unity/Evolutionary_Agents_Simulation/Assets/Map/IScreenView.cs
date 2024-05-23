@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IScreenView
 {
-    void RenderMap(MapObject[,] Map, List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint);
+    void RenderMap(ScreenViewModel screenViewModel);
 
     
 }   

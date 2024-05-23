@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Codice.Client.BaseCommands;
 using UnityEngine;
 
 
@@ -192,7 +193,7 @@ public class EntranceManager : IEntranceManager
 
     private bool IsWalkable(Vector2Int pos1, Vector2Int pos2)
     {
-        int[,] globalTileMap = _graphModel.GlobalTileMap;
-        return globalTileMap[pos1.x, pos1.y] != 1 && globalTileMap[pos2.x, pos2.y] != 1;
+        MapObject[,] globalTileMap = _graphModel.GlobalTileMap;
+        return globalTileMap[pos1.x, pos1.y].Type != MapObject.ObjectType.Wall && globalTileMap[pos2.x, pos2.y].Type != MapObject.ObjectType.Wall;
     }
 }

@@ -1,4 +1,7 @@
 
+using System.Numerics;
+using System.Runtime.InteropServices.WindowsRuntime;
+
 public class CellularAutomata
 {
 
@@ -17,8 +20,8 @@ public class CellularAutomata
 
     private static int[,] GenerateNoise(int[,] map, float density)
     {
-        int height = map.GetLength(0);
-        int width = map.GetLength(1);
+        int width = map.GetLength(0);
+        int height = map.GetLength(1);
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
@@ -32,16 +35,16 @@ public class CellularAutomata
 
     private static int[,] CellularAutomaton(int[,] map, int cellularIterations, int erosionLimit)
     {
-        int height = map.GetLength(0);
-        int width = map.GetLength(1);
+        int width = map.GetLength(0);
+        int height = map.GetLength(1);
 
         for (int i = 0; i < cellularIterations; i++)
         {
             int[,] tempGrid = (int[,])map.Clone();
 
-            for (int j = 0; j < height; j++)
+            for (int j = 0; j < width; j++)
             {
-                for (int k = 0; k < width; k++)
+                for (int k = 0; k < height; k++)
                 {
                     int neighborWallCount = 0;
 
@@ -70,5 +73,17 @@ public class CellularAutomata
             }
         }
         return map;
+    }
+
+    public static MapObject[,] Convert2DTo3D(int[,] map2D){
+        int width = map2D.GetLength(0);
+        int height = map2D.GetLength(1);
+        MapObject[,] map = new MapObject[height,width];
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+                if(map2D[i,j] == 0) map[i,j] = new Tile(new UnityEngine.Vector2Int(i,j));
+                else map[i,j] = new Wall(new UnityEngine.Vector2Int(i,j));
+            }
+        } return map;
     }
 }

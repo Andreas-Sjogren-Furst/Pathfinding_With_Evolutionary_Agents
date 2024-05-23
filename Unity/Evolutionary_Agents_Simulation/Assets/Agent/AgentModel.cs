@@ -1,10 +1,14 @@
-using System.Collections.Generic;
-using UnityEngine;
+using System.Collections;
 
-public class AgentModel : ScriptableObject
+public class AgentModel
 {
-    public State.ExploringState state;
-    [Range(1,10)] public float viewRadius;
     public Agent[] agents;
+    public int amountOfAgents;
     
+    //Stack<Vector2Int> frontierPoints;
+    
+    public AgentModel(int amountOfAgents){
+        this.amountOfAgents = amountOfAgents;
+        agents = new Agent[amountOfAgents];
+    }
 }
