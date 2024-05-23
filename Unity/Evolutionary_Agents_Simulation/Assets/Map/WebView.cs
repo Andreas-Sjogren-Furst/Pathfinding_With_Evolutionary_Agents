@@ -33,6 +33,7 @@ public class WebView : MonoBehaviour, IScreenView
         MyGameManager myGameManager = new();
         screenPresenter = new(myGameManager);
         RenderMap(screenPresenter.PackageData());
+        RenderGraph(1,screenPresenter.PackageData());
     }
 
     // Update is called once per frame
@@ -93,9 +94,10 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-
     // Graph begins
-    void DrawGraph(int level, ScreenViewModel screenViewModel) {
+    private void RenderGraph(int level, ScreenViewModel screenViewModel) {
+        ClearGraph(InstantiatedGraph);
+        InstantiatedGraph = new();
         IGraphModel graph = screenViewModel.graph;
         if (graph.ClusterByLevel.TryGetValue(level, out var clusters))
         {
@@ -126,7 +128,14 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    void DrawNode(HPANode node)
+    private void ClearGraph(List<GameObject> InstantiatedGraph){
+        if(InstantiatedGraph == null) return;
+        foreach(GameObject graphObject in InstantiatedGraph){
+            Destroy(graphObject);
+        }
+    }
+
+    private void DrawNode(HPANode node)
     {
         GameObject nodeObj = Instantiate(nodePrefab, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
         nodeObj.transform.localScale = Vector3.one * nodeScale * tileSize;
@@ -134,7 +143,7 @@ public class WebView : MonoBehaviour, IScreenView
         InstantiatedGraph.Add(nodeObj);
     }
 
-    void DrawPath(HPAPath path)
+    private void DrawPath(HPAPath path)
     {
         for (int i = 0; i < path.path.Count - 1; i++)
         {
@@ -144,7 +153,7 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    void DrawEntrances(Cluster cluster)
+    private void DrawEntrances(Cluster cluster)
     {
         foreach (Entrance entrance in cluster.Entrances)
         {
@@ -155,7 +164,7 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    void DrawEdges(HPANode node, HPAEdgeType edgeType)
+    private void DrawEdges(HPANode node, HPAEdgeType edgeType)
     {
         foreach (HPAEdge edge in node.Edges)
         {
@@ -168,15 +177,37 @@ public class WebView : MonoBehaviour, IScreenView
 
 
 
-    void DrawLine(Vector3 start, Vector3 end, Material material)
+    private void DrawLine(Vector3 start, Vector3 end, Material material)
     {
-        GameObject lineObj = new GameObject("Edge");
+        /*GameObject lineObj = new GameObject("Edge");
         LineRenderer lr = lineObj.AddComponent<LineRenderer>();
         lr.material = material;
         lr.startWidth = 0.05f * tileSize;
         lr.endWidth = 0.05f * tileSize;
         lr.SetPositions(new Vector3[] { start, end });
+        InstantiatedGraph.Add(lineObj);*/
+
+
+        GameObject lineObj = new GameObject("Edge");
+        Debug.Log(lineObj == null ? "lineObj is null" : "lineObj is not null");
+
+        LineRenderer lr = lineObj.AddComponent<LineRenderer>();
+        Debug.Log(lr == null ? "lr is null" : "lr is not null");
+
+        lr.material = material;
+        Debug.Log(material == null ? "material is null" : "material is not null");
+
+        lr.startWidth = 0.05f * tileSize;
+        lr.endWidth = 0.05f * tileSize;
+
+        lr.SetPositions(new Vector3[] { start, end });
+        Debug.Log(start == null ? "start is null" : "start is not null");
+        Debug.Log(end == null ? "end is null" : "end is not null");
+
         InstantiatedGraph.Add(lineObj);
+        Debug.Log(lineObj == null ? "lineObj is null" : "lineObj is added to InstantiatedGraph");
+        Debug.Log(InstantiatedGraph == null ? "InstantiatedGraph is null" : "InstantiatedGraph is not null");
+
     }
 
 }
