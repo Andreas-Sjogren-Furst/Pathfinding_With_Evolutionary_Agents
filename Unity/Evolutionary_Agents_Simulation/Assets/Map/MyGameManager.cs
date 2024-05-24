@@ -52,19 +52,13 @@ public class MyGameManager
 
     private MMAS InitialiseMMMAS(){
         Graph graph = new Graph();
-
         int numAnts = 0;
         double alpha = 1.5;
         double beta = 4.5;
         double rho = 0.90;
         double q = 100.0;
-        int maxIterations = 500;
-
-        MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q);
-        mmas.SetGraph(graph);
-        mmas.Run(maxIterations);
+        MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q, graph);
         return mmas;
-
     }
     
 }

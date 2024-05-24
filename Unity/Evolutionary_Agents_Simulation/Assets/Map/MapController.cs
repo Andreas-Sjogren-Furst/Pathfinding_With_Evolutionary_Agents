@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
-using Codice.CM.WorkspaceServer.Tree;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
+
 
 public class MapController
 {
@@ -15,7 +13,8 @@ public class MapController
 
     private void Initialise(){
         mapModel.checkPoints = GenerateCheckPoints(mapModel.numberOfCheckPoints, mapModel.width, mapModel.height);
-        List<MapObject> objects = new(){mapModel.spawnPoint,mapModel.spawnPoint};
+        List<MapObject> objects = new(){mapModel.spawnPoint};
+        objects.AddRange(mapModel.checkPoints);
         int[,] map2D = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, mapModel.erosionLimit);
         map2D = RemoveWallsAroundObjects(map2D, objects, mapModel.checkPointSpacing);
         mapModel.map = CreateMap3D(map2D);

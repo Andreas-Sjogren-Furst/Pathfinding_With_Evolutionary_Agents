@@ -22,11 +22,6 @@ public class WebView : MonoBehaviour, IScreenView
 
 
     // Tags
-    private string wallTag = "Wall";
-    private string tileTag = "Tile";
-    private string checkPointTag = "CheckPoint";
-    private string spawnPointTag = "SpawnPoint";
-    private string agentTag = "Agent";
     private string nodeTag = "Node";
     private string entranceTag = "Entrance";
     private string lineTag = "Line";
@@ -41,8 +36,8 @@ public class WebView : MonoBehaviour, IScreenView
     private readonly float nodeScale = 0.1f;
 
 
-    private ScreenViewModel screenViewModel;
     // Presenter
+    private ScreenViewModel screenViewModel;
     private ScreenPresenter screenPresenter;
 
     // GameManager
@@ -50,32 +45,12 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Awake()
     {
-
         myGameManager = new();
         screenPresenter = new(myGameManager);
         screenViewModel = screenPresenter.PackageData();
         int mapSize = screenViewModel.map.GetLength(0) * screenViewModel.map.GetLength(1);
 
-        Debug.Log("Map Size: " + mapSize);
         // Add pools programmatically
-        if (objectPooler == null)
-        {
-            Debug.Log("objectPooler is null");
-        }
-        if (wallPrefab == null)
-        {
-            Debug.Log("wallPrefab is null");
-        }
-        if (wallTag == null)
-        {
-            Debug.Log("wallTag is null");
-        }
-
-        objectPooler.AddPool(wallTag, wallPrefab, mapSize);
-        objectPooler.AddPool(tileTag, tilePrefab, mapSize);
-        objectPooler.AddPool(checkPointTag, checkPointPrefab, 50);
-        objectPooler.AddPool(spawnPointTag, spawnPointPrefab, 5);
-        objectPooler.AddPool(agentTag, agentPrefab, 10);
         objectPooler.AddPool(nodeTag, nodePrefab, mapSize);
         objectPooler.AddPool(entranceTag, entrancePrefab, mapSize / 10);
         objectPooler.AddPool(lineTag, linePrefab, mapSize * 5);
@@ -83,10 +58,8 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Start()
     {
-        MyGameManager myGameManager = new();
-        screenPresenter = new(myGameManager);
         RenderMap(screenPresenter.PackageData());
-        //RenderGraph(1,screenPresenter.PackageData());
+        RenderGraph(1,screenPresenter.PackageData());
     }
 
     void Update()
@@ -132,7 +105,7 @@ public class WebView : MonoBehaviour, IScreenView
             Vector3Int worldPosition = ConvertVector2DTo3D(checkPoint.ArrayPosition);
             int i = checkPoint.ArrayPosition.x;
             int j = checkPoint.ArrayPosition.y;
-            InstantiatedMap[i, j] = objectPooler.SpawnFromPool(checkPointTag, worldPosition, Quaternion.identity);
+            InstantiatedMap[i, j] = Instantiate(checkPointPrefab, worldPosition, Quaternion.identity);
         }
     }
 
@@ -141,7 +114,7 @@ public class WebView : MonoBehaviour, IScreenView
         Vector3Int worldPosition = ConvertVector2DTo3D(spawnPoint.ArrayPosition);
         int i = spawnPoint.ArrayPosition.x;
         int j = spawnPoint.ArrayPosition.y;
-        InstantiatedMap[i, j] = objectPooler.SpawnFromPool(spawnPointTag, worldPosition, Quaternion.identity);
+        InstantiatedMap[i, j] = Instantiate(spawnPointPrefab, worldPosition, Quaternion.identity);
     }
 
     private Vector3Int ConvertVector2DTo3D(Vector2Int arrayPosition)
@@ -165,7 +138,7 @@ public class WebView : MonoBehaviour, IScreenView
     {
         ClearGraph(InstantiatedGraph);
         InstantiatedGraph = new List<GameObject>();
-        IGraphModel graph = screenViewModel.graph;
+        IGraphModel graph = screenViewModel.hpaGraph;
         if (graph.ClusterByLevel.TryGetValue(level, out var clusters))
         {
             foreach (Cluster cluster in clusters)
