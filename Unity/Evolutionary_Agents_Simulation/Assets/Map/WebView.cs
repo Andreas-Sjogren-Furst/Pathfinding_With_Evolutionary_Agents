@@ -57,6 +57,19 @@ public class WebView : MonoBehaviour, IScreenView
 
         Debug.Log("Map Size: " + mapSize);
         // Add pools programmatically
+        if (objectPooler == null)
+        {
+            Debug.Log("objectPooler is null");
+        }
+        if (wallPrefab == null)
+        {
+            Debug.Log("wallPrefab is null");
+        }
+        if (wallTag == null)
+        {
+            Debug.Log("wallTag is null");
+        }
+
         objectPooler.AddPool(wallTag, wallPrefab, mapSize);
         objectPooler.AddPool(tileTag, tilePrefab, mapSize);
         objectPooler.AddPool(checkPointTag, checkPointPrefab, 50);

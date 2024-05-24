@@ -35,6 +35,11 @@ public class ObjectPooler : MonoBehaviour
 
     public void AddPool(string tag, GameObject prefab, int size)
     {
+        if (poolDictionary == null)
+        {
+            poolDictionary = new Dictionary<string, Queue<GameObject>>();
+        }
+
         if (!poolDictionary.ContainsKey(tag))
         {
             Pool newPool = new Pool { tag = tag, prefab = prefab, size = size };
