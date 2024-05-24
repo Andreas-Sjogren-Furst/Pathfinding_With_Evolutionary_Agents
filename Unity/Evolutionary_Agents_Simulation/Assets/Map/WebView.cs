@@ -20,6 +20,8 @@ public class WebView : MonoBehaviour, IScreenView
     public Material intraEdgeMaterial;
     public Material interEdgeMaterial;
 
+    public Material pathMaterial;
+
 
     // Tags
     private string wallTag = "Wall";
@@ -54,6 +56,7 @@ public class WebView : MonoBehaviour, IScreenView
         screenPresenter = new(myGameManager);
         screenViewModel = screenPresenter.PackageData();
         int mapSize = screenViewModel.map.GetLength(0) * screenViewModel.map.GetLength(1);
+        instantiatedGraph = new List<GameObject>();
 
         Debug.Log("Map Size: " + mapSize);
         // Add pools programmatically
@@ -85,6 +88,15 @@ public class WebView : MonoBehaviour, IScreenView
 
         RenderMap(screenViewModel);
         RenderGraph(1, screenViewModel);
+
+        // myGameManager.graphController.Preprocessing(3);
+        Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
+        Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
+        HPAPath path = myGameManager.graphController.HierarchicalSearch(start, end, 1);
+
+        DrawPath(path);
+
+
     }
 
     void Update()
@@ -207,9 +219,22 @@ public class WebView : MonoBehaviour, IScreenView
     {
         for (int i = 0; i < path.path.Count - 1; i++)
         {
-            Vector3 start = transform.position + new Vector3(path.path[i].Position.x * tileSize, 0, path.path[i].Position.y * tileSize);
-            Vector3 end = transform.position + new Vector3(path.path[i + 1].Position.x * tileSize, 0, path.path[i + 1].Position.y * tileSize);
-            DrawLine(start, end, intraEdgeMaterial);
+            Vector3 start = transform.position + new Vector3(path.path[i].Position.x * tileSize, -0.8f, path.path[i].Position.y * tileSize);
+            Vector3 end = transform.position + new Vector3(path.path[i + 1].Position.x * tileSize, -0.8f, path.path[i + 1].Position.y * tileSize);
+
+            if (start == null)
+            {
+                Debug.Log("Start is null");
+            }
+            if (end == null)
+            {
+                Debug.Log("End is null");
+            }
+            if (pathMaterial == null)
+            {
+                Debug.Log("intraEdgeMaterial is null");
+            }
+            DrawLine(start, end, pathMaterial);
         }
     }
 
