@@ -48,8 +48,10 @@ public class MapController
         int mapHeight = map2D.GetLength(0);
         int mapWidth = map2D.GetLength(1);
         foreach(MapObject mapObject in objects){
-            for(int i = mapObject.ArrayPosition.y - spacing; i < 2 * spacing; i++){
-                for(int j = mapObject.ArrayPosition.x - spacing; j < 2 * spacing; j++){
+            int yPos = mapObject.ArrayPosition.y;
+            int xPos = mapObject.ArrayPosition.x;
+            for(int i = yPos - spacing; i < spacing + yPos; i++){
+                for(int j = xPos - spacing; j < spacing + xPos; j++){
                     if(i >= 0 && i < mapHeight && j >= 0 && j < mapWidth){
                         map2D[i,j] = 0;
                     } 
