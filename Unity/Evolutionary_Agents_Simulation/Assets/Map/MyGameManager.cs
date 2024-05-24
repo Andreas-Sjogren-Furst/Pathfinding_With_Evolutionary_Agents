@@ -10,7 +10,8 @@ public class MyGameManager
    
     // Controllers
     public MapController mapController;
-    public HPAStar graphController;
+    public HPAStar HPAGraphController;
+    public MMAS mmasGraphController;
     public AgentController agentController;
         
 
@@ -28,7 +29,9 @@ public class MyGameManager
         MapModel mapModel = customMaps.GetCustomMap(1);
         mapController = new MapController(mapModel);
         agentController = new AgentController(new AgentModel(1));
-        graphController = InitialiseHPAStar(mapModel.map);
+        HPAGraphController = InitialiseHPAStar(mapModel.map);
+        mmasGraphController = InitialiseMMMAS();
+        
     }
 
     private HPAStar InitialiseHPAStar(MapObject[,] map){
@@ -41,6 +44,23 @@ public class MyGameManager
         HPAStar hpaStar = new HPAStar(_graphModel, clusterManager, _nodeManager, entranceManager, edgeManager, _pathFinder);
         hpaStar.Preprocessing(1);
         return hpaStar;
+    }
+
+    private MMAS InitialiseMMMAS(){
+        Graph graph = new Graph();
+
+        int numAnts = 0;
+        double alpha = 1.5;
+        double beta = 4.5;
+        double rho = 0.90;
+        double q = 100.0;
+        int maxIterations = 500;
+
+        MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q);
+        mmas.SetGraph(graph);
+        mmas.Run(maxIterations);
+        return mmas;
+
     }
     
 }

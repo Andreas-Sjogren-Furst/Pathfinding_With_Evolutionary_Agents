@@ -22,6 +22,7 @@ public class WebView : MonoBehaviour, IScreenView
     // Local variables
     private GameObject[,] InstantiatedMap;
     private List<GameObject> InstantiatedGraph;
+    private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
     private readonly float nodeScale = 0.1f;
 
@@ -33,7 +34,7 @@ public class WebView : MonoBehaviour, IScreenView
         MyGameManager myGameManager = new();
         screenPresenter = new(myGameManager);
         RenderMap(screenPresenter.PackageData());
-        RenderGraph(1,screenPresenter.PackageData());
+        //RenderGraph(1,screenPresenter.PackageData());
     }
 
     // Update is called once per frame
@@ -49,24 +50,27 @@ public class WebView : MonoBehaviour, IScreenView
 
         ClearMap(InstantiatedMap);
         InstantiatedMap = new GameObject[map.GetLength(1),map.GetLength(0)];
+        InstantiateMap(map); 
+        InstantiateCheckPoints(checkPoints);
+        InstantiateSpawnPoint(spawnPoint);
+
+    }
+    private void InstantiateMap(MapObject[,] map){
+        int mapWidth = (int) (map.GetLength(0) * tileScale);
+        int mapHeight = (int) (map.GetLength(1) * tileScale);
+        Vector3Int position = new Vector3Int(map.GetLength(0)/2, 0, map.GetLength(1)/2);
+        GameObject floor = Instantiate(tilePrefab, position, Quaternion.identity);
+        floor.transform.position = position;
+        floor.transform.localScale = new Vector3(mapWidth,0,mapHeight);
+
         foreach(MapObject mapObject in map){
             Vector3Int worldPosition = ConvertVector2DTo3D(mapObject.ArrayPosition);
             int i = mapObject.ArrayPosition.x;
             int j = mapObject.ArrayPosition.y;
-            switch(mapObject.Type)
-            {
-                case MapObject.ObjectType.Tile:
-                    InstantiatedMap[i,j] = Instantiate(tilePrefab,worldPosition,Quaternion.identity);
-                    break;
-                case MapObject.ObjectType.Wall:
-                    InstantiatedMap[i,j] = Instantiate(wallPrefab,worldPosition,Quaternion.identity);
-                    break;
+            if(mapObject.Type == MapObject.ObjectType.Wall){
+                InstantiatedMap[i,j] = Instantiate(wallPrefab,worldPosition,Quaternion.identity);
             }
-
-        } 
-        InstantiateCheckPoints(checkPoints);
-        InstantiateSpawnPoint(spawnPoint);
-
+        }
     }
 
     private void InstantiateCheckPoints(List<CheckPoint> checkPoints){
