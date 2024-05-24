@@ -2,29 +2,32 @@ using System;
 using UnityEngine;
 
 public class MyGameManager
-{    
+{
 
     // Object for Custom Maps
     CustomMaps customMaps;
-        
-   
+
+
     // Controllers
     public MapController mapController;
     public HPAStar HPAGraphController;
     public MMAS mmasGraphController;
     public AgentController agentController;
-        
+
 
     // Main
-    public void main(){
-        mapController.ChangeMapParameters(customMaps.GetCustomMap(0));
-        
+    public void main()
+    {
+
+        mapController.ChangeMapParameters(customMaps.GetCustomMap(1));
+
     }
-    
-    
+
+
     //Run backend here
 
-    public MyGameManager(){
+    public MyGameManager()
+    {
         customMaps = new();
         MapModel mapModel = customMaps.GetCustomMap(1);
         mapController = new MapController(mapModel);
@@ -34,7 +37,8 @@ public class MyGameManager
         
     }
 
-    private HPAStar InitialiseHPAStar(MapObject[,] map){
+    private HPAStar InitialiseHPAStar(MapObject[,] map)
+    {
         PathFinder _pathFinder = new PathFinder();
         GraphModel _graphModel = new GraphModel(map);
         IEdgeManager edgeManager = new EdgeManager(_pathFinder);
