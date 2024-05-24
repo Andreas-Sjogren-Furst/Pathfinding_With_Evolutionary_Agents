@@ -36,8 +36,9 @@ public class WebView : MonoBehaviour, IScreenView
 
 
     // Local variables
-    private GameObject[,] instantiatedMap;
-    private List<GameObject> instantiatedGraph;
+    private GameObject[,] InstantiatedMap;
+    private List<GameObject> InstantiatedGraph;
+    private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
     private readonly float nodeScale = 0.1f;
 
@@ -92,7 +93,7 @@ public class WebView : MonoBehaviour, IScreenView
         // myGameManager.graphController.Preprocessing(3);
         Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
         Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
-        HPAPath path = myGameManager.graphController.HierarchicalSearch(start, end, 1);
+        HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 1);
 
         DrawPath(path);
 
@@ -110,25 +111,32 @@ public class WebView : MonoBehaviour, IScreenView
         List<CheckPoint> checkPoints = screenViewModel.checkPoints;
         AgentSpawnPoint spawnPoint = screenViewModel.spawnPoint;
 
-        ClearMap(instantiatedMap);
-        instantiatedMap = new GameObject[map.GetLength(1), map.GetLength(0)];
+        ClearMap(InstantiatedMap);
+        InstantiatedMap = new GameObject[map.GetLength(1), map.GetLength(0)];
+        InstantiateMap(map);
+        InstantiateCheckPoints(checkPoints);
+        InstantiateSpawnPoint(spawnPoint);
+
+    }
+    private void InstantiateMap(MapObject[,] map)
+    {
+        int mapWidth = (int)(map.GetLength(0) * tileScale);
+        int mapHeight = (int)(map.GetLength(1) * tileScale);
+        Vector3Int position = new Vector3Int(map.GetLength(0) / 2, 0, map.GetLength(1) / 2);
+        GameObject floor = Instantiate(tilePrefab, position, Quaternion.identity);
+        floor.transform.position = position;
+        floor.transform.localScale = new Vector3(mapWidth, 0, mapHeight);
+
         foreach (MapObject mapObject in map)
         {
             Vector3Int worldPosition = ConvertVector2DTo3D(mapObject.ArrayPosition);
             int i = mapObject.ArrayPosition.x;
             int j = mapObject.ArrayPosition.y;
-            switch (mapObject.Type)
+            if (mapObject.Type == MapObject.ObjectType.Wall)
             {
-                case MapObject.ObjectType.Tile:
-                    instantiatedMap[i, j] = objectPooler.SpawnFromPool(tileTag, worldPosition, Quaternion.identity);
-                    break;
-                case MapObject.ObjectType.Wall:
-                    instantiatedMap[i, j] = objectPooler.SpawnFromPool(wallTag, worldPosition, Quaternion.identity);
-                    break;
+                InstantiatedMap[i, j] = Instantiate(wallPrefab, worldPosition, Quaternion.identity);
             }
         }
-        InstantiateCheckPoints(checkPoints);
-        InstantiateSpawnPoint(spawnPoint);
     }
 
     private void InstantiateCheckPoints(List<CheckPoint> checkPoints)
@@ -138,7 +146,7 @@ public class WebView : MonoBehaviour, IScreenView
             Vector3Int worldPosition = ConvertVector2DTo3D(checkPoint.ArrayPosition);
             int i = checkPoint.ArrayPosition.x;
             int j = checkPoint.ArrayPosition.y;
-            instantiatedMap[i, j] = objectPooler.SpawnFromPool(checkPointTag, worldPosition, Quaternion.identity);
+            InstantiatedMap[i, j] = objectPooler.SpawnFromPool(checkPointTag, worldPosition, Quaternion.identity);
         }
     }
 
@@ -147,7 +155,7 @@ public class WebView : MonoBehaviour, IScreenView
         Vector3Int worldPosition = ConvertVector2DTo3D(spawnPoint.ArrayPosition);
         int i = spawnPoint.ArrayPosition.x;
         int j = spawnPoint.ArrayPosition.y;
-        instantiatedMap[i, j] = objectPooler.SpawnFromPool(spawnPointTag, worldPosition, Quaternion.identity);
+        InstantiatedMap[i, j] = objectPooler.SpawnFromPool(spawnPointTag, worldPosition, Quaternion.identity);
     }
 
     private Vector3Int ConvertVector2DTo3D(Vector2Int arrayPosition)
@@ -169,8 +177,8 @@ public class WebView : MonoBehaviour, IScreenView
 
     private void RenderGraph(int level, ScreenViewModel screenViewModel)
     {
-        ClearGraph(instantiatedGraph);
-        instantiatedGraph = new List<GameObject>();
+        ClearGraph(InstantiatedGraph);
+        InstantiatedGraph = new List<GameObject>();
         IGraphModel graph = screenViewModel.graph;
         if (graph.ClusterByLevel.TryGetValue(level, out var clusters))
         {
@@ -212,7 +220,7 @@ public class WebView : MonoBehaviour, IScreenView
     {
         GameObject nodeObj = objectPooler.SpawnFromPool(nodeTag, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
         nodeObj.transform.localScale = Vector3.one * nodeScale * tileSize;
-        instantiatedGraph.Add(nodeObj);
+        InstantiatedGraph.Add(nodeObj);
     }
 
     private void DrawPath(HPAPath path)
@@ -244,7 +252,7 @@ public class WebView : MonoBehaviour, IScreenView
         {
             GameObject entranceObj = objectPooler.SpawnFromPool(entranceTag, transform.position + new Vector3(entrance.Node1.Position.x * tileSize, 0, entrance.Node1.Position.y * tileSize), Quaternion.identity);
             entranceObj.transform.localScale = Vector3.one * nodeScale * tileSize;
-            instantiatedGraph.Add(entranceObj);
+            InstantiatedGraph.Add(entranceObj);
         }
     }
 
@@ -267,6 +275,6 @@ public class WebView : MonoBehaviour, IScreenView
         lr.startWidth = 0.05f * tileSize;
         lr.endWidth = 0.05f * tileSize;
         lr.SetPositions(new Vector3[] { start, end });
-        instantiatedGraph.Add(lineObj);
+        InstantiatedGraph.Add(lineObj);
     }
 }
