@@ -62,7 +62,7 @@ public class MMASVisualizer : MonoBehaviour
         double q = 100.0;
         int maxIterations = 500;
 
-        mmas = new MMAS(numAnts, alpha, beta, rho, q);
+        mmas = new MMAS(numAnts, alpha, beta, rho, q, graph);
         mmas.SetGraph(graph);
         mmas.Run(maxIterations);
         Node[] bestTour = mmas.GetBestTour();

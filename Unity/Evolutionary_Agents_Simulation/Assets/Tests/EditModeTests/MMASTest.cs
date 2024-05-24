@@ -28,7 +28,7 @@ public class MMASTest
         double q = 100.0;
         int maxIterations = 500;
 
-        MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q);
+        MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q,graph);
         mmas.SetGraph(graph);
         mmas.Run(maxIterations);
 
