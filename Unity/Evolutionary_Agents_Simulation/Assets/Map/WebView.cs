@@ -20,6 +20,8 @@ public class WebView : MonoBehaviour, IScreenView
     public Material intraEdgeMaterial;
     public Material interEdgeMaterial;
 
+    public Material pathMaterial;
+
 
     // Tags
     private string nodeTag = "Node";
@@ -49,6 +51,7 @@ public class WebView : MonoBehaviour, IScreenView
         screenPresenter = new(myGameManager);
         screenViewModel = screenPresenter.PackageData();
         int mapSize = screenViewModel.map.GetLength(0) * screenViewModel.map.GetLength(1);
+        InstantiatedGraph = new List<GameObject>();
 
         // Add pools programmatically
         objectPooler.AddPool(nodeTag, nodePrefab, mapSize);
@@ -58,8 +61,20 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Start()
     {
-        RenderMap(screenPresenter.PackageData());
-        RenderGraph(1,screenPresenter.PackageData());
+        //RenderMap(screenPresenter.PackageData());
+        //RenderGraph(1,screenPresenter.PackageData());
+
+        RenderMap(screenViewModel);
+        RenderGraph(1, screenViewModel);
+
+        // myGameManager.graphController.Preprocessing(3);
+        //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
+        //Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
+        //HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
+
+        //DrawPath(path);
+
+
     }
 
     void Update()
@@ -74,26 +89,29 @@ public class WebView : MonoBehaviour, IScreenView
         AgentSpawnPoint spawnPoint = screenViewModel.spawnPoint;
 
         ClearMap(InstantiatedMap);
-        InstantiatedMap = new GameObject[map.GetLength(1),map.GetLength(0)];
-        InstantiateMap(map); 
+        InstantiatedMap = new GameObject[map.GetLength(1), map.GetLength(0)];
+        InstantiateMap(map);
         InstantiateCheckPoints(checkPoints);
         InstantiateSpawnPoint(spawnPoint);
 
     }
-    private void InstantiateMap(MapObject[,] map){
-        int mapWidth = (int) (map.GetLength(0) * tileScale);
-        int mapHeight = (int) (map.GetLength(1) * tileScale);
-        Vector3Int position = new Vector3Int(map.GetLength(0)/2, 0, map.GetLength(1)/2);
+    private void InstantiateMap(MapObject[,] map)
+    {
+        int mapWidth = (int)(map.GetLength(0) * tileScale);
+        int mapHeight = (int)(map.GetLength(1) * tileScale);
+        Vector3Int position = new Vector3Int(map.GetLength(0) / 2, 0, map.GetLength(1) / 2);
         GameObject floor = Instantiate(tilePrefab, position, Quaternion.identity);
         floor.transform.position = position;
-        floor.transform.localScale = new Vector3(mapWidth,0,mapHeight);
+        floor.transform.localScale = new Vector3(mapWidth, 0, mapHeight);
 
-        foreach(MapObject mapObject in map){
+        foreach (MapObject mapObject in map)
+        {
             Vector3Int worldPosition = ConvertVector2DTo3D(mapObject.ArrayPosition);
             int i = mapObject.ArrayPosition.x;
             int j = mapObject.ArrayPosition.y;
-            if(mapObject.Type == MapObject.ObjectType.Wall){
-                InstantiatedMap[i,j] = Instantiate(wallPrefab,worldPosition,Quaternion.identity);
+            if (mapObject.Type == MapObject.ObjectType.Wall)
+            {
+                InstantiatedMap[i, j] = Instantiate(wallPrefab, worldPosition, Quaternion.identity);
             }
         }
     }
@@ -186,9 +204,22 @@ public class WebView : MonoBehaviour, IScreenView
     {
         for (int i = 0; i < path.path.Count - 1; i++)
         {
-            Vector3 start = transform.position + new Vector3(path.path[i].Position.x * tileSize, 0, path.path[i].Position.y * tileSize);
-            Vector3 end = transform.position + new Vector3(path.path[i + 1].Position.x * tileSize, 0, path.path[i + 1].Position.y * tileSize);
-            DrawLine(start, end, intraEdgeMaterial);
+            Vector3 start = transform.position + new Vector3(path.path[i].Position.x * tileSize, -0.8f, path.path[i].Position.y * tileSize);
+            Vector3 end = transform.position + new Vector3(path.path[i + 1].Position.x * tileSize, -0.8f, path.path[i + 1].Position.y * tileSize);
+
+            if (start == null)
+            {
+                Debug.Log("Start is null");
+            }
+            if (end == null)
+            {
+                Debug.Log("End is null");
+            }
+            if (pathMaterial == null)
+            {
+                Debug.Log("intraEdgeMaterial is null");
+            }
+            DrawLine(start, end, pathMaterial);
         }
     }
 
