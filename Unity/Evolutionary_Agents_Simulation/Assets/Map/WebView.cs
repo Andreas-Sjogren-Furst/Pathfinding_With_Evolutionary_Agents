@@ -75,7 +75,7 @@ public class WebView : MonoBehaviour, IScreenView
         objectPooler.AddPool(checkPointTag, checkPointPrefab, 50);
         objectPooler.AddPool(spawnPointTag, spawnPointPrefab, 5);
         objectPooler.AddPool(agentTag, agentPrefab, 10);
-        objectPooler.AddPool(nodeTag, nodePrefab, mapSize * 2);
+        objectPooler.AddPool(nodeTag, nodePrefab, mapSize);
         objectPooler.AddPool(entranceTag, entrancePrefab, mapSize / 10);
         objectPooler.AddPool(lineTag, linePrefab, mapSize * 5);
     }
