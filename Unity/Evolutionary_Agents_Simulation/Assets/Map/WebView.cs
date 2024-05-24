@@ -57,7 +57,7 @@ public class WebView : MonoBehaviour, IScreenView
         screenPresenter = new(myGameManager);
         screenViewModel = screenPresenter.PackageData();
         int mapSize = screenViewModel.map.GetLength(0) * screenViewModel.map.GetLength(1);
-        instantiatedGraph = new List<GameObject>();
+        InstantiatedGraph = new List<GameObject>();
 
         Debug.Log("Map Size: " + mapSize);
         // Add pools programmatically
@@ -93,7 +93,7 @@ public class WebView : MonoBehaviour, IScreenView
         // myGameManager.graphController.Preprocessing(3);
         Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
         Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
-        HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 1);
+        HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
 
         DrawPath(path);
 

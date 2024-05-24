@@ -4777,6 +4777,7 @@ MonoBehaviour:
   clusterMaterial: {fileID: 2100000, guid: edf3f4707d65044e9a62d1450f067cda, type: 2}
   intraEdgeMaterial: {fileID: 2100000, guid: 2edd948b783e146fb893d44a49d5eeac, type: 2}
   interEdgeMaterial: {fileID: 2100000, guid: 1fd6fb1bc1f094556a12c4a452b24fb5, type: 2}
+  pathMaterial: {fileID: 2100000, guid: 2d0e6a0dea7c54718938281b306e1128, type: 2}
 --- !u!114 &1743635986
 MonoBehaviour:
   m_ObjectHideFlags: 0

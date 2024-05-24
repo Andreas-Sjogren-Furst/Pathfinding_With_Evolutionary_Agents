@@ -7,14 +7,16 @@ public class ScreenPresenter : IGamePresenter
     MapModel mapModel;
     AgentModel agentModel;
     IGraphModel graphModel;
-    public ScreenPresenter(MyGameManager myGameManager){
+    public ScreenPresenter(MyGameManager myGameManager)
+    {
         mapModel = myGameManager.mapController.mapModel;
         agentModel = myGameManager.agentController.agentModel;
-        graphModel = myGameManager.graphController._graphModel;
+        graphModel = myGameManager.HPAGraphController._graphModel;
     }
-    
-    public ScreenViewModel PackageData(){
-        ScreenViewModel screenViewModel = new(mapModel.map,agentModel.agents,graphModel, mapModel.checkPoints,mapModel.spawnPoint);
+
+    public ScreenViewModel PackageData()
+    {
+        ScreenViewModel screenViewModel = new(mapModel.map, agentModel.agents, graphModel, mapModel.checkPoints, mapModel.spawnPoint);
         return screenViewModel;
     }
 }

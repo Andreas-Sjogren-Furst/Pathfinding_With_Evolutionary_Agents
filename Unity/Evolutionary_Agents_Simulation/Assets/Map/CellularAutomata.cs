@@ -42,9 +42,9 @@ public class CellularAutomata
         {
             int[,] tempGrid = (int[,])map.Clone();
 
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < height; j++)
             {
-                for (int k = 0; k < height; k++)
+                for (int k = 0; k < width; k++)
                 {
                     int neighborWallCount = 0;
 
@@ -75,15 +75,19 @@ public class CellularAutomata
         return map;
     }
 
-    public static MapObject[,] Convert2DTo3D(int[,] map2D){
+    public static MapObject[,] Convert2DTo3D(int[,] map2D)
+    {
         int width = map2D.GetLength(0);
         int height = map2D.GetLength(1);
-        MapObject[,] map = new MapObject[height,width];
-        for(int i = 0; i < height; i++){
-            for(int j = 0; j < width; j++){
-                if(map2D[i,j] == 0) map[i,j] = new Tile(new UnityEngine.Vector2Int(i,j));
-                else map[i,j] = new Wall(new UnityEngine.Vector2Int(i,j));
+        MapObject[,] map = new MapObject[height, width];
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (map2D[i, j] == 0) map[i, j] = new Tile(new UnityEngine.Vector2Int(i, j));
+                else map[i, j] = new Wall(new UnityEngine.Vector2Int(i, j));
             }
-        } return map;
+        }
+        return map;
     }
 }

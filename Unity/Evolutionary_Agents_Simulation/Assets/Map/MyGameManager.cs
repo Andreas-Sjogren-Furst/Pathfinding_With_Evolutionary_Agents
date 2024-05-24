@@ -29,12 +29,12 @@ public class MyGameManager
     public MyGameManager()
     {
         customMaps = new();
-        MapModel mapModel = customMaps.GetCustomMap(6);
+        MapModel mapModel = customMaps.GetCustomMap(8);
         mapController = new MapController(mapModel);
         agentController = new AgentController(new AgentModel(1));
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
-        
+
     }
 
     private HPAStar InitialiseHPAStar(MapObject[,] map)
@@ -50,7 +50,8 @@ public class MyGameManager
         return hpaStar;
     }
 
-    private MMAS InitialiseMMMAS(){
+    private MMAS InitialiseMMMAS()
+    {
         Graph graph = new Graph();
 
         int numAnts = 0;
@@ -58,14 +59,14 @@ public class MyGameManager
         double beta = 4.5;
         double rho = 0.90;
         double q = 100.0;
-        int maxIterations = 500;
+        // int maxIterations = 500;
 
         MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q);
-        mmas.SetGraph(graph);
-        mmas.Run(maxIterations);
+        // mmas.SetGraph(graph);
+        // mmas.Run(maxIterations);
         return mmas;
 
     }
-    
+
 }
 
