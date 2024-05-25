@@ -93,9 +93,16 @@ public class WebView : MonoBehaviour, IScreenView
         // myGameManager.graphController.Preprocessing(3);
         Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
         Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
-        HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
+        // HPAPath path3 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 3);
+        // HPAPath path2 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
+        HPAPath path1 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 1);
 
-        DrawPath(path);
+
+        // DrawPath(path3);
+        // DrawPath(path2);
+        DrawPath(path1);
+
+
 
 
     }

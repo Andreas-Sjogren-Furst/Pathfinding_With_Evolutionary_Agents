@@ -185,7 +185,7 @@ public class ClusterManager : IClusterManager
 
 
 
-                    _edgeManager.AddHPAEdge(n1, n2, entrance.Edge1.Weight, level, HPAEdgeType.INTER);
+                    _edgeManager.AddHPAEdge(n1, n2, entrance.Edge1.Weight, level, HPAEdgeType.INTER, IntraPath: entrance.Edge1.IntraPaths);
 
                     Entrance entrance1 = new Entrance(n1.Cluster, n2.Cluster, n1, n2); //TODO: check if entrance should be reversed? 
                     Entrance entrance2 = new Entrance(n2.Cluster, n1.Cluster, n2, n1);
@@ -264,7 +264,7 @@ public class ClusterManager : IClusterManager
             HPANode node2 = _nodeManager.FindOrCreateNode(edge.Node2.Position.x, edge.Node2.Position.y, newCluster);
             if (!newNode.Edges.Any(e => e.Node2 == node2))
             {
-                _edgeManager.AddHPAEdge(newNode, node2, edge.Weight, newCluster.Level, edge.Type, IntraPath: edge is HPAInterEdge ? ((HPAInterEdge)edge).IntraPaths : null);
+                _edgeManager.AddHPAEdge(newNode, node2, edge.Weight, newCluster.Level, edge.Type, IntraPath: edge.IntraPaths);
                 // Debug.Log($"Edge transferred from {newNode.Position} to {node2.Position} at new level {newCluster.Level}");
             }
         }

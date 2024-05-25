@@ -15,7 +15,7 @@ public class EdgeManager : IEdgeManager
     public void AddHPAEdge(HPANode node1, HPANode node2, double weight, int level, HPAEdgeType type, HPAPath IntraPath = null)
     {
 
-        if (type == HPAEdgeType.INTER && IntraPath != null)
+        if (IntraPath != null)
         {
             // if (IntraPath.Length == 0)
             // {
@@ -25,8 +25,8 @@ public class EdgeManager : IEdgeManager
             //     }
             //     throw new ArgumentException("IntraPath length must be greater than 0");
             // }
-            HPAInterEdge edge3 = new HPAInterEdge(node1, node2, weight, level, IntraPath);
-            HPAInterEdge edge4 = new HPAInterEdge(node2, node1, weight, level, IntraPath);
+            HPAEdge edge3 = new HPAEdge(node1, node2, weight, level, type, IntraPath);
+            HPAEdge edge4 = new HPAEdge(node2, node1, weight, level, type, IntraPath);
             node1.Edges.Add(edge3);
             node2.Edges.Add(edge4);
             return;

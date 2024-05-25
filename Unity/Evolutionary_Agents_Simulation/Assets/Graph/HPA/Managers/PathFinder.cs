@@ -7,6 +7,15 @@ using UnityEngine;
 
 public class PathFinder : IPathFinder
 {
+    private readonly IGraphModel _graphModel;
+
+    public PathFinder(IGraphModel graphModel)
+    {
+        _graphModel = graphModel;
+    }
+
+
+
 
 
 
@@ -21,7 +30,8 @@ public class PathFinder : IPathFinder
         return abstractPath;
     }
 
-    // public HPAPath RefinePath(HPAPath abstractPath, int level) //TODO: fetch the intra paths from the inter edges. 
+
+    // public HPAPath RefinePath(HPAPath abstractPath, int level)
     // {
     //     if (abstractPath == null || abstractPath.path.Count == 0)
     //     {
@@ -42,138 +52,167 @@ public class PathFinder : IPathFinder
     //             continue;
     //         }
 
-    //         if (startNode.Cluster == null || endNode.Cluster == null)
+    //         if (NeightBorCheck(startNode, endNode))
     //         {
-    //             Debug.LogError("One of the nodes has a null cluster.");
+    //             refinedPath.path.Add(startNode);
     //             continue;
     //         }
 
-    //         if (startNode.Cluster == endNode.Cluster)
+    //         // Attempt to use precomputed path in HPAInterEdge
+    //         HPAPath interEdge = FindInterEdge(startNode, endNode);
+    //         if (interEdge != null && interEdge.path.Count > 0)
     //         {
-    //             HPAPath localPath = FindLocalPath(startNode, endNode, startNode.Cluster);
-    //             if (localPath == null || localPath.path.Count == 0)
+    //             if (level > 1)
     //             {
-    //                 Debug.LogError("Failed to find local path within cluster for nodes: " + startNode.Id + " to " + endNode.Id);
-    //                 continue;
-    //             }
-    //             refinedPath.AddRange(localPath);
-    //         }
-    //         else
-    //         {
-    //             Entrance entrance = FindEntrance(startNode.Cluster, endNode.Cluster);
-    //             if (entrance == null || entrance.Node1 == null || entrance.Node2 == null)
-    //             {
-    //                 Debug.LogError("No valid entrance or null nodes in entrance between clusters: " + startNode.Cluster.bottomLeftPos + " and " + endNode.Cluster.bottomLeftPos);
-    //                 continue;
-    //             }
-
-    //             // Debug.Log("trying to find path to entrance");
-    //             HPAPath pathToEntrance = FindLocalPath(startNode, entrance.Node1, startNode.Cluster);
-    //             if (pathToEntrance == null || pathToEntrance.path.Count == 0)
-    //             {
-    //                 Debug.LogError("Failed to find path to entrance for startNode.");
-    //                 continue;
-    //             }
-    //             refinedPath.AddRange(pathToEntrance);
-
-    //             HPAPath pathFromEntrance = FindLocalPath(entrance.Node2, endNode, endNode.Cluster);
-    //             if (pathFromEntrance == null || pathFromEntrance.path.Count == 0)
-    //             {
-    //                 Debug.LogError("Failed to find path from entrance for endNode.");
-    //                 continue;
-    //             }
-    //             if (pathFromEntrance.path.Count > 0 && pathFromEntrance.path.First() == entrance.Node2)
-    //                 pathFromEntrance.path.RemoveAt(0);
-    //             refinedPath.AddRange(pathFromEntrance);
-    //         }
-    //     }
-
-    //     if (refinedPath.path.LastOrDefault() != abstractPath.path.Last())
-    //     {
-    //         if (refinedPath.path.Count > 0 && refinedPath.path.Last().Cluster == abstractPath.path.Last().Cluster)
-    //         {
-    //             HPAPath finalSegment = FindLocalPath(refinedPath.path.Last(), abstractPath.path.Last(), abstractPath.path.Last().Cluster);
-    //             if (finalSegment != null && finalSegment.path.Count > 0)
-    //             {
-    //                 if (finalSegment.path.First() == refinedPath.path.Last())
-    //                     finalSegment.path.RemoveAt(0);
-    //                 refinedPath.AddRange(finalSegment);
+    //                 Debug.Log($"Refining interEdge between {startNode.Position} and {endNode.Position} at level {level - 1}");
+    //                 HPAPath refinedInterEdge = RefinePath(interEdge, level - 1);
+    //                 refinedPath.AddRange(refinedInterEdge);
     //             }
     //             else
     //             {
-    //                 Debug.LogError("No valid path to final node found.");
+    //                 Debug.Log($"Adding interEdge directly between {startNode.Position} and {endNode.Position} at level 1");
+    //                 refinedPath.AddRange(interEdge);
     //             }
     //         }
     //         else
     //         {
-    //             refinedPath.path.Add(abstractPath.path.Last());
+    //             if (level > 1)
+    //             {
+    //                 // Recompute everything by finding nodes at a lower level
+    //                 if (_graphModel.NodesByLevel[level - 1].TryGetValue(startNode.Position, out HPANode lowerStartNode) &&
+    //                     _graphModel.NodesByLevel[level - 1].TryGetValue(endNode.Position, out HPANode lowerEndNode))
+    //                 {
+    //                     Debug.Log($"Refining local path between {startNode.Position} and {endNode.Position} at level {level - 1}");
+    //                     HPAPath lowerLevelPath = new HPAPath(new List<HPANode> { lowerStartNode, lowerEndNode });
+    //                     HPAPath refinedLowerLevelPath = RefinePath(lowerLevelPath, level - 1);
+    //                     refinedPath.AddRange(refinedLowerLevelPath);
+    //                 }
+    //                 else
+    //                 {
+    //                     Debug.LogError($"Failed to find nodes at level {level - 1} for positions {startNode.Position} and {endNode.Position}");
+    //                 }
+    //             }
+    //             else
+    //             {
+    //                 // Find local path within the same cluster at level 1
+    //                 HPAPath localPath = FindLocalPath(startNode, endNode, startNode.Cluster);
+    //                 if (localPath != null && localPath.path.Count > 0)
+    //                 {
+    //                     Debug.Log($"Adding local path directly between {startNode.Position} and {endNode.Position} at level 1");
+    //                     refinedPath.AddRange(localPath);
+    //                 }
+    //                 else
+    //                 {
+    //                     Debug.LogError($"Local path not found between {startNode.Position} and {endNode.Position} at level 1");
+    //                 }
+    //             }
     //         }
+    //     }
+
+    //     // Add the last node of the abstract path to the refined path
+    //     if (abstractPath.path.Count > 0)
+    //     {
+    //         refinedPath.path.Add(abstractPath.path.Last());
     //     }
 
     //     return refinedPath;
     // }
 
-    public HPAPath RefinePath(HPAPath abstractPath, int level)
+    public HPAPath RefinePath(HPAPath abstractPath, int initialLevel)
     {
         if (abstractPath == null || abstractPath.path.Count == 0)
         {
-            // Debug.LogError("Abstract path is null or empty.");
+            Debug.LogError("Abstract path is null or empty.");
             return new HPAPath(new List<HPANode>());
         }
 
         HPAPath refinedPath = new HPAPath(new List<HPANode>());
+        Stack<(HPANode, HPANode, int)> stack = new Stack<(HPANode, HPANode, int)>();
 
-        for (int i = 0; i < abstractPath.path.Count - 1; i++)
+        // Initialize the stack with the abstract path nodes and initial level
+        for (int i = abstractPath.path.Count - 1; i > 0; i--)
         {
-            HPANode startNode = abstractPath.path[i];
-            HPANode endNode = abstractPath.path[i + 1];
+            stack.Push((abstractPath.path[i - 1], abstractPath.path[i], initialLevel));
+        }
+
+        while (stack.Count > 0)
+        {
+            var (startNode, endNode, level) = stack.Pop();
 
             if (startNode == null || endNode == null)
             {
-                // Debug.LogError($"Null node encountered in abstract path at indices {i} and {i + 1}.");
+                Debug.LogError("Null node encountered in stack.");
                 continue;
             }
 
-            if (startNode.Cluster == endNode.Cluster)
+            if (NeighborCheck(startNode, endNode))
             {
-                // Find local path within the same cluster
-                HPAPath localPath = FindLocalPath(startNode, endNode, startNode.Cluster);
-                refinedPath.AddRange(localPath);
+                refinedPath.path.Add(startNode);
+                continue;
             }
-            else
+
+            if (level > 1)
             {
-                // Attempt to use precomputed path in HPAInterEdge
-                HPAPath interEdge = FindInterEdge(startNode, endNode);
-                if (interEdge != null && interEdge != null && interEdge.path.Count > 0)
+                // Finding paths at a lower level. 
+                if (_graphModel.NodesByLevel[level - 1].TryGetValue(startNode.Position, out HPANode lowerStartNode) &&
+                    _graphModel.NodesByLevel[level - 1].TryGetValue(endNode.Position, out HPANode lowerEndNode))
                 {
-                    refinedPath.AddRange(interEdge);
+                    Debug.Log($"Refining path between {startNode.Position} and {endNode.Position} at level {level - 1}");
+
+                    HPAPath lowerLevelPath = FindAbstractPath(lowerStartNode, lowerEndNode, level - 1);
+                    if (lowerLevelPath != null && lowerLevelPath.path.Count > 0)
+                    {
+                        for (int i = lowerLevelPath.path.Count - 1; i > 0; i--)
+                        {
+                            stack.Push((lowerLevelPath.path[i - 1], lowerLevelPath.path[i], level - 1));
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError($"Failed to find abstract path between {lowerStartNode.Position} and {lowerEndNode.Position} at level {level - 1}");
+                    }
                 }
                 else
                 {
-                    HPAPath localPath = FindLocalPath(startNode, endNode, startNode.Cluster);
+                    Debug.LogError($"Failed to find nodes at level {level - 1} for positions {startNode.Position} and {endNode.Position}");
+                }
+            }
+            else
+            {
+                // Find local path within the same cluster at level 1
+                HPAPath localPath = FindLocalPath(startNode, endNode, startNode.Cluster);
+                if (localPath != null && localPath.path.Count > 0)
+                {
+                    Debug.Log($"Adding local path directly between {startNode.Position} and {endNode.Position} at level 1");
                     refinedPath.AddRange(localPath);
+                }
+                else
+                {
+                    Debug.LogError($"Local path not found between {startNode.Position} and {endNode.Position} at level 1");
                 }
             }
         }
 
-        // Handle final node match
-        HPANode lastNodeInRefined = refinedPath.path.LastOrDefault();
-        HPANode lastNodeInAbstract = abstractPath.path.Last();
-        if (lastNodeInRefined != lastNodeInAbstract)
+        // Add the last node of the abstract path to the refined path
+        if (abstractPath.path.Count > 0)
         {
-            if (lastNodeInRefined != null && lastNodeInRefined.Cluster == lastNodeInAbstract.Cluster)
-            {
-                HPAPath finalSegment = FindLocalPath(lastNodeInRefined, lastNodeInAbstract, lastNodeInAbstract.Cluster);
-                refinedPath.AddRange(finalSegment);
-            }
-            else
-            {
-                refinedPath.path.Add(lastNodeInAbstract);
-            }
+            refinedPath.path.Add(abstractPath.path.Last());
         }
 
         return refinedPath;
     }
+
+
+
+    private static bool NeighborCheck(HPANode startNode, HPANode endNode)
+    {
+        if (startNode.Position - endNode.Position == Vector2Int.down || startNode.Position - endNode.Position == Vector2Int.up || startNode.Position - endNode.Position == Vector2Int.left || startNode.Position - endNode.Position == Vector2Int.right)
+        {
+            return true;
+        }
+        return false;
+    }
+
 
 
     public HPAPath FindLocalPath(HPANode startNode, HPANode endNode, Cluster cluster)
@@ -192,9 +231,9 @@ public class PathFinder : IPathFinder
     {
         foreach (var edge in start.Edges)
         {
-            if (edge is HPAInterEdge interEdge && (interEdge.Node1 == end || interEdge.Node2 == end))
+            if (edge.Type == HPAEdgeType.INTER && (edge.Node1 == end || edge.Node2 == end))
             {
-                return interEdge.IntraPaths;
+                return edge.IntraPaths;
             }
         }
         return null;

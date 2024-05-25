@@ -85,7 +85,9 @@ public class Edge
         return false;
     }
 
-
+    //  any time => ændrer på objektiv funktionen, og bruge den tidligere løsning, som warm start løsning. 
+    //  Hvor lang tid tager før systemet tiltager sig.
+    //  Sammenlignet med at det starte helt. 
 }
 
 public class Graph

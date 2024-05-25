@@ -186,7 +186,7 @@ public class HPAStar : IHPAStar
             {
                 if (edge.Type == HPAEdgeType.INTER)
                 {
-                    _edgeManager.AddHPAEdge(n, _graphModel.NodesByLevel[l][edge.Node2.Position], edge.Weight, l, HPAEdgeType.INTRA);
+                    _edgeManager.AddHPAEdge(n, _graphModel.NodesByLevel[l][edge.Node2.Position], edge.Weight, l, HPAEdgeType.INTRA, IntraPath: edge.IntraPaths);
                 }
             }
         }
@@ -233,6 +233,7 @@ public class HPAStar : IHPAStar
         }
 
         HPAPath refinedPath = _pathFinder.RefinePath(abstractPath, level);
+
         // Optional: Smoothing the path if needed
         return refinedPath;
     }

@@ -23,9 +23,9 @@ public class PathfindingTest
 
         RunHPASimulation(
             iterations: 10,
-            densityRange: (min: 45, max: 65),
+            densityRange: (min: 55, max: 65),
             checkPointsRange: (min: 1, max: 5),
-            cellularIterationsRange: (min: 5, max: 10),
+            cellularIterationsRange: (min: 5, max: 15),
             heightRange: (min: 100, max: 100),
             widthRange: (min: 100, max: 100),
             refinePath: true,
