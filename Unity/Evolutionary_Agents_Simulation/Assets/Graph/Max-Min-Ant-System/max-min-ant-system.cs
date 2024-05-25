@@ -306,6 +306,7 @@ public class MMAS
         if (!_graph.Nodes.Contains(node))
         {
             _graph.AddNode(node);
+            // _numAnts = _graph.Nodes.Count;
             // recalculate tau min and tau max
             int numNodes = _graph.Nodes.Count;
             _tauMax = 1.0 / (_rho * GetNearestNeighborTourLength());
@@ -341,6 +342,8 @@ public class MMAS
                 }
             }
             _graph.RemoveNode(node);
+            // _numAnts = _graph.Nodes.Count;
+
         }
     }
 

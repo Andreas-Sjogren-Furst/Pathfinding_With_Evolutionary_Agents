@@ -96,6 +96,7 @@ public class WebView : MonoBehaviour, IScreenView
         // HPAPath path3 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 3);
         // HPAPath path2 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
         HPAPath path1 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 1);
+        // Astar.FindPath(start, end, screenViewModel.map);
 
 
         // DrawPath(path3);

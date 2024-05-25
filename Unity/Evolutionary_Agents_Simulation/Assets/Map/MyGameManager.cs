@@ -68,5 +68,47 @@ public class MyGameManager
 
     }
 
+    public void MmasAddCheckpoint(Vector2Int checkpoint, int heuristicsLevel, int iterations = 0)
+    {
+        Node newNode = new Node(mmasGraphController._graph.Nodes.Count + 1, checkpoint.x, checkpoint.y);
+        mmasGraphController.AddNode(newNode);
+        mmasGraphController._numAnts = mmasGraphController._graph.Nodes.Count;
+
+
+        // Connect Checkpoint to all other checkpoints:
+
+        foreach (Node node in mmasGraphController._graph.Nodes)
+        {
+            if (node != newNode)
+            {
+                Vector2Int nodePosition = new Vector2Int((int)node.X, (int)node.Y);
+                Vector2Int newNodePosition = new Vector2Int((int)newNode.X, (int)newNode.Y);
+                int distance = (int)HPAGraphController.HierarchicalAbstractSearch(nodePosition, newNodePosition, heuristicsLevel).Length;
+                mmasGraphController._graph.AddEdge(node, newNode, distance);
+                mmasGraphController._graph.AddEdge(newNode, node, distance);
+            }
+        }
+
+        if (iterations > 0)
+        {
+            mmasGraphController.Run(iterations);
+        }
+
+    }
+
+    public void MmasRemoveCheckpoint(Vector2Int checkpoint, int iterations = 0)
+    {
+        Node nodeToRemove = mmasGraphController._graph.Nodes.Find(x => x.X == checkpoint.x && x.Y == checkpoint.y); // TODO: can be optimized. 
+        mmasGraphController.RemoveNode(nodeToRemove);
+        mmasGraphController._numAnts = mmasGraphController._graph.Nodes.Count;
+
+        if (iterations > 0)
+        {
+            mmasGraphController.Run(iterations);
+        }
+    }
+
+
+
 }
 
