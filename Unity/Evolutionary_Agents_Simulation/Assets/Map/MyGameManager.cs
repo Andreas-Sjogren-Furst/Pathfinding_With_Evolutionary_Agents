@@ -83,7 +83,14 @@ public class MyGameManager
             {
                 Vector2Int nodePosition = new Vector2Int((int)node.X, (int)node.Y);
                 Vector2Int newNodePosition = new Vector2Int((int)newNode.X, (int)newNode.Y);
-                int distance = (int)HPAGraphController.HierarchicalAbstractSearch(nodePosition, newNodePosition, heuristicsLevel).Length;
+                HPAPath path = HPAGraphController.HierarchicalAbstractSearch(nodePosition, newNodePosition, heuristicsLevel);
+                double distance = double.PositiveInfinity;
+                if (path != null)
+                {
+
+                    distance = path.Length;
+                }
+
                 mmasGraphController._graph.AddEdge(node, newNode, distance);
                 mmasGraphController._graph.AddEdge(newNode, node, distance);
             }
@@ -98,7 +105,13 @@ public class MyGameManager
 
     public void MmasRemoveCheckpoint(Vector2Int checkpoint, int iterations = 0)
     {
+
+
         Node nodeToRemove = mmasGraphController._graph.Nodes.Find(x => x.X == checkpoint.x && x.Y == checkpoint.y); // TODO: can be optimized. 
+        if (nodeToRemove == null)
+        {
+            return;
+        }
         mmasGraphController.RemoveNode(nodeToRemove);
         mmasGraphController._numAnts = mmasGraphController._graph.Nodes.Count;
 
