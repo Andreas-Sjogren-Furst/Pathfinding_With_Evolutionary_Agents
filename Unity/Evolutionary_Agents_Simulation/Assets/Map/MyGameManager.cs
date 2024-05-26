@@ -37,6 +37,14 @@ public class MyGameManager
 
     }
 
+    public MyGameManager(MapModel mapModel)
+    {
+        mapController = new MapController(mapModel);
+        agentController = new AgentController(new AgentModel(1));
+        HPAGraphController = InitialiseHPAStar(mapModel.map);
+        mmasGraphController = InitialiseMMMAS();
+    }
+
     private HPAStar InitialiseHPAStar(MapObject[,] map)
     {
         GraphModel _graphModel = new GraphModel(map);
@@ -61,16 +69,23 @@ public class MyGameManager
         double q = 100.0;
         // int maxIterations = 500;
 
-        MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q);
+        MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q, graph);
         // mmas.SetGraph(graph);
         // mmas.Run(maxIterations);
         return mmas;
 
     }
 
-    public void MmasAddCheckpoint(Vector2Int checkpoint, int heuristicsLevel, int iterations = 0)
+    public void MmasAddCheckpoint(Vector2Int checkpoint, int heuristicsLevel, int iterations = 0, bool linearHeuristic = true)
     {
-        Node newNode = new Node(mmasGraphController._graph.Nodes.Count + 1, checkpoint.x, checkpoint.y);
+        if (mmasGraphController._graph == null)
+        {
+            Debug.LogError("Graph is null");
+        }
+
+
+        Node newNode = new Node(mmasGraphController._graph.Nodes.Count, checkpoint.x, checkpoint.y);
+
         mmasGraphController.AddNode(newNode);
         mmasGraphController._numAnts = mmasGraphController._graph.Nodes.Count;
 
@@ -83,12 +98,21 @@ public class MyGameManager
             {
                 Vector2Int nodePosition = new Vector2Int((int)node.X, (int)node.Y);
                 Vector2Int newNodePosition = new Vector2Int((int)newNode.X, (int)newNode.Y);
-                HPAPath path = HPAGraphController.HierarchicalAbstractSearch(nodePosition, newNodePosition, heuristicsLevel);
                 double distance = double.PositiveInfinity;
-                if (path != null)
-                {
 
-                    distance = path.Length;
+                if (linearHeuristic)
+                {
+                    distance = Vector2Int.Distance(nodePosition, newNodePosition);
+                }
+                else
+                {
+                    HPAPath path = HPAGraphController.HierarchicalAbstractSearch(nodePosition, newNodePosition, heuristicsLevel);
+
+                    if (path != null)
+                    {
+
+                        distance = path.Length;
+                    }
                 }
 
                 mmasGraphController._graph.AddEdge(node, newNode, distance);

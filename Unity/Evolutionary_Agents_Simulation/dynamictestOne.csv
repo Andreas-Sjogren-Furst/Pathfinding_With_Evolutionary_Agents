@@ -1,0 +1,7 @@
+Mode,SimulationRun,Iteration,MMASIterations,BestTourLength,BestTourNodes
+AddNodesDynamically,0,4,83,217.631329774857,5
+AddNodesDynamically,0,4,100,217.190274000168,5
+AddNodesDynamically,1,4,31,301.85907626152,5
+AddNodesDynamically,1,4,31,189.176432609558,5
+AddNodesDynamically,2,4,32,234.87194275856,5
+AddNodesDynamically,2,4,31,234.584653615952,5
