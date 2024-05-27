@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using Codice.Client.BaseCommands;
 using UnityEngine;
 
 public class WebView : MonoBehaviour, IScreenView
 {
+    public static WebView Instance { get; private set; }
     // Object Pooler
     public ObjectPooler objectPooler;
 
@@ -24,11 +26,6 @@ public class WebView : MonoBehaviour, IScreenView
 
 
     // Tags
-    private string wallTag = "Wall";
-    private string tileTag = "Tile";
-    private string checkPointTag = "CheckPoint";
-    private string spawnPointTag = "SpawnPoint";
-    private string agentTag = "Agent";
     private string nodeTag = "Node";
     private string entranceTag = "Entrance";
     private string lineTag = "Line";
@@ -43,7 +40,6 @@ public class WebView : MonoBehaviour, IScreenView
     private readonly float nodeScale = 0.1f;
 
 
-    private ScreenViewModel screenViewModel;
     // Presenter
     private ScreenPresenter screenPresenter;
 
@@ -52,33 +48,14 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Awake()
     {
-
+        Instance = this;
         myGameManager = new();
         screenPresenter = new(myGameManager);
-        screenViewModel = screenPresenter.PackageData();
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
         int mapSize = screenViewModel.map.GetLength(0) * screenViewModel.map.GetLength(1);
         InstantiatedGraph = new List<GameObject>();
 
-        Debug.Log("Map Size: " + mapSize);
         // Add pools programmatically
-        if (objectPooler == null)
-        {
-            Debug.Log("objectPooler is null");
-        }
-        if (wallPrefab == null)
-        {
-            Debug.Log("wallPrefab is null");
-        }
-        if (wallTag == null)
-        {
-            Debug.Log("wallTag is null");
-        }
-
-        objectPooler.AddPool(wallTag, wallPrefab, mapSize);
-        objectPooler.AddPool(tileTag, tilePrefab, mapSize);
-        objectPooler.AddPool(checkPointTag, checkPointPrefab, 50);
-        objectPooler.AddPool(spawnPointTag, spawnPointPrefab, 5);
-        objectPooler.AddPool(agentTag, agentPrefab, 10);
         objectPooler.AddPool(nodeTag, nodePrefab, mapSize);
         objectPooler.AddPool(entranceTag, entrancePrefab, mapSize / 10);
         objectPooler.AddPool(lineTag, linePrefab, mapSize * 5);
@@ -86,24 +63,16 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Start()
     {
-
-        RenderMap(screenViewModel);
-        RenderGraph(1, screenViewModel);
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        RenderMap();
+        //RenderGraph(1, screenViewModel);
 
         // myGameManager.graphController.Preprocessing(3);
-        Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
-        Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
-        // HPAPath path3 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 3);
-        // HPAPath path2 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
-        HPAPath path1 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 1);
-        // Astar.FindPath(start, end, screenViewModel.map);
+        //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
+        //Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
+        //HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
 
-
-        // DrawPath(path3);
-        // DrawPath(path2);
-        DrawPath(path1);
-
-
+        //DrawPath(path);
 
 
     }
@@ -112,14 +81,17 @@ public class WebView : MonoBehaviour, IScreenView
     {
 
     }
-
-    public void RenderMap(ScreenViewModel screenViewModel)
+    public void CreateMap(MapModel mapModel){
+        myGameManager.mapController.ChangeMapParameters(mapModel);
+    }
+    public void RenderMap()
     {
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
         MapObject[,] map = screenViewModel.map;
         List<CheckPoint> checkPoints = screenViewModel.checkPoints;
         AgentSpawnPoint spawnPoint = screenViewModel.spawnPoint;
 
-        ClearMap(InstantiatedMap);
+        ClearMap();
         InstantiatedMap = new GameObject[map.GetLength(1), map.GetLength(0)];
         InstantiateMap(map);
         InstantiateCheckPoints(checkPoints);
@@ -154,7 +126,7 @@ public class WebView : MonoBehaviour, IScreenView
             Vector3Int worldPosition = ConvertVector2DTo3D(checkPoint.ArrayPosition);
             int i = checkPoint.ArrayPosition.x;
             int j = checkPoint.ArrayPosition.y;
-            InstantiatedMap[i, j] = objectPooler.SpawnFromPool(checkPointTag, worldPosition, Quaternion.identity);
+            InstantiatedMap[i, j] = Instantiate(checkPointPrefab, worldPosition, Quaternion.identity);
         }
     }
 
@@ -163,7 +135,7 @@ public class WebView : MonoBehaviour, IScreenView
         Vector3Int worldPosition = ConvertVector2DTo3D(spawnPoint.ArrayPosition);
         int i = spawnPoint.ArrayPosition.x;
         int j = spawnPoint.ArrayPosition.y;
-        InstantiatedMap[i, j] = objectPooler.SpawnFromPool(spawnPointTag, worldPosition, Quaternion.identity);
+        InstantiatedMap[i, j] = Instantiate(spawnPointPrefab, worldPosition, Quaternion.identity);
     }
 
     private Vector3Int ConvertVector2DTo3D(Vector2Int arrayPosition)
@@ -171,14 +143,14 @@ public class WebView : MonoBehaviour, IScreenView
         return new Vector3Int(arrayPosition.x, 0, arrayPosition.y);
     }
 
-    private void ClearMap(GameObject[,] instantiatedMap)
+    public void ClearMap()
     {
-        if (instantiatedMap == null) return;
-        foreach (GameObject mapObject in instantiatedMap)
+        if (InstantiatedMap == null) return;
+        foreach (GameObject mapObject in InstantiatedMap)
         {
             if (mapObject != null)
             {
-                mapObject.SetActive(false);
+                Destroy(mapObject);
             }
         }
     }
@@ -187,7 +159,7 @@ public class WebView : MonoBehaviour, IScreenView
     {
         ClearGraph(InstantiatedGraph);
         InstantiatedGraph = new List<GameObject>();
-        IGraphModel graph = screenViewModel.graph;
+        IGraphModel graph = screenViewModel.hpaGraph;
         if (graph.ClusterByLevel.TryGetValue(level, out var clusters))
         {
             foreach (Cluster cluster in clusters)

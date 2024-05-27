@@ -261,6 +261,7 @@ public class MMAS
 
     public MMAS(int numAnts, double alpha, double beta, double rho, double q, Graph graph)
     {
+        _graph = graph;
         _numAnts = numAnts;
         _alpha = alpha;
         _beta = beta;

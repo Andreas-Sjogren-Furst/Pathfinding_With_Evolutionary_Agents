@@ -29,7 +29,7 @@ public class MyGameManager
     public MyGameManager()
     {
         customMaps = new();
-        MapModel mapModel = customMaps.GetCustomMap(8);
+        MapModel mapModel = customMaps.GetCustomMap(0);
         mapController = new MapController(mapModel);
         agentController = new AgentController(new AgentModel(1));
         HPAGraphController = InitialiseHPAStar(mapModel.map);
@@ -49,7 +49,7 @@ public class MyGameManager
     private HPAStar InitialiseHPAStar(MapObject[,] map)
     {
         GraphModel _graphModel = new GraphModel(map);
-        PathFinder _pathFinder = new PathFinder(_graphModel);
+        PathFinder _pathFinder = new PathFinder(new GraphModel(map));
         IEdgeManager edgeManager = new EdgeManager(_pathFinder);
         NodeManager _nodeManager = new NodeManager(_graphModel, edgeManager);
         IEntranceManager entranceManager = new EntranceManager(_graphModel, _nodeManager);
@@ -62,7 +62,6 @@ public class MyGameManager
     private MMAS InitialiseMMMAS()
     {
         Graph graph = new Graph();
-
         int numAnts = 0;
         double alpha = 1.5;
         double beta = 4.5;
@@ -74,7 +73,6 @@ public class MyGameManager
         // mmas.SetGraph(graph);
         // mmas.Run(maxIterations);
         return mmas;
-
     }
 
     public void MmasAddCheckpoint(Vector2Int checkpoint, int heuristicsLevel, int iterations = 0, bool linearHeuristic = true)

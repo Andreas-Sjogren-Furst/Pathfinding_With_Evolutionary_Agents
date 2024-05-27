@@ -2,5 +2,5 @@
 
 public interface IPrintView
 {  
-    void WriteDataToFile(){}
+    void WriteDataToFile(string fileName);
 }

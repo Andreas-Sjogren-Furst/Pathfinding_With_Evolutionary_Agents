@@ -196,7 +196,7 @@ public class PathfindingTest
     public static (HPAPath, long) EffiencyInNodeExploration(MapObject[,] tileMap, Vector2Int start, Vector2Int end, int maxLevel, Boolean RefinePath = false)
     {
         GraphModel _graphModel = new GraphModel(tileMap);
-        PathFinder _pathFinder = new PathFinder(_graphModel);
+        PathFinder _pathFinder = new PathFinder(new GraphModel(tileMap));
         IEdgeManager edgeManager = new EdgeManager(_pathFinder);
         NodeManager _nodeManager = new NodeManager(_graphModel, edgeManager);
         IEntranceManager entranceManager = new EntranceManager(_graphModel, _nodeManager);
@@ -243,11 +243,11 @@ public class PathfindingTest
 
             // Build graph once
             var graphModel = new GraphModel(map);
-            var edgeManager = new EdgeManager(new PathFinder(graphModel));
+            var edgeManager = new EdgeManager(new PathFinder(new GraphModel(map)));
             var nodeManager = new NodeManager(graphModel, edgeManager);
             var entranceManager = new EntranceManager(graphModel, nodeManager);
             var clusterManager = new ClusterManager(graphModel, nodeManager, edgeManager, entranceManager);
-            var hpaStar = new HPAStar(graphModel, clusterManager, nodeManager, entranceManager, edgeManager, new PathFinder(graphModel));
+            var hpaStar = new HPAStar(graphModel, clusterManager, nodeManager, entranceManager, edgeManager, new PathFinder(new GraphModel(map)));
 
             hpaStar.Preprocessing(3);
 
