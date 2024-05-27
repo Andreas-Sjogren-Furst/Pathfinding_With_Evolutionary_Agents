@@ -196,7 +196,7 @@ public class PathfindingTest
     public static (HPAPath, long) EffiencyInNodeExploration(MapObject[,] tileMap, Vector2Int start, Vector2Int end, int maxLevel, Boolean RefinePath = false)
     {
         GraphModel _graphModel = new GraphModel(tileMap);
-        PathFinder _pathFinder = new PathFinder();
+        PathFinder _pathFinder = new PathFinder(new GraphModel(tileMap));
         IEdgeManager edgeManager = new EdgeManager(_pathFinder);
         NodeManager _nodeManager = new NodeManager(_graphModel, edgeManager);
         IEntranceManager entranceManager = new EntranceManager(_graphModel, _nodeManager);
