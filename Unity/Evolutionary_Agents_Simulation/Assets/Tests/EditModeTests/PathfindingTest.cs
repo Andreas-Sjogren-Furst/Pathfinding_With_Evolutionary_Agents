@@ -243,11 +243,11 @@ public class PathfindingTest
 
             // Build graph once
             var graphModel = new GraphModel(map);
-            var edgeManager = new EdgeManager(new PathFinder());
+            var edgeManager = new EdgeManager(new PathFinder(new GraphModel(map)));
             var nodeManager = new NodeManager(graphModel, edgeManager);
             var entranceManager = new EntranceManager(graphModel, nodeManager);
             var clusterManager = new ClusterManager(graphModel, nodeManager, edgeManager, entranceManager);
-            var hpaStar = new HPAStar(graphModel, clusterManager, nodeManager, entranceManager, edgeManager, new PathFinder());
+            var hpaStar = new HPAStar(graphModel, clusterManager, nodeManager, entranceManager, edgeManager, new PathFinder(new GraphModel(map)));
 
             hpaStar.Preprocessing(3);
 
