@@ -161,9 +161,16 @@ public class Graph
 
         foreach (Node isolatedNode in isolatedNodes)
         {
+            foreach (Node node2 in Nodes)
+            {
+                RemoveEdge(isolatedNode, node2);
+                RemoveEdge(node2, isolatedNode);
+            }
             RemoveNode(isolatedNode);
+
         }
     }
+
 
 
     public bool IsFullyConnected()

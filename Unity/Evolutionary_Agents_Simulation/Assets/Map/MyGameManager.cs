@@ -29,7 +29,7 @@ public class MyGameManager
     public MyGameManager()
     {
         customMaps = new();
-        MapModel mapModel = customMaps.GetCustomMap(0);
+        MapModel mapModel = customMaps.GetCustomMap(8);
         mapController = new MapController(mapModel);
         agentController = new AgentController(new AgentModel(1));
         HPAGraphController = InitialiseHPAStar(mapModel.map);

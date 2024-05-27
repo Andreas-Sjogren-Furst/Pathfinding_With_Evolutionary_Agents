@@ -1,2 +1,10 @@
 Mode,SimulationRun,Checkpoints,MMASIterations,LocalIterations,BestTourLength,BestTourNodes
-AddNodesDynamically,7,20,148,148,496,0
+AddNodesDynamically,0,40,226,226,1842,0
+AddNodesDynamically,1,36,133,133,1688,0
+AddNodesDynamically,3,39,109,109,2091,0
+AddNodesDynamically,4,39,298,298,2037,0
+AddNodesDynamically,5,38,134,134,2167,0
+AddNodesDynamically,6,40,187,187,2278,0
+AddNodesDynamically,7,40,184,184,2080,0
+AddNodesDynamically,9,40,253,253,1852,0
+AddNodesDynamically,10,37,135,135,1787,0
