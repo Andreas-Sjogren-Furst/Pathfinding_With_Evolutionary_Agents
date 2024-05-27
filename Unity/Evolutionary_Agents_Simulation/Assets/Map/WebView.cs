@@ -65,10 +65,6 @@ public class WebView : MonoBehaviour, IScreenView
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         RenderMap();
-        foreach(MapObject mapObject in screenViewModel.map){
-            Debug.Log(mapObject.Type);
-        }
-        Debug.Log(myGameManager.mapController.mapModel.density);
         //RenderGraph(1, screenViewModel);
 
         // myGameManager.graphController.Preprocessing(3);

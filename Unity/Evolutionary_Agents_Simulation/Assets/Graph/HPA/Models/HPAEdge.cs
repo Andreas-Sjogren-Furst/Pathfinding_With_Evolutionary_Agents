@@ -11,6 +11,7 @@ public class HPAEdge
     public double Weight { get; set; }
     public int Level { get; set; }
     public HPAEdgeType Type { get; set; }
+    public HPAPath IntraPaths { get; set; }
 
     public HPAEdge(HPANode node1, HPANode node2, double weight, int level, HPAEdgeType type)
     {
@@ -19,6 +20,16 @@ public class HPAEdge
         Weight = weight;
         Level = level;
         Type = type;
+    }
+
+    public HPAEdge(HPANode node1, HPANode node2, double weight, int level, HPAEdgeType type, HPAPath IntraPath)
+    {
+        Node1 = node1;
+        Node2 = node2;
+        Weight = weight;
+        Level = level;
+        Type = type;
+        IntraPaths = IntraPath;
     }
 
     public override bool Equals(object obj)
@@ -39,16 +50,16 @@ public class HPAEdge
 
 }
 
-public class HPAInterEdge : HPAEdge
-{
-    public HPAPath IntraPaths { get; set; }
+// public class HPAInterEdge : HPAEdge
+// {
+//     public HPAPath IntraPaths { get; set; }
 
-    public HPAInterEdge(HPANode node1, HPANode node2, double weight, int level, HPAPath IntraPath)
-        : base(node1, node2, weight, level, HPAEdgeType.INTER)
-    {
-        IntraPaths = IntraPath;
-    }
+//     public HPAInterEdge(HPANode node1, HPANode node2, double weight, int level, HPAPath IntraPath)
+//         : base(node1, node2, weight, level, HPAEdgeType.INTER)
+//     {
+//         IntraPaths = IntraPath;
+//     }
 
-    // You can override methods or add new ones specific to inter-cluster edges
-}
+//     // You can override methods or add new ones specific to inter-cluster edges
+// }
 public enum HPAEdgeType { INTER, INTRA }

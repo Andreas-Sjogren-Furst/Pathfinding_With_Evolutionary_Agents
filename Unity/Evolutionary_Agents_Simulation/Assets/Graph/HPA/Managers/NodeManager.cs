@@ -82,7 +82,7 @@ public class NodeManager : INodeManager
                         // Debug.LogError("Border node cluster does not match current cluster");
                         continue;
                     }
-                    _edgeManager.AddHPAEdge(checkPointNode, borderNode, path.Length, l, HPAEdgeType.INTRA);
+                    _edgeManager.AddHPAEdge(checkPointNode, borderNode, path.Length, l, HPAEdgeType.INTRA, IntraPath: path);
                     // _edgeManager.AddHPAEdge(checkPointNode, borderNode, path.Length, l, HPAEdgeType.INTER, path);
 
                 }

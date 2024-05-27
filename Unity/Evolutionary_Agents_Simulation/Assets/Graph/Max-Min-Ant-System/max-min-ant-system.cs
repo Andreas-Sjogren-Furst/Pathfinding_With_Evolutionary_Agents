@@ -85,7 +85,9 @@ public class Edge
         return false;
     }
 
-
+    //  any time => ændrer på objektiv funktionen, og bruge den tidligere løsning, som warm start løsning. 
+    //  Hvor lang tid tager før systemet tiltager sig.
+    //  Sammenlignet med at det starte helt. 
 }
 
 public class Graph
@@ -210,6 +212,7 @@ public class MMAS
         _beta = beta;
         _rho = rho; // pheromone evaporation
         _q = q; // 
+        _graph = graph;
 
         _graph = null;
         _pheromones = null;
@@ -221,10 +224,12 @@ public class MMAS
     {
         _graph = graph;
         int numNodes = _graph.Nodes.Count;
+        _numAnts = numNodes;
         _tauMax = 1.0 / (_rho * GetNearestNeighborTourLength());
         _tauMin = _tauMax / (2.0 * numNodes);
         _pheromones = new Dictionary<int, double>();
         InitializePheromones();
+        _bestTourLength = double.MaxValue;
         _bestTour = new Node[numNodes];
     }
 
@@ -239,9 +244,10 @@ public class MMAS
     }
 
     // TODO: MMAS, dynamisk, hvis en edge forsvinder, kan man nemt compute det restende af turen. 
-    public void Run(int maxIterations) // O(I*N^2) // The ants construct solutions concurrently. Avg. computation time of Berlin52 = 2.7 seconds on M1 Pro. 
+    public int Run(int maxIterations) // O(I*N^2) // The ants construct solutions concurrently. Avg. computation time of Berlin52 = 2.7 seconds on M1 Pro. 
     {
-        for (int iteration = 0; iteration < maxIterations; iteration++)
+        int iterations = 0;
+        for (iterations = 0; iterations < maxIterations; iterations++)
         {
             Ant[] ants = new Ant[_numAnts];
             Node[][] antTours = new Node[_numAnts][];
@@ -273,7 +279,7 @@ public class MMAS
                 convergenceCount++;
                 if (convergenceCount >= convergenceCountRequired)
                 {
-                    UnityEngine.Debug.Log("Convergence reached after " + iteration + " iterations.");
+                    UnityEngine.Debug.Log("Convergence reached after " + iterations + " iterations.");
                     break; // Early stopping, this signifcanlty increased the speed of the algorithm from 5 sec to 0.5 sec
                 }
             }
@@ -285,6 +291,7 @@ public class MMAS
 
 
         }
+        return iterations;
 
     }
 
@@ -305,10 +312,13 @@ public class MMAS
         if (!_graph.Nodes.Contains(node))
         {
             _graph.AddNode(node);
+            // _numAnts = _graph.Nodes.Count;
             // recalculate tau min and tau max
             int numNodes = _graph.Nodes.Count;
             _tauMax = 1.0 / (_rho * GetNearestNeighborTourLength());
             _tauMin = _tauMax / (2.0 * numNodes);
+            _bestTourLength = double.MaxValue;
+            _bestTour = new Node[numNodes];
 
             // Initialize pheromones for new connections
             foreach (Node existingNode in _graph.Nodes)
@@ -340,6 +350,10 @@ public class MMAS
                 }
             }
             _graph.RemoveNode(node);
+            _bestTourLength = double.MaxValue;
+            _bestTour = new Node[_graph.Nodes.Count];
+            // _numAnts = _graph.Nodes.Count;
+
         }
     }
 

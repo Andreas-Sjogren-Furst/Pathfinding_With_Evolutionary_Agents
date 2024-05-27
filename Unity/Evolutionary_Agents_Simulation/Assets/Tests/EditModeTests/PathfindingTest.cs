@@ -22,14 +22,14 @@ public class PathfindingTest
     {
 
         RunHPASimulation(
-            iterations: 10,
-            densityRange: (min: 45, max: 65),
+            iterations: 100,
+            densityRange: (min: 60, max: 60),
             checkPointsRange: (min: 1, max: 5),
-            cellularIterationsRange: (min: 5, max: 10),
+            cellularIterationsRange: (min: 17, max: 20),
             heightRange: (min: 100, max: 100),
             widthRange: (min: 100, max: 100),
-            refinePath: true,
-            name: "general_maps_timer_refined"
+            refinePath: false,
+            name: "general_maps_timer_refined_random"
         );
 
         // RunDynamicReplanningTests(
@@ -143,8 +143,13 @@ public class PathfindingTest
             MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize: height, randomSeed: randomSeed);
             int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, 4);
             MapObject[,] map = CellularAutomata.Convert2DTo3D(tileMap);
-            Vector2Int start = new Vector2Int(10, 10);
-            Vector2Int end = new Vector2Int(mapModel.height - 10, mapModel.width - 10);
+            int xc = UnityEngine.Random.Range(2, 100); // Generates a random integer between 1 and 100
+            int yc = UnityEngine.Random.Range(2, 100);
+
+            int xs = UnityEngine.Random.Range(2, 100); // Generates a random integer between 1 and 100
+            int ys = UnityEngine.Random.Range(2, 100);
+            Vector2Int start = new Vector2Int(xs, ys);
+            Vector2Int end = new Vector2Int(xc, yc);
 
             // HPA* Pathfinding at different abstraction levels
             (HPAPath hpaPath1, var timeLevel1) = EffiencyInNodeExploration(map, start, end, 1, RefinePath: refinePath);
@@ -244,12 +249,12 @@ public class PathfindingTest
             var clusterManager = new ClusterManager(graphModel, nodeManager, edgeManager, entranceManager);
             var hpaStar = new HPAStar(graphModel, clusterManager, nodeManager, entranceManager, edgeManager, new PathFinder());
 
-            hpaStar.Preprocessing(1);
+            hpaStar.Preprocessing(3);
 
             // Initial Pathfinding
             HPAPath hpaPath1 = ExecutePathfinding(hpaStar, start, end, 1, RefinePath: refinePath);
-            // HPAPath hpaPath2 = ExecutePathfinding(hpaStar, start, end, 2, RefinePath: refinePath);
-            // HPAPath hpaPath3 = ExecutePathfinding(hpaStar, start, end, 3, RefinePath: refinePath);
+            HPAPath hpaPath2 = ExecutePathfinding(hpaStar, start, end, 2, RefinePath: refinePath);
+            HPAPath hpaPath3 = ExecutePathfinding(hpaStar, start, end, 3, RefinePath: refinePath);
             (List<Vector2Int> Path, int NodesExplored) Apath = Astar.FindPath(start, end, tileMap);
 
             // Define points to add and remove
@@ -288,14 +293,14 @@ public class PathfindingTest
 
             // Simulate dynamic changes and replanning
             long replanningTimeLevel1 = ApplyChangesAndReplan(hpaStar, start, end, 1, RefinePath: refinePath, validPointsToAdd, validPointsToRemove);
-            // long replanningTimeLevel2 = ApplyChangesAndReplan(hpaStar, start, end, 2, RefinePath: true, validPointsToAdd, validPointsToRemove);
-            // long replanningTimeLevel3 = ApplyChangesAndReplan(hpaStar, start, end, 3, RefinePath: true, validPointsToAdd, validPointsToRemove);
+            long replanningTimeLevel2 = ApplyChangesAndReplan(hpaStar, start, end, 2, RefinePath: true, validPointsToAdd, validPointsToRemove);
+            long replanningTimeLevel3 = ApplyChangesAndReplan(hpaStar, start, end, 3, RefinePath: true, validPointsToAdd, validPointsToRemove);
             long replanningTimeAStar = ApplyChangesAndReplanAStar(tileMap, start, end, validPointsToAdd, validPointsToRemove);
 
             // Calculate path length changes
             long pathLengthChangeLevel1 = CalculatePathLengthChange(hpaPath1);
-            // long pathLengthChangeLevel2 = CalculatePathLengthChange(hpaPath2);
-            // long pathLengthChangeLevel3 = CalculatePathLengthChange(hpaPath3);
+            long pathLengthChangeLevel2 = CalculatePathLengthChange(hpaPath2);
+            long pathLengthChangeLevel3 = CalculatePathLengthChange(hpaPath3);
             long pathLengthChangeAStar = CalculatePathLengthChange(Apath);
 
             string result = $"{i + 1}," +
