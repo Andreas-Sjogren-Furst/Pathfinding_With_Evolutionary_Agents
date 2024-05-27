@@ -14,6 +14,7 @@ public class MapController
 
     private void Initialise()
     {
+        Random.InitState(mapModel.randomSeed);
         mapModel.checkPoints = GenerateCheckPoints(mapModel.numberOfCheckPoints, mapModel.width, mapModel.height);
         List<MapObject> objects = new(){mapModel.spawnPoint};
         objects.AddRange(mapModel.checkPoints);
@@ -35,6 +36,8 @@ public class MapController
         mapModel.width = customMap.width;
         mapModel.height = customMap.height;
         mapModel.randomSeed = customMap.randomSeed;
+        Random.InitState(mapModel.randomSeed);
+        
     }
 
     private int[,] InitialiseSpawnPoint(AgentSpawnPoint spawnPoint, int[,] map2D)

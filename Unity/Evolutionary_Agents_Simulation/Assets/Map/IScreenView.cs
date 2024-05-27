@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IScreenView
 {
-    void RenderMap(ScreenViewModel screenViewModel);
+    void RenderMap();
 
     
 }   

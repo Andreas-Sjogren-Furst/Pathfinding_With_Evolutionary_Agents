@@ -28,17 +28,17 @@ public class ClusterManager : IClusterManager
         HashSet<Cluster> clusters = new HashSet<Cluster>();
         int clusterSize = 10 * level;
 
-        int gridHeight = (int)Math.Ceiling((double)globalTileMap.GetLength(1) / clusterSize);
-        int gridWidth = (int)Math.Ceiling((double)globalTileMap.GetLength(0) / clusterSize);
+        int gridWidth = (int)Math.Ceiling((double)globalTileMap.GetLength(1) / clusterSize);
+        int gridHeight = (int)Math.Ceiling((double)globalTileMap.GetLength(0) / clusterSize);
 
-        for (int i = 0; i < gridHeight; i++)
+        for (int i = 0; i < gridWidth; i++)
         {
-            for (int j = 0; j < gridWidth; j++)
+            for (int j = 0; j < gridHeight; j++)
             {
                 int startX = i * clusterSize;
                 int startY = j * clusterSize;
-                int endX = Math.Min(startX + clusterSize - 1, globalTileMap.GetLength(0) - 1);
-                int endY = Math.Min(startY + clusterSize - 1, globalTileMap.GetLength(1) - 1);
+                int endX = Math.Min(startX + clusterSize - 1, globalTileMap.GetLength(1) - 1);
+                int endY = Math.Min(startY + clusterSize - 1, globalTileMap.GetLength(0) - 1);
 
                 Cluster cluster = new Cluster(
                     bottomLeftPos: new Vector2Int(startX, startY),

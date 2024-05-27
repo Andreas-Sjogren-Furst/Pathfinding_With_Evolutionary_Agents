@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using Codice.Client.BaseCommands;
 using UnityEngine;
 
 public class WebView : MonoBehaviour, IScreenView
 {
+    public static WebView Instance { get; private set; }
     // Object Pooler
     public ObjectPooler objectPooler;
 
@@ -39,7 +41,6 @@ public class WebView : MonoBehaviour, IScreenView
 
 
     // Presenter
-    private ScreenViewModel screenViewModel;
     private ScreenPresenter screenPresenter;
 
     // GameManager
@@ -47,9 +48,10 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Awake()
     {
+        Instance = this;
         myGameManager = new();
         screenPresenter = new(myGameManager);
-        screenViewModel = screenPresenter.PackageData();
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
         int mapSize = screenViewModel.map.GetLength(0) * screenViewModel.map.GetLength(1);
         InstantiatedGraph = new List<GameObject>();
 
@@ -61,11 +63,13 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Start()
     {
-        //RenderMap(screenPresenter.PackageData());
-        //RenderGraph(1,screenPresenter.PackageData());
-
-        RenderMap(screenViewModel);
-        RenderGraph(1, screenViewModel);
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        RenderMap();
+        foreach(MapObject mapObject in screenViewModel.map){
+            Debug.Log(mapObject.Type);
+        }
+        Debug.Log(myGameManager.mapController.mapModel.density);
+        //RenderGraph(1, screenViewModel);
 
         // myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
@@ -81,14 +85,17 @@ public class WebView : MonoBehaviour, IScreenView
     {
 
     }
-
-    public void RenderMap(ScreenViewModel screenViewModel)
+    public void CreateMap(MapModel mapModel){
+        myGameManager.mapController.ChangeMapParameters(mapModel);
+    }
+    public void RenderMap()
     {
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
         MapObject[,] map = screenViewModel.map;
         List<CheckPoint> checkPoints = screenViewModel.checkPoints;
         AgentSpawnPoint spawnPoint = screenViewModel.spawnPoint;
 
-        ClearMap(InstantiatedMap);
+        ClearMap();
         InstantiatedMap = new GameObject[map.GetLength(1), map.GetLength(0)];
         InstantiateMap(map);
         InstantiateCheckPoints(checkPoints);
@@ -140,14 +147,14 @@ public class WebView : MonoBehaviour, IScreenView
         return new Vector3Int(arrayPosition.x, 0, arrayPosition.y);
     }
 
-    private void ClearMap(GameObject[,] instantiatedMap)
+    public void ClearMap()
     {
-        if (instantiatedMap == null) return;
-        foreach (GameObject mapObject in instantiatedMap)
+        if (InstantiatedMap == null) return;
+        foreach (GameObject mapObject in InstantiatedMap)
         {
             if (mapObject != null)
             {
-                mapObject.SetActive(false);
+                Destroy(mapObject);
             }
         }
     }
