@@ -1,14 +1,14 @@
 
 public class PDFView : IPrintView
 {
-    PrintPresenter PrintPresenter;
+    PrintPresenter printPresenter;
     public void WriteDataToFile(string fileName)
     {
         throw new System.NotImplementedException();
     }
 
     public PDFView(PrintPresenter printPresenter){
-        this.PrintPresenter = printPresenter;
+        this.printPresenter = printPresenter;
     }
 
 }
