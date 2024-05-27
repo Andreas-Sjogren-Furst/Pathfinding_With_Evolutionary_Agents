@@ -29,7 +29,7 @@ using UnityEngine;
 
 public class Node
 {
-    public int Id { get; private set; }
+    public int Id { get; set; }
     public double X { get; set; }
     public double Y { get; set; }
 
@@ -135,6 +135,61 @@ public class Graph
     {
         int key = source.Id * 1000 + destination.Id;
         Edges.Remove(key);
+    }
+
+    public void RemoveIsolatedNodes()
+    {
+        List<Node> isolatedNodes = new List<Node>();
+
+        foreach (Node node in Nodes)
+        {
+            bool isConnected = false;
+            foreach (Node otherNode in Nodes)
+            {
+                if (node != otherNode && (getEdge(node, otherNode) < Double.MaxValue || getEdge(otherNode, node) < Double.MaxValue))
+                {
+                    isConnected = true;
+                    break;
+                }
+            }
+
+            if (!isConnected)
+            {
+                isolatedNodes.Add(node);
+            }
+        }
+
+        foreach (Node isolatedNode in isolatedNodes)
+        {
+            RemoveNode(isolatedNode);
+        }
+    }
+
+
+    public bool IsFullyConnected()
+    {
+        var visited = new HashSet<Node>();
+        var toVisit = new Queue<Node>();
+
+        if (Nodes.Count == 0) return true;
+
+        toVisit.Enqueue(Nodes[0]);
+        while (toVisit.Count > 0)
+        {
+            var node = toVisit.Dequeue();
+            if (!visited.Contains(node))
+            {
+                visited.Add(node);
+                foreach (var otherNode in Nodes)
+                {
+                    if (node != otherNode && (getEdge(node, otherNode) < Double.MaxValue || getEdge(otherNode, node) < Double.MaxValue))
+                    {
+                        toVisit.Enqueue(otherNode);
+                    }
+                }
+            }
+        }
+        return visited.Count == Nodes.Count;
     }
 
 

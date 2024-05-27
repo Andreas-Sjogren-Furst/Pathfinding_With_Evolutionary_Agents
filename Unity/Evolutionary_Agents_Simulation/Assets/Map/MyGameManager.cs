@@ -45,6 +45,7 @@ public class MyGameManager
         mmasGraphController = InitialiseMMMAS();
     }
 
+
     private HPAStar InitialiseHPAStar(MapObject[,] map)
     {
         GraphModel _graphModel = new GraphModel(map);

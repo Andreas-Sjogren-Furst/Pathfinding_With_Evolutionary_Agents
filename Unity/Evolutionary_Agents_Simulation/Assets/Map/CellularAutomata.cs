@@ -90,4 +90,19 @@ public class CellularAutomata
         }
         return map;
     }
+
+    public static int[,] Convert3DTo2D(MapObject[,] map)
+    {
+        int width = map.GetLength(0);
+        int height = map.GetLength(1);
+        int[,] map2D = new int[height, width];
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                map2D[i, j] = map[i, j].GetType() == typeof(Tile) ? 0 : 1;
+            }
+        }
+        return map2D;
+    }
 }
