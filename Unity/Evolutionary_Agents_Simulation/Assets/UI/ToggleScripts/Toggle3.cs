@@ -15,6 +15,7 @@ public class Toggle3 : MonoBehaviour
 
     void ToggleValueChanged(Toggle change)
     {
-        //TODO: make behavior from web view
+        WebView.Instance.ShowOrHideMap(change.isOn);
+        Debug.Log("heyo");
     }
 }

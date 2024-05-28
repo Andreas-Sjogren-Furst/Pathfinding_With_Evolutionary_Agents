@@ -56,7 +56,7 @@ public class WebView : MonoBehaviour, IScreenView
         screenPresenter = new(myGameManager);
         InstantiatedCheckPoints = new();
         InstantiatedWalls = new();
-        
+
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
 
         int mapSize = screenViewModel.map.GetLength(0) * screenViewModel.map.GetLength(1);
@@ -70,9 +70,8 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Start()
     {
-        ScreenViewModel screenViewModel = screenPresenter.PackageData();
         RenderMap();
-        //RenderGraph(1, screenViewModel);
+        RenderGraph(1);
 
         // myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
@@ -164,8 +163,21 @@ public class WebView : MonoBehaviour, IScreenView
         Destroy(InstantiatedFloor);
     }
 
-    private void RenderGraph(int level, ScreenViewModel screenViewModel)
+    public void ShowOrHideMap(bool isOn){
+        foreach (GameObject wall in InstantiatedWalls)
+            if (wall != null) wall.SetActive(isOn);
+            
+        foreach(GameObject checkPoint in InstantiatedCheckPoints)
+            if(checkPoint != null) checkPoint.SetActive(isOn);
+
+        InstantiatedSpawnPoint.SetActive(isOn);
+        InstantiatedFloor.SetActive(isOn);
+    }
+
+    // ### Webview for Graph ###
+    private void RenderGraph(int level)
     {
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
         ClearGraph(InstantiatedGraph);
         InstantiatedGraph = new List<GameObject>();
         IGraphModel graph = screenViewModel.hpaGraph;
@@ -201,13 +213,18 @@ public class WebView : MonoBehaviour, IScreenView
         if (instantiatedGraph == null) return;
         foreach (GameObject graphObject in instantiatedGraph)
         {
-            graphObject.SetActive(false);
+            Destroy(graphObject);
         }
     }
 
+    public void ShowOrHideGraph(bool isOn){
+        foreach (GameObject graphObject in InstantiatedGraph)
+            if (graphObject != null) graphObject.SetActive(isOn);
+    }
+    
     private void DrawNode(HPANode node)
     {
-        GameObject nodeObj = objectPooler.SpawnFromPool(nodeTag, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
+        GameObject nodeObj = Instantiate(nodePrefab ,transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
         nodeObj.transform.localScale = Vector3.one * nodeScale * tileSize;
         InstantiatedGraph.Add(nodeObj);
     }
@@ -239,7 +256,7 @@ public class WebView : MonoBehaviour, IScreenView
     {
         foreach (Entrance entrance in cluster.Entrances)
         {
-            GameObject entranceObj = objectPooler.SpawnFromPool(entranceTag, transform.position + new Vector3(entrance.Node1.Position.x * tileSize, 0, entrance.Node1.Position.y * tileSize), Quaternion.identity);
+            GameObject entranceObj = Instantiate(entrancePrefab, transform.position + new Vector3(entrance.Node1.Position.x * tileSize, 0, entrance.Node1.Position.y * tileSize), Quaternion.identity);
             entranceObj.transform.localScale = Vector3.one * nodeScale * tileSize;
             InstantiatedGraph.Add(entranceObj);
         }
@@ -258,7 +275,7 @@ public class WebView : MonoBehaviour, IScreenView
 
     private void DrawLine(Vector3 start, Vector3 end, Material material)
     {
-        GameObject lineObj = objectPooler.SpawnFromPool(lineTag, Vector3.zero, Quaternion.identity);
+        GameObject lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
         LineRenderer lr = lineObj.GetComponent<LineRenderer>();
         lr.material = material;
         lr.startWidth = 0.05f * tileSize;
