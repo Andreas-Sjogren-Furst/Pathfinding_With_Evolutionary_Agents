@@ -12,6 +12,7 @@ public class MapModel
     public int iterations;
     public int width;
     public int height;
+    public int accessibleNodes;
     public MapObject[,] map;
     public List<CheckPoint> checkPoints;
     public AgentSpawnPoint spawnPoint;
@@ -20,6 +21,7 @@ public class MapModel
         this.density = density;
         this.iterations = iterations;
         this.numberOfCheckPoints = numberOfCheckPoints;
+        accessibleNodes = 0;
         width = mapSize;
         height = mapSize;
         this.randomSeed = randomSeed;

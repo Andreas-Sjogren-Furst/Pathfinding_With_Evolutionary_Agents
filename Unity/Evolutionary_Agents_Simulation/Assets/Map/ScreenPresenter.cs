@@ -7,6 +7,7 @@ public class ScreenPresenter : IGamePresenter<ScreenViewModel>
     public ScreenViewModel screenViewModel;
     public ScreenPresenter(MyGameManager myGameManager){
         screenViewModel = new ScreenViewModel(
+            myGameManager.mapController.mapModel.accessibleNodes,
             myGameManager.mapController.mapModel.map,
             myGameManager.agentController.agentModel.agents,
             myGameManager.HPAGraphController._graphModel,
