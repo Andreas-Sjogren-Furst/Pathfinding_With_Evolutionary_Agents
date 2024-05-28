@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IGamePresenter
+public interface IGamePresenter<TViewModel>
 {
-    ScreenViewModel PackageData();
+    TViewModel PackageData();
 }

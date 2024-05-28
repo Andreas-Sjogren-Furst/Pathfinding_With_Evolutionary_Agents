@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScreenPresenter : IGamePresenter
+public class ScreenPresenter : IGamePresenter<ScreenViewModel>
 {
     public ScreenViewModel screenViewModel;
     public ScreenPresenter(MyGameManager myGameManager){

@@ -25,7 +25,7 @@ public class MapModel
         this.randomSeed = randomSeed;
         map = new MapObject[mapSize, mapSize];
         checkPoints = new();
-        spawnPoint = new(new Vector2Int(mapSize / 2 - 5, mapSize / 2));
+        spawnPoint = new(new Vector2Int(mapSize / 2, mapSize / 2));
     }
 
 }
