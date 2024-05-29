@@ -199,6 +199,45 @@ public class Graph
         return visited.Count == Nodes.Count;
     }
 
+    public static double ScaleValue(double originalValue, double originalMin, double originalMax, double newMin, double newMax)
+    {
+        if (originalMin == originalMax)
+        {
+            throw new ArgumentException("The min and max values must be different.");
+        }
+
+        return ((newMax - newMin) * (originalValue - originalMin) / (originalMax - originalMin)) + newMin;
+    }
+
+
+    public void ScaleGraphEdges(double newMin, double newMax)
+    {
+        double originalMin = double.MaxValue;
+        double originalMax = double.MinValue;
+
+        // Find the original min and max edge values
+        foreach (var edge in Edges)
+        {
+            if (edge.Value < originalMin)
+            {
+                originalMin = edge.Value;
+            }
+            if (edge.Value > originalMax)
+            {
+                originalMax = edge.Value;
+            }
+        }
+
+        // Create a list of keys to iterate over
+        List<int> keys = Edges.Keys.ToList();
+
+        // Scale the edge values
+        foreach (var key in keys)
+        {
+            Edges[key] = ScaleValue(Edges[key], originalMin, originalMax, newMin, newMax);
+        }
+    }
+
 
 }
 
@@ -341,7 +380,7 @@ public class MMAS
                 convergenceCount++;
                 if (convergenceCount >= convergenceCountRequired)
                 {
-                    UnityEngine.Debug.Log("Convergence reached after " + iterations + " iterations.");
+                    // UnityEngine.Debug.Log("Convergence reached after " + iterations + " iterations.");
                     break; // Early stopping, this signifcanlty increased the speed of the algorithm from 5 sec to 0.5 sec
                 }
             }

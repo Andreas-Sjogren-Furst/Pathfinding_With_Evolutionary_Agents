@@ -58,7 +58,7 @@ public class WebView : MonoBehaviour, IScreenView
 
     // GameManager
     private MyGameManager myGameManager;
-    
+
     void Awake()
     {
         Instance = this;
@@ -99,7 +99,8 @@ public class WebView : MonoBehaviour, IScreenView
     {
 
     }
-    public void CreateMap(MapModel mapModel){
+    public void CreateMap(MapModel mapModel)
+    {
         myGameManager.mapController.ChangeMapParameters(mapModel);
     }
     public void RenderMap()
@@ -129,7 +130,8 @@ public class WebView : MonoBehaviour, IScreenView
             }
         }
     }
-    private void InstantiateFloor(MapObject[,] map){
+    private void InstantiateFloor(MapObject[,] map)
+    {
         int mapWidth = (int)(map.GetLength(0) * tileScale);
         int mapHeight = (int)(map.GetLength(1) * tileScale);
         Vector3Int position = new Vector3Int(map.GetLength(0) / 2, 0, map.GetLength(1) / 2);
@@ -167,20 +169,21 @@ public class WebView : MonoBehaviour, IScreenView
         if (InstantiatedSpawnPoint == null || InstantiatedFloor == null) return;
         foreach (GameObject wall in InstantiatedWalls)
             if (wall != null) Destroy(wall);
-            
-        foreach(GameObject checkPoint in InstantiatedCheckPoints)
-            if(checkPoint != null) Destroy(checkPoint);
+
+        foreach (GameObject checkPoint in InstantiatedCheckPoints)
+            if (checkPoint != null) Destroy(checkPoint);
 
         Destroy(InstantiatedSpawnPoint);
         Destroy(InstantiatedFloor);
     }
 
-    public void ShowOrHideMap(bool isOn){
+    public void ShowOrHideMap(bool isOn)
+    {
         foreach (GameObject wall in InstantiatedWalls)
             if (wall != null) wall.SetActive(isOn);
-            
-        foreach(GameObject checkPoint in InstantiatedCheckPoints)
-            if(checkPoint != null) checkPoint.SetActive(isOn);
+
+        foreach (GameObject checkPoint in InstantiatedCheckPoints)
+            if (checkPoint != null) checkPoint.SetActive(isOn);
 
         InstantiatedSpawnPoint.SetActive(isOn);
         InstantiatedFloor.SetActive(isOn);
@@ -229,14 +232,15 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    public void ShowOrHideGraph(bool isOn){
+    public void ShowOrHideGraph(bool isOn)
+    {
         foreach (GameObject graphObject in InstantiatedGraph)
             if (graphObject != null) graphObject.SetActive(isOn);
     }
-    
+
     private void DrawNode(HPANode node)
     {
-        GameObject nodeObj = Instantiate(nodePrefab ,transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
+        GameObject nodeObj = Instantiate(nodePrefab, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
         nodeObj.transform.localScale = Vector3.one * nodeScale * tileSize;
         InstantiatedGraph.Add(nodeObj);
     }
