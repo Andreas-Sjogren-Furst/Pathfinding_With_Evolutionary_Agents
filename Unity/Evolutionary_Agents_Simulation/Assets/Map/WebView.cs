@@ -375,7 +375,7 @@ public class WebView : MonoBehaviour, IScreenView
                 Node nodej = graph.Nodes[j];
                 if (graph.getEdge(nodei, nodej) < double.MaxValue)
                 {
-                    if (InstantiatedEdges != null) // Only create if it doesn't already exist
+                    if (InstantiatedEdges != null && InstantiatedNodes.Count > 3) // only render if there are more than 3 
                     {
                         LineRenderer lr = new GameObject("Edge_" + i + "_" + j).AddComponent<LineRenderer>();
                         lr.material = edgeMaterial;

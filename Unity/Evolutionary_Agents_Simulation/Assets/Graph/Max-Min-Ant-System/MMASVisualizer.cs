@@ -28,49 +28,49 @@ public class MMASVisualizer : MonoBehaviour
     void Start()
     {
 
-        graph = new Graph();
+        // graph = new Graph();
 
-        // init graph: 
+        // // init graph: 
 
-        nodes = new Node[checkpoints];
-        for (int i = 0; i < checkpoints; i++)
-        {
-            System.Random random = new System.Random();
+        // nodes = new Node[checkpoints];
+        // for (int i = 0; i < checkpoints; i++)
+        // {
+        //     System.Random random = new System.Random();
 
-            int x = random.Next(0, 100);
-            int y = random.Next(0, 100);
-            nodes[i] = new Node(i, x, y);
-            graph.AddNode(nodes[i]);
-        }
+        //     int x = random.Next(0, 100);
+        //     int y = random.Next(0, 100);
+        //     nodes[i] = new Node(i, x, y);
+        //     graph.AddNode(nodes[i]);
+        // }
 
-        for (int i = 0; i < checkpoints; i++)
-        {
-            for (int j = i + 1; j < checkpoints; j++)
-            {
-                double distance = Vector2Int.Distance(new Vector2Int((int)nodes[i].X, (int)nodes[i].Y), new Vector2Int((int)nodes[j].X, (int)nodes[j].Y));
-                graph.AddEdge(nodes[i], nodes[j], distance);
-                graph.AddEdge(nodes[j], nodes[i], distance);
-            }
-        }
+        // for (int i = 0; i < checkpoints; i++)
+        // {
+        //     for (int j = i + 1; j < checkpoints; j++)
+        //     {
+        //         double distance = Vector2Int.Distance(new Vector2Int((int)nodes[i].X, (int)nodes[i].Y), new Vector2Int((int)nodes[j].X, (int)nodes[j].Y));
+        //         graph.AddEdge(nodes[i], nodes[j], distance);
+        //         graph.AddEdge(nodes[j], nodes[i], distance);
+        //     }
+        // }
 
 
 
-        int numAnts = checkpoints;
-        double alpha = 1.5;
-        double beta = 4.5;
-        double rho = 0.90;
-        double q = 100.0;
-        int maxIterations = 500;
+        // int numAnts = checkpoints;
+        // double alpha = 1.5;
+        // double beta = 4.5;
+        // double rho = 0.90;
+        // double q = 100.0;
+        // int maxIterations = 500;
 
-        mmas = new MMAS(numAnts, alpha, beta, rho, q, graph);
-        mmas.SetGraph(graph);
-        mmas.Run(maxIterations);
-        Node[] bestTour = mmas.GetBestTour();
-        double bestTourLength = mmas.GetBestTourLength();
+        // mmas = new MMAS(numAnts, alpha, beta, rho, q, graph);
+        // mmas.SetGraph(graph);
+        // mmas.Run(maxIterations);
+        // Node[] bestTour = mmas.GetBestTour();
+        // double bestTourLength = mmas.GetBestTourLength();
 
-        // Debug.Log("Best Tour: " + string.Join(" -> ", bestTour));
+        // // Debug.Log("Best Tour: " + string.Join(" -> ", bestTour));
 
-        InitializeVisualization(graph, mmas);
+        // InitializeVisualization(graph, mmas);
 
 
 
@@ -79,49 +79,49 @@ public class MMASVisualizer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (showRemoval)
-        {
-            showRemoval = false;
+        // if (showRemoval)
+        // {
+        //     showRemoval = false;
 
-            mmas.RemoveNode(nodes.Last());
-            nodes = nodes.Take(nodes.Length - 1).ToArray();
+        //     mmas.RemoveNode(nodes.Last());
+        //     nodes = nodes.Take(nodes.Length - 1).ToArray();
 
-            mmas._numAnts = mmas._graph.Nodes.Count;
-            Debug.Log("Num Ants: " + mmas._numAnts);
-            Debug.Log("Num Nodes: " + mmas._graph.Nodes.Count);
-            mmas.Run(1);
-            RemovedGameObjectAndLines();
-            InitializeVisualization(mmas._graph, mmas);
-        }
+        //     mmas._numAnts = mmas._graph.Nodes.Count;
+        //     Debug.Log("Num Ants: " + mmas._numAnts);
+        //     Debug.Log("Num Nodes: " + mmas._graph.Nodes.Count);
+        //     mmas.Run(1);
+        //     RemovedGameObjectAndLines();
+        //     InitializeVisualization(mmas._graph, mmas);
+        // }
 
-        if (showAddition)
-        {
-            showAddition = false;
+        // if (showAddition)
+        // {
+        //     showAddition = false;
 
-            System.Random random = new System.Random();
+        //     System.Random random = new System.Random();
 
-            int x = random.Next(0, 100);
-            int y = random.Next(0, 100);
-            Node newNode = new Node(nodes.Length, x, y);
-            nodes = nodes.Concat(new Node[] { newNode }).ToArray();
-            mmas.AddNode(newNode);
-            mmas._numAnts = mmas._graph.Nodes.Count;
+        //     int x = random.Next(0, 100);
+        //     int y = random.Next(0, 100);
+        //     Node newNode = new Node(nodes.Length, x, y);
+        //     nodes = nodes.Concat(new Node[] { newNode }).ToArray();
+        //     mmas.AddNode(newNode);
+        //     mmas._numAnts = mmas._graph.Nodes.Count;
 
-            foreach (Node node in mmas._graph.Nodes)
-            {
-                if (node != newNode)
-                {
-                    double distance = Vector2Int.Distance(new Vector2Int((int)node.X, (int)node.Y), new Vector2Int((int)newNode.X, (int)newNode.Y));
-                    mmas._graph.AddEdge(node, newNode, distance);
-                    mmas._graph.AddEdge(newNode, node, distance);
-                }
-            }
-            Debug.Log("Num Ants: " + mmas._numAnts);
-            Debug.Log("Num Nodes: " + mmas._graph.Nodes.Count);
-            mmas.Run(100);
-            RemovedGameObjectAndLines();
-            InitializeVisualization(mmas._graph, mmas);
-        }
+        //     foreach (Node node in mmas._graph.Nodes)
+        //     {
+        //         if (node != newNode)
+        //         {
+        //             double distance = Vector2Int.Distance(new Vector2Int((int)node.X, (int)node.Y), new Vector2Int((int)newNode.X, (int)newNode.Y));
+        //             mmas._graph.AddEdge(node, newNode, distance);
+        //             mmas._graph.AddEdge(newNode, node, distance);
+        //         }
+        //     }
+        //     Debug.Log("Num Ants: " + mmas._numAnts);
+        //     Debug.Log("Num Nodes: " + mmas._graph.Nodes.Count);
+        //     mmas.Run(100);
+        //     RemovedGameObjectAndLines();
+        //     InitializeVisualization(mmas._graph, mmas);
+        // }
     }
 
     public void RemovedGameObjectAndLines()

@@ -87,20 +87,27 @@ public class MyGameManager
 
         if (mmasGraphController._graph.Nodes.Count < 3)
         {
-            mmasGraphController._graph.AddNode(newNode);
-        }
-        else if (mmasGraphController._graph.Nodes.Count == 3)
-        {
-            mmasGraphController._graph.AddNode(newNode);
+            Debug.Log(" < 3 " + mmasGraphController._graph.Nodes.Count);
+            mmasGraphController._graph.AddNode(newNode); // adds nodes statically
             CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+        }
+        else if (mmasGraphController._graph.Nodes.Count == 3) // ensures graph is built when 3 checkpoints are added.
+        {
+            Debug.Log(" == 3 " + mmasGraphController._graph.Nodes.Count);
+            mmasGraphController._graph.AddNode(newNode);
+            Debug.Log("Caluclate edgs");
+
+            CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            Debug.Log("set graph");
             mmasGraphController.SetGraph(mmasGraphController._graph);
         }
         else
         {
-            mmasGraphController.AddNode(newNode);
+            mmasGraphController.AddNode(newNode); // adds Dynamiclly.  
+            CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+
         }
         mmasGraphController._numAnts = mmasGraphController._graph.Nodes.Count;
-        CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
 
 
 
@@ -110,6 +117,7 @@ public class MyGameManager
 
         if (iterations > 0 && mmasGraphController._graph.Nodes.Count > 3)
         {
+            Debug.Log("Run");
             mmasGraphController.Run(iterations);
         }
 
