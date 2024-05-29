@@ -1,9 +1,15 @@
 using System.Collections.Generic;
 using Codice.Client.BaseCommands;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class WebView : MonoBehaviour, IScreenView
 {
+
+    // MMAS materials
+    public Material edgeMaterial; // Assign a material for the edges
+    public Material tourMaterial; // Assign a material for highlighting the to
+
     public static WebView Instance { get; private set; }
     // Object Pooler
     public ObjectPooler objectPooler;
@@ -38,9 +44,13 @@ public class WebView : MonoBehaviour, IScreenView
     private GameObject InstantiatedSpawnPoint;
     private GameObject InstantiatedFloor;
     private List<GameObject> InstantiatedGraph;
+    private List<GameObject> InstantiatedAgents;
+    private GameObject[] InstantiatedNodes;
+    private LineRenderer[] InstantiatedEdges;
     private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
     private readonly float nodeScale = 0.1f;
+    private readonly float animationSpeed = 5f;
 
 
     // Presenter
@@ -71,7 +81,9 @@ public class WebView : MonoBehaviour, IScreenView
     void Start()
     {
         RenderMap();
-        RenderGraph(1);
+        RenderHPAGraph(1);
+        SpawnAgents();
+        RenderMMASGraph();
 
         // myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
@@ -175,7 +187,7 @@ public class WebView : MonoBehaviour, IScreenView
     }
 
     // ### Webview for Graph ###
-    private void RenderGraph(int level)
+    private void RenderHPAGraph(int level)
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         ClearGraph(InstantiatedGraph);
@@ -283,4 +295,118 @@ public class WebView : MonoBehaviour, IScreenView
         lr.SetPositions(new Vector3[] { start, end });
         InstantiatedGraph.Add(lineObj);
     }
+
+    // ### WebView for Agents ###
+    private void SpawnAgents(){
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        Agent[] agents = screenViewModel.agents;
+        AgentSpawnPoint spawnPoint = screenViewModel.spawnPoint;
+        Vector3Int worldSpawnPosition = ConvertVector2DTo3D(spawnPoint.ArrayPosition) + new Vector3Int(0,1,0);
+        foreach(Agent agent in agents){
+            InstantiatedAgents.Add(Instantiate(agentPrefab,worldSpawnPosition,Quaternion.identity));
+        }
+    }
+
+    private void MoveAgents(){
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        float step = animationSpeed * Time.deltaTime;
+        int index = 0;
+        foreach(GameObject agent in InstantiatedAgents){
+            Vector2Int agentPosition = screenViewModel.agents[index].position;
+            Vector3Int newWorldPosition = ConvertVector2DTo3D(agentPosition) + new Vector3Int(0,1,0);
+            agent.transform.position = Vector3.MoveTowards(agent.transform.position, newWorldPosition, step);
+            index++;
+        }
+    }
+
+    public void ShowOrHideAgents(bool isOn){
+        foreach(GameObject agent in InstantiatedAgents){
+            agent.SetActive(isOn);
+        }
+    }
+
+
+    // ##### WebView for MMAS #####
+    void RenderMMASGraph()
+    {
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        if(screenViewModel.checkPoints.Count < 3) return;
+        MMAS mmas = myGameManager.mmasGraphController;
+        Graph graph = mmas._graph;
+        ClearMMASGraph();
+
+        List<CheckPoint> checkPoints = screenViewModel.checkPoints;
+        int index = 0;
+        foreach(CheckPoint checkPoint in checkPoints){
+            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1);
+        }
+        // Create node objects
+        for (int i = 0; i < graph.Nodes.Count; i++)
+        {
+            Node node = graph.Nodes[i];
+            if (InstantiatedNodes[i] == null) // Only create if it doesn't already exist
+            {
+                InstantiatedNodes[i] = Instantiate(nodePrefab, new Vector3((float)node.X, 1, (float)node.Y), Quaternion.identity);
+                InstantiatedNodes[i].name = "Node " + node.Id;
+            }
+        }
+
+        // Create edges
+        int edgeIndex = 0;
+        for (int i = 0; i < graph.Nodes.Count; i++)
+        {
+            Node nodei = graph.Nodes[i];
+            for (int j = 0; j < graph.Nodes.Count; j++)
+            {
+                Node nodej = graph.Nodes[j];
+                if (graph.getEdge(nodei, nodej) < double.MaxValue)
+                {
+                    if (InstantiatedEdges[edgeIndex] == null) // Only create if it doesn't already exist
+                    {
+                        LineRenderer lr = new GameObject("Edge_" + i + "_" + j).AddComponent<LineRenderer>();
+                        lr.material = edgeMaterial;
+                        lr.SetPositions(new Vector3[] { InstantiatedNodes[i].transform.position, InstantiatedNodes[j].transform.position });
+                        lr.startWidth = 0.05f;
+                        lr.endWidth = 0.05f;
+                        InstantiatedEdges[edgeIndex] = lr;
+                        UpdateEdgeTransparency(lr, mmas.getPheromone(nodei, nodej));
+                    }
+                    edgeIndex++;
+                }
+            }
+        }
+    }
+
+    private void ClearMMASGraph(){
+        foreach(GameObject node in InstantiatedNodes){
+            Destroy(node);
+        }
+        foreach(LineRenderer edge in InstantiatedEdges){
+            Destroy(edge);
+        }
+    }
+    void UpdateEdgeTransparency(LineRenderer edge, double pheromoneLevel)
+    {
+        MMAS mmas = myGameManager.mmasGraphController;
+        Color color = edge.material.color;
+        color.a = mmas._tauMax > 0 ? (float)(pheromoneLevel / mmas._tauMax) : 0;
+        edge.material.color = color;
+    }
+
+    void HighlightBestTour()
+    {
+        MMAS mmas = myGameManager.mmasGraphController;
+        Node[] bestTour = mmas.GetBestTour();
+        for (int i = 0; i < bestTour.Length - 1; i++)
+        {
+            Node startIndex = bestTour[i];
+            Node endIndex = bestTour[i + 1];
+            LineRenderer lr = InstantiatedEdges[startIndex.Id * mmas._graph.Nodes.Count + endIndex.Id];
+            lr.material = tourMaterial;
+            lr.startWidth = 0.1f;
+            lr.endWidth = 0.1f;
+        }
+    }
 }
+
+
