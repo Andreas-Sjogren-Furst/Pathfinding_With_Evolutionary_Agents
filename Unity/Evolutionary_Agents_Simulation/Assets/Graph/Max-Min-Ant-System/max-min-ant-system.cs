@@ -313,9 +313,7 @@ public class MMAS
         _beta = beta;
         _rho = rho; // pheromone evaporation
         _q = q; // 
-        _graph = graph;
 
-        _graph = null;
         _pheromones = null;
         _bestTour = null;
         _bestTourLength = double.MaxValue;
