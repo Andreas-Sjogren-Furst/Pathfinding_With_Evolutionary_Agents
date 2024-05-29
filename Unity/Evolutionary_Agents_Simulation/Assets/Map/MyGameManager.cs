@@ -31,7 +31,7 @@ public class MyGameManager
         customMaps = new();
         MapModel mapModel = customMaps.GetCustomMap(8);
         mapController = new MapController(mapModel);
-        agentController = new AgentController(new AgentModel(1,mapModel.map));
+        agentController = new AgentController(new AgentModel(1, mapModel.map));
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
 
@@ -40,7 +40,7 @@ public class MyGameManager
     public MyGameManager(MapModel mapModel)
     {
         mapController = new MapController(mapModel);
-        agentController = new AgentController(new AgentModel(1,mapModel.map));
+        agentController = new AgentController(new AgentModel(1, mapModel.map));
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
     }
@@ -123,6 +123,12 @@ public class MyGameManager
 
         if (iterations > 0 && mmasGraphController._graph.Nodes.Count >= 3)
         {
+
+            if (mmasGraphController._graph.Nodes.Count == 3)
+            {
+                mmasGraphController.SetGraph(mmasGraphController._graph);
+            }
+
             mmasGraphController.Run(iterations);
         }
 
