@@ -45,8 +45,8 @@ public class WebView : MonoBehaviour, IScreenView
     private GameObject InstantiatedFloor;
     private List<GameObject> InstantiatedGraph;
     private List<GameObject> InstantiatedAgents;
-    private GameObject[] InstantiatedNodes;
-    private LineRenderer[] InstantiatedEdges;
+    private List<GameObject> InstantiatedNodes;
+    private List<LineRenderer> InstantiatedEdges;
     private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
     private readonly float nodeScale = 0.1f;
@@ -66,6 +66,10 @@ public class WebView : MonoBehaviour, IScreenView
         screenPresenter = new(myGameManager);
         InstantiatedCheckPoints = new();
         InstantiatedWalls = new();
+        InstantiatedAgents = new();
+        InstantiatedEdges = new();
+        InstantiatedNodes = new();
+
 
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
 
@@ -340,9 +344,8 @@ public class WebView : MonoBehaviour, IScreenView
         ClearMMASGraph();
 
         List<CheckPoint> checkPoints = screenViewModel.checkPoints;
-        int index = 0;
         foreach(CheckPoint checkPoint in checkPoints){
-            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1);
+            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, true);
         }
         // Create node objects
         for (int i = 0; i < graph.Nodes.Count; i++)
