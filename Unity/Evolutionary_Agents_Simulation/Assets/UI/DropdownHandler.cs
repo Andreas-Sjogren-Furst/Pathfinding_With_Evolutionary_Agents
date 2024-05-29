@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class DropdownHandler : MonoBehaviour
 {
     Dropdown dropdown;
-    PanelManager panelManager;
+    PanelManager1 panelManager;
     void Start()
     {
         // Get the Dropdown component from the same GameObject

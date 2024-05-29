@@ -21,6 +21,7 @@ public class MapController
         int[,] map2D = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, mapModel.erosionLimit);
         map2D = RemoveWallsAroundObjects(map2D, objects, mapModel.checkPointSpacing);
         mapModel.map = CreateMap3D(map2D);
+        mapModel.accessibleNodes = GridExplorer.CountAccessibleNodes(mapModel.map,mapModel.spawnPoint);
     }
 
     public MapModel GetMapModel()

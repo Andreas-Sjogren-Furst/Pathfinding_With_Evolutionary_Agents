@@ -33,7 +33,10 @@ public class WebView : MonoBehaviour, IScreenView
 
 
     // Local variables
-    private GameObject[,] InstantiatedMap;
+    private List<GameObject> InstantiatedWalls;
+    private List<GameObject> InstantiatedCheckPoints;
+    private GameObject InstantiatedSpawnPoint;
+    private GameObject InstantiatedFloor;
     private List<GameObject> InstantiatedGraph;
     private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
@@ -41,7 +44,7 @@ public class WebView : MonoBehaviour, IScreenView
 
 
     // Presenter
-    private ScreenPresenter screenPresenter;
+    public ScreenPresenter screenPresenter;
 
     // GameManager
     private MyGameManager myGameManager;
@@ -51,7 +54,11 @@ public class WebView : MonoBehaviour, IScreenView
         Instance = this;
         myGameManager = new();
         screenPresenter = new(myGameManager);
+        InstantiatedCheckPoints = new();
+        InstantiatedWalls = new();
+
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
+
         int mapSize = screenViewModel.map.GetLength(0) * screenViewModel.map.GetLength(1);
         InstantiatedGraph = new List<GameObject>();
 
@@ -63,9 +70,8 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Start()
     {
-        ScreenViewModel screenViewModel = screenPresenter.PackageData();
         RenderMap();
-        RenderGraph(1, screenViewModel);
+        RenderGraph(1);
 
         // myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
@@ -93,7 +99,7 @@ public class WebView : MonoBehaviour, IScreenView
         AgentSpawnPoint spawnPoint = screenViewModel.spawnPoint;
 
         ClearMap();
-        InstantiatedMap = new GameObject[map.GetLength(1), map.GetLength(0)];
+        InstantiateFloor(map);
         InstantiateMap(map);
         InstantiateCheckPoints(checkPoints);
         InstantiateSpawnPoint(spawnPoint);
@@ -101,13 +107,6 @@ public class WebView : MonoBehaviour, IScreenView
     }
     private void InstantiateMap(MapObject[,] map)
     {
-        int mapWidth = (int)(map.GetLength(0) * tileScale);
-        int mapHeight = (int)(map.GetLength(1) * tileScale);
-        Vector3Int position = new Vector3Int(map.GetLength(0) / 2, 0, map.GetLength(1) / 2);
-        GameObject floor = Instantiate(tilePrefab, position, Quaternion.identity);
-        floor.transform.position = position;
-        floor.transform.localScale = new Vector3(mapWidth, 0, mapHeight);
-
         foreach (MapObject mapObject in map)
         {
             Vector3Int worldPosition = ConvertVector2DTo3D(mapObject.ArrayPosition);
@@ -115,9 +114,18 @@ public class WebView : MonoBehaviour, IScreenView
             int j = mapObject.ArrayPosition.y;
             if (mapObject.Type == MapObject.ObjectType.Wall)
             {
-                InstantiatedMap[i, j] = Instantiate(wallPrefab, worldPosition, Quaternion.identity);
+                InstantiatedWalls.Add(Instantiate(wallPrefab, worldPosition, Quaternion.identity));
             }
         }
+    }
+    private void InstantiateFloor(MapObject[,] map)
+    {
+        int mapWidth = (int)(map.GetLength(0) * tileScale);
+        int mapHeight = (int)(map.GetLength(1) * tileScale);
+        Vector3Int position = new Vector3Int(map.GetLength(0) / 2, 0, map.GetLength(1) / 2);
+        InstantiatedFloor = Instantiate(tilePrefab, position, Quaternion.identity);
+        InstantiatedFloor.transform.position = position;
+        InstantiatedFloor.transform.localScale = new Vector3(mapWidth, 0, mapHeight);
     }
 
     private void InstantiateCheckPoints(List<CheckPoint> checkPoints)
@@ -127,7 +135,7 @@ public class WebView : MonoBehaviour, IScreenView
             Vector3Int worldPosition = ConvertVector2DTo3D(checkPoint.ArrayPosition);
             int i = checkPoint.ArrayPosition.x;
             int j = checkPoint.ArrayPosition.y;
-            InstantiatedMap[i, j] = Instantiate(checkPointPrefab, worldPosition, Quaternion.identity);
+            InstantiatedCheckPoints.Add(Instantiate(checkPointPrefab, worldPosition, Quaternion.identity));
         }
     }
 
@@ -136,7 +144,7 @@ public class WebView : MonoBehaviour, IScreenView
         Vector3Int worldPosition = ConvertVector2DTo3D(spawnPoint.ArrayPosition);
         int i = spawnPoint.ArrayPosition.x;
         int j = spawnPoint.ArrayPosition.y;
-        InstantiatedMap[i, j] = Instantiate(spawnPointPrefab, worldPosition, Quaternion.identity);
+        InstantiatedSpawnPoint = Instantiate(spawnPointPrefab, worldPosition, Quaternion.identity);
     }
 
     private Vector3Int ConvertVector2DTo3D(Vector2Int arrayPosition)
@@ -146,18 +154,33 @@ public class WebView : MonoBehaviour, IScreenView
 
     public void ClearMap()
     {
-        if (InstantiatedMap == null) return;
-        foreach (GameObject mapObject in InstantiatedMap)
-        {
-            if (mapObject != null)
-            {
-                Destroy(mapObject);
-            }
-        }
+        if (InstantiatedSpawnPoint == null || InstantiatedFloor == null) return;
+        foreach (GameObject wall in InstantiatedWalls)
+            if (wall != null) Destroy(wall);
+
+        foreach (GameObject checkPoint in InstantiatedCheckPoints)
+            if (checkPoint != null) Destroy(checkPoint);
+
+        Destroy(InstantiatedSpawnPoint);
+        Destroy(InstantiatedFloor);
     }
 
-    private void RenderGraph(int level, ScreenViewModel screenViewModel)
+    public void ShowOrHideMap(bool isOn)
     {
+        foreach (GameObject wall in InstantiatedWalls)
+            if (wall != null) wall.SetActive(isOn);
+
+        foreach (GameObject checkPoint in InstantiatedCheckPoints)
+            if (checkPoint != null) checkPoint.SetActive(isOn);
+
+        InstantiatedSpawnPoint.SetActive(isOn);
+        InstantiatedFloor.SetActive(isOn);
+    }
+
+    // ### Webview for Graph ###
+    private void RenderGraph(int level)
+    {
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
         ClearGraph(InstantiatedGraph);
         InstantiatedGraph = new List<GameObject>();
         IGraphModel graph = screenViewModel.hpaGraph;
@@ -193,13 +216,19 @@ public class WebView : MonoBehaviour, IScreenView
         if (instantiatedGraph == null) return;
         foreach (GameObject graphObject in instantiatedGraph)
         {
-            graphObject.SetActive(false);
+            Destroy(graphObject);
         }
+    }
+
+    public void ShowOrHideGraph(bool isOn)
+    {
+        foreach (GameObject graphObject in InstantiatedGraph)
+            if (graphObject != null) graphObject.SetActive(isOn);
     }
 
     private void DrawNode(HPANode node)
     {
-        GameObject nodeObj = objectPooler.SpawnFromPool(nodeTag, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
+        GameObject nodeObj = Instantiate(nodePrefab, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
         nodeObj.transform.localScale = Vector3.one * nodeScale * tileSize;
         InstantiatedGraph.Add(nodeObj);
     }
@@ -231,7 +260,7 @@ public class WebView : MonoBehaviour, IScreenView
     {
         foreach (Entrance entrance in cluster.Entrances)
         {
-            GameObject entranceObj = objectPooler.SpawnFromPool(entranceTag, transform.position + new Vector3(entrance.Node1.Position.x * tileSize, 0, entrance.Node1.Position.y * tileSize), Quaternion.identity);
+            GameObject entranceObj = Instantiate(entrancePrefab, transform.position + new Vector3(entrance.Node1.Position.x * tileSize, 0, entrance.Node1.Position.y * tileSize), Quaternion.identity);
             entranceObj.transform.localScale = Vector3.one * nodeScale * tileSize;
             InstantiatedGraph.Add(entranceObj);
         }
@@ -250,7 +279,7 @@ public class WebView : MonoBehaviour, IScreenView
 
     private void DrawLine(Vector3 start, Vector3 end, Material material)
     {
-        GameObject lineObj = objectPooler.SpawnFromPool(lineTag, Vector3.zero, Quaternion.identity);
+        GameObject lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
         LineRenderer lr = lineObj.GetComponent<LineRenderer>();
         lr.material = material;
         lr.startWidth = 0.05f * tileSize;

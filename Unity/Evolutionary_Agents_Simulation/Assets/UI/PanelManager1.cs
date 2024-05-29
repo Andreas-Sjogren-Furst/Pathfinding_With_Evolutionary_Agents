@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PanelManager : MonoBehaviour
+public class PanelManager1 : MonoBehaviour
 {
     Button submitButton;
     Dropdown dropdown;
