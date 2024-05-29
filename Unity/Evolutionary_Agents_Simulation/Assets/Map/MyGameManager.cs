@@ -107,7 +107,6 @@ public class MyGameManager
 
         if (iterations > 0 && mmasGraphController._graph.Nodes.Count > 3)
         {
-            Debug.Log("Run");
             mmasGraphController.Run(iterations);
         }
 

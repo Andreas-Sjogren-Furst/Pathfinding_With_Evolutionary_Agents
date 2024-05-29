@@ -8,11 +8,10 @@ public class WebView : MonoBehaviour, IScreenView
 
     // MMAS materials
     public Material edgeMaterial; // Assign a material for the edges
-    public Material tourMaterial; // Assign a material for highlighting the to
+    public Material tourMaterial; // Assign a material for highlighting the tos
 
     public static WebView Instance { get; private set; }
     // Object Pooler
-    public ObjectPooler objectPooler;
 
     // Game Objects prefabs
     public GameObject wallPrefab;
@@ -31,22 +30,14 @@ public class WebView : MonoBehaviour, IScreenView
     public Material pathMaterial;
 
 
-    // Tags
-    private string nodeTag = "Node";
-    private string entranceTag = "Entrance";
-    private string lineTag = "Line";
-
-
-
     // Local variables
-    private List<GameObject> InstantiatedWalls;
+    private GameObject[,] InstantiatedMap;
     private List<GameObject> InstantiatedCheckPoints;
     private GameObject InstantiatedSpawnPoint;
-    private GameObject InstantiatedFloor;
-    private List<GameObject> InstantiatedGraph;
+    private List<GameObject> InstantiatedHPAGraph;
     private List<GameObject> InstantiatedAgents;
-    private List<GameObject> InstantiatedNodes;
-    private List<LineRenderer> InstantiatedEdges;
+    private List<GameObject> InstantiatedMMASNodes;
+    private List<GameObject> InstantiatedMMASEdges;
     private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
     private readonly float nodeScale = 0.1f;
@@ -64,22 +55,14 @@ public class WebView : MonoBehaviour, IScreenView
         Instance = this;
         myGameManager = new();
         screenPresenter = new(myGameManager);
-        InstantiatedCheckPoints = new();
-        InstantiatedWalls = new();
-        InstantiatedAgents = new();
-        InstantiatedEdges = new();
-        InstantiatedNodes = new();
-
-
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
 
-        int mapSize = screenViewModel.map.GetLength(0) * screenViewModel.map.GetLength(1);
-        InstantiatedGraph = new List<GameObject>();
-
-        // Add pools programmatically
-        objectPooler.AddPool(nodeTag, nodePrefab, mapSize);
-        objectPooler.AddPool(entranceTag, entrancePrefab, mapSize / 10);
-        objectPooler.AddPool(lineTag, linePrefab, mapSize * 5);
+        InstantiatedCheckPoints = new();
+        InstantiatedAgents = new();
+        InstantiatedMap = new GameObject[screenViewModel.map.GetLength(1),screenViewModel.map.GetLength(0)];
+        InstantiatedMMASEdges = new();
+        InstantiatedMMASNodes = new();
+        InstantiatedHPAGraph = new List<GameObject>();
     }
 
     void Start()
@@ -115,7 +98,6 @@ public class WebView : MonoBehaviour, IScreenView
         AgentSpawnPoint spawnPoint = screenViewModel.spawnPoint;
 
         ClearMap();
-        InstantiateFloor(map);
         InstantiateMap(map);
         InstantiateCheckPoints(checkPoints);
         InstantiateSpawnPoint(spawnPoint);
@@ -128,20 +110,11 @@ public class WebView : MonoBehaviour, IScreenView
             Vector3Int worldPosition = ConvertVector2DTo3D(mapObject.ArrayPosition);
             int i = mapObject.ArrayPosition.x;
             int j = mapObject.ArrayPosition.y;
-            if (mapObject.Type == MapObject.ObjectType.Wall)
-            {
-                InstantiatedWalls.Add(Instantiate(wallPrefab, worldPosition, Quaternion.identity));
-            }
+            if (mapObject.Type == MapObject.ObjectType.Tile)
+                InstantiatedMap[i,j] = Instantiate(tilePrefab, worldPosition, Quaternion.identity);
+            else
+                InstantiatedMap[i,j] = Instantiate(wallPrefab, worldPosition, Quaternion.identity);
         }
-    }
-    private void InstantiateFloor(MapObject[,] map)
-    {
-        int mapWidth = (int)(map.GetLength(0) * tileScale);
-        int mapHeight = (int)(map.GetLength(1) * tileScale);
-        Vector3Int position = new Vector3Int(map.GetLength(0) / 2, 0, map.GetLength(1) / 2);
-        InstantiatedFloor = Instantiate(tilePrefab, position, Quaternion.identity);
-        InstantiatedFloor.transform.position = position;
-        InstantiatedFloor.transform.localScale = new Vector3(mapWidth, 0, mapHeight);
     }
 
     private void InstantiateCheckPoints(List<CheckPoint> checkPoints)
@@ -170,35 +143,35 @@ public class WebView : MonoBehaviour, IScreenView
 
     public void ClearMap()
     {
-        if (InstantiatedSpawnPoint == null || InstantiatedFloor == null) return;
-        foreach (GameObject wall in InstantiatedWalls)
-            if (wall != null) Destroy(wall);
+        if (InstantiatedMap == null) return;
+        foreach (GameObject mapObject in InstantiatedMap)
+            if (mapObject != null) Destroy(mapObject);
 
         foreach (GameObject checkPoint in InstantiatedCheckPoints)
             if (checkPoint != null) Destroy(checkPoint);
 
-        Destroy(InstantiatedSpawnPoint);
-        Destroy(InstantiatedFloor);
+        if(InstantiatedSpawnPoint != null)
+            Destroy(InstantiatedSpawnPoint);
     }
 
     public void ShowOrHideMap(bool isOn)
     {
-        foreach (GameObject wall in InstantiatedWalls)
-            if (wall != null) wall.SetActive(isOn);
+        foreach (GameObject mapObject in InstantiatedMap)
+            if(mapObject != null) mapObject.SetActive(isOn);
 
         foreach (GameObject checkPoint in InstantiatedCheckPoints)
             if (checkPoint != null) checkPoint.SetActive(isOn);
 
-        InstantiatedSpawnPoint.SetActive(isOn);
-        InstantiatedFloor.SetActive(isOn);
+        if(InstantiatedSpawnPoint != null)
+            InstantiatedSpawnPoint.SetActive(isOn);
     }
 
     // ### Webview for Graph ###
     private void RenderHPAGraph(int level)
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        ClearGraph(InstantiatedGraph);
-        InstantiatedGraph = new List<GameObject>();
+        ClearHPAGraph(InstantiatedHPAGraph);
+        InstantiatedHPAGraph = new List<GameObject>();
         IGraphModel graph = screenViewModel.hpaGraph;
         if (graph.ClusterByLevel.TryGetValue(level, out var clusters))
         {
@@ -227,7 +200,7 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    private void ClearGraph(List<GameObject> instantiatedGraph)
+    private void ClearHPAGraph(List<GameObject> instantiatedGraph)
     {
         if (instantiatedGraph == null) return;
         foreach (GameObject graphObject in instantiatedGraph)
@@ -236,9 +209,9 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    public void ShowOrHideGraph(bool isOn)
+    public void ShowOrHideHPAGraph(bool isOn)
     {
-        foreach (GameObject graphObject in InstantiatedGraph)
+        foreach (GameObject graphObject in InstantiatedHPAGraph)
             if (graphObject != null) graphObject.SetActive(isOn);
     }
 
@@ -246,7 +219,7 @@ public class WebView : MonoBehaviour, IScreenView
     {
         GameObject nodeObj = Instantiate(nodePrefab, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
         nodeObj.transform.localScale = Vector3.one * nodeScale * tileSize;
-        InstantiatedGraph.Add(nodeObj);
+        InstantiatedHPAGraph.Add(nodeObj);
     }
 
     private void DrawPath(HPAPath path)
@@ -278,7 +251,7 @@ public class WebView : MonoBehaviour, IScreenView
         {
             GameObject entranceObj = Instantiate(entrancePrefab, transform.position + new Vector3(entrance.Node1.Position.x * tileSize, 0, entrance.Node1.Position.y * tileSize), Quaternion.identity);
             entranceObj.transform.localScale = Vector3.one * nodeScale * tileSize;
-            InstantiatedGraph.Add(entranceObj);
+            InstantiatedHPAGraph.Add(entranceObj);
         }
     }
 
@@ -301,7 +274,7 @@ public class WebView : MonoBehaviour, IScreenView
         lr.startWidth = 0.05f * tileSize;
         lr.endWidth = 0.05f * tileSize;
         lr.SetPositions(new Vector3[] { start, end });
-        InstantiatedGraph.Add(lineObj);
+        InstantiatedHPAGraph.Add(lineObj);
     }
 
     // ### WebView for Agents ###
@@ -335,7 +308,8 @@ public class WebView : MonoBehaviour, IScreenView
     {
         foreach (GameObject agent in InstantiatedAgents)
         {
-            agent.SetActive(isOn);
+            MeshRenderer meshRenderer = agent.GetComponent<MeshRenderer>();
+            meshRenderer.enabled = isOn;
         }
     }
 
@@ -352,16 +326,16 @@ public class WebView : MonoBehaviour, IScreenView
         List<CheckPoint> checkPoints = screenViewModel.checkPoints;
         foreach (CheckPoint checkPoint in checkPoints)
         {
-            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, true);
-        }
+            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, false);
+        } myGameManager.MmasAddCheckpoint(screenViewModel.spawnPoint.ArrayPosition,1,100,false);
         // Create node objects
         for (int i = 0; i < graph.Nodes.Count; i++)
         {
             Node node = graph.Nodes[i];
-            if (InstantiatedNodes != null) // Only create if it doesn't already exist
+            if (InstantiatedMMASNodes != null) // Only create if it doesn't already exist
             {
-                InstantiatedNodes.Add(Instantiate(nodePrefab, new Vector3((float)node.X, 1, (float)node.Y), Quaternion.identity));
-                InstantiatedNodes[i].name = "Node " + node.Id;
+                InstantiatedMMASNodes.Add(Instantiate(nodePrefab, new Vector3((float)node.X, 1, (float)node.Y), Quaternion.identity));
+                InstantiatedMMASNodes[i].name = "Node " + node.Id;
             }
         }
 
@@ -375,14 +349,15 @@ public class WebView : MonoBehaviour, IScreenView
                 Node nodej = graph.Nodes[j];
                 if (graph.getEdge(nodei, nodej) < double.MaxValue)
                 {
-                    if (InstantiatedEdges != null && InstantiatedNodes.Count > 3) // only render if there are more than 3 
+                    if (InstantiatedMMASEdges != null && InstantiatedMMASNodes.Count > 3) // only render if there are more than 3 
                     {
-                        LineRenderer lr = new GameObject("Edge_" + i + "_" + j).AddComponent<LineRenderer>();
+                        GameObject edge = new GameObject("Edge_" + i + "_" + j);
+                        LineRenderer lr = edge.AddComponent<LineRenderer>();
                         lr.material = edgeMaterial;
-                        lr.SetPositions(new Vector3[] { InstantiatedNodes[i].transform.position, InstantiatedNodes[j].transform.position });
+                        lr.SetPositions(new Vector3[] { InstantiatedMMASNodes[i].transform.position, InstantiatedMMASNodes[j].transform.position });
                         lr.startWidth = 0.05f;
                         lr.endWidth = 0.05f;
-                        InstantiatedEdges.Add(lr);
+                        InstantiatedMMASEdges.Add(edge);
                         UpdateEdgeTransparency(lr, mmas.getPheromone(nodei, nodej));
                     }
                     edgeIndex++;
@@ -393,13 +368,20 @@ public class WebView : MonoBehaviour, IScreenView
 
     private void ClearMMASGraph()
     {
-        foreach (GameObject node in InstantiatedNodes)
+        foreach (GameObject node in InstantiatedMMASNodes)
         {
             Destroy(node);
         }
-        foreach (LineRenderer edge in InstantiatedEdges)
+        foreach (GameObject edge in InstantiatedMMASEdges)
         {
             Destroy(edge);
+        }
+    }
+    public void ShowOrHideMMASGraph(bool isOn){
+        foreach (GameObject node in InstantiatedMMASNodes)
+            if (node != null) node.SetActive(isOn);
+        foreach(GameObject edge in InstantiatedMMASEdges){
+            if(edge != null) edge.SetActive(isOn);
         }
     }
     void UpdateEdgeTransparency(LineRenderer edge, double pheromoneLevel)
@@ -418,7 +400,8 @@ public class WebView : MonoBehaviour, IScreenView
         {
             Node startIndex = bestTour[i];
             Node endIndex = bestTour[i + 1];
-            LineRenderer lr = InstantiatedEdges[startIndex.Id * mmas._graph.Nodes.Count + endIndex.Id];
+            GameObject edge = InstantiatedMMASEdges[startIndex.Id * mmas._graph.Nodes.Count + endIndex.Id];
+            LineRenderer lr = edge.GetComponent<LineRenderer>();
             lr.material = tourMaterial;
             lr.startWidth = 0.1f;
             lr.endWidth = 0.1f;

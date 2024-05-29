@@ -15,6 +15,6 @@ public class Toggle1 : MonoBehaviour
 
     void ToggleValueChanged(Toggle change)
     {
-        WebView.Instance.ShowOrHideGraph(change.isOn);
+        WebView.Instance.ShowOrHideHPAGraph(change.isOn);
     }
 }
