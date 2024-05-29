@@ -87,7 +87,7 @@ public class WebView : MonoBehaviour, IScreenView
         RenderMap();
         RenderHPAGraph(1);
         SpawnAgents();
-        //RenderMMASGraph();
+        RenderMMASGraph();
 
         // myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
@@ -305,30 +305,36 @@ public class WebView : MonoBehaviour, IScreenView
     }
 
     // ### WebView for Agents ###
-    private void SpawnAgents(){
+    private void SpawnAgents()
+    {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         Agent[] agents = screenViewModel.agents;
         AgentSpawnPoint spawnPoint = screenViewModel.spawnPoint;
-        Vector3Int worldSpawnPosition = ConvertVector2DTo3D(spawnPoint.ArrayPosition) + new Vector3Int(0,1,0);
-        foreach(Agent agent in agents){
-            InstantiatedAgents.Add(Instantiate(agentPrefab,worldSpawnPosition,Quaternion.identity));
+        Vector3Int worldSpawnPosition = ConvertVector2DTo3D(spawnPoint.ArrayPosition) + new Vector3Int(0, 1, 0);
+        foreach (Agent agent in agents)
+        {
+            InstantiatedAgents.Add(Instantiate(agentPrefab, worldSpawnPosition, Quaternion.identity));
         }
     }
 
-    private void MoveAgents(){
+    private void MoveAgents()
+    {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         float step = animationSpeed * Time.deltaTime;
         int index = 0;
-        foreach(GameObject agent in InstantiatedAgents){
+        foreach (GameObject agent in InstantiatedAgents)
+        {
             Vector2Int agentPosition = screenViewModel.agents[index].position;
-            Vector3Int newWorldPosition = ConvertVector2DTo3D(agentPosition) + new Vector3Int(0,1,0);
+            Vector3Int newWorldPosition = ConvertVector2DTo3D(agentPosition) + new Vector3Int(0, 1, 0);
             agent.transform.position = Vector3.MoveTowards(agent.transform.position, newWorldPosition, step);
             index++;
         }
     }
 
-    public void ShowOrHideAgents(bool isOn){
-        foreach(GameObject agent in InstantiatedAgents){
+    public void ShowOrHideAgents(bool isOn)
+    {
+        foreach (GameObject agent in InstantiatedAgents)
+        {
             agent.SetActive(isOn);
         }
     }
@@ -338,22 +344,23 @@ public class WebView : MonoBehaviour, IScreenView
     void RenderMMASGraph()
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        if(screenViewModel.checkPoints.Count < 3) return;
+        if (screenViewModel.checkPoints.Count < 3) return;
         MMAS mmas = myGameManager.mmasGraphController;
         Graph graph = mmas._graph;
         ClearMMASGraph();
 
         List<CheckPoint> checkPoints = screenViewModel.checkPoints;
-        foreach(CheckPoint checkPoint in checkPoints){
+        foreach (CheckPoint checkPoint in checkPoints)
+        {
             myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, true);
         }
         // Create node objects
         for (int i = 0; i < graph.Nodes.Count; i++)
         {
             Node node = graph.Nodes[i];
-            if (InstantiatedNodes[i] == null) // Only create if it doesn't already exist
+            if (InstantiatedNodes != null) // Only create if it doesn't already exist
             {
-                InstantiatedNodes[i] = Instantiate(nodePrefab, new Vector3((float)node.X, 1, (float)node.Y), Quaternion.identity);
+                InstantiatedNodes.Add(Instantiate(nodePrefab, new Vector3((float)node.X, 1, (float)node.Y), Quaternion.identity));
                 InstantiatedNodes[i].name = "Node " + node.Id;
             }
         }
@@ -368,14 +375,14 @@ public class WebView : MonoBehaviour, IScreenView
                 Node nodej = graph.Nodes[j];
                 if (graph.getEdge(nodei, nodej) < double.MaxValue)
                 {
-                    if (InstantiatedEdges[edgeIndex] == null) // Only create if it doesn't already exist
+                    if (InstantiatedEdges != null) // Only create if it doesn't already exist
                     {
                         LineRenderer lr = new GameObject("Edge_" + i + "_" + j).AddComponent<LineRenderer>();
                         lr.material = edgeMaterial;
                         lr.SetPositions(new Vector3[] { InstantiatedNodes[i].transform.position, InstantiatedNodes[j].transform.position });
                         lr.startWidth = 0.05f;
                         lr.endWidth = 0.05f;
-                        InstantiatedEdges[edgeIndex] = lr;
+                        InstantiatedEdges.Add(lr);
                         UpdateEdgeTransparency(lr, mmas.getPheromone(nodei, nodej));
                     }
                     edgeIndex++;
@@ -384,11 +391,14 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    private void ClearMMASGraph(){
-        foreach(GameObject node in InstantiatedNodes){
+    private void ClearMMASGraph()
+    {
+        foreach (GameObject node in InstantiatedNodes)
+        {
             Destroy(node);
         }
-        foreach(LineRenderer edge in InstantiatedEdges){
+        foreach (LineRenderer edge in InstantiatedEdges)
+        {
             Destroy(edge);
         }
     }
