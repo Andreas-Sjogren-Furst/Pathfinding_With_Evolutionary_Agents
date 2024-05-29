@@ -89,6 +89,8 @@ public class MyGameManager
         mmasGraphController._numAnts = mmasGraphController._graph.Nodes.Count;
 
 
+
+
         // Connect Checkpoint to all other checkpoints:
 
         foreach (Node node in mmasGraphController._graph.Nodes)
@@ -119,7 +121,7 @@ public class MyGameManager
             }
         }
 
-        if (iterations > 0)
+        if (iterations > 0 && mmasGraphController._graph.Nodes.Count >= 3)
         {
             mmasGraphController.Run(iterations);
         }

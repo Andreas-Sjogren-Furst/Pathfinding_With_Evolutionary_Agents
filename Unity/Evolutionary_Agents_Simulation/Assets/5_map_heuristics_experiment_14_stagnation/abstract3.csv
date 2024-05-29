@@ -1,0 +1,6 @@
+Mode,SimulationRun,Checkpoints,MMASIterations,LocalIterations,BestTourLength,BestTourNodes
+RebuildWholeGraph,0,11,0,0,677,369.215957641602
+RebuildWholeGraph,1,9,0,0,380,303.336398124695
+RebuildWholeGraph,2,13,0,0,551,469.686666488647
+RebuildWholeGraph,3,10,0,0,352,301.080400943756
+RebuildWholeGraph,4,14,0,0,438,378.716271400452

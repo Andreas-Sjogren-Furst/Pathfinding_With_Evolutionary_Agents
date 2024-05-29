@@ -65,7 +65,7 @@ public class WebView : MonoBehaviour, IScreenView
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         RenderMap();
-        //RenderGraph(1, screenViewModel);
+        RenderGraph(1, screenViewModel);
 
         // myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
@@ -81,7 +81,8 @@ public class WebView : MonoBehaviour, IScreenView
     {
 
     }
-    public void CreateMap(MapModel mapModel){
+    public void CreateMap(MapModel mapModel)
+    {
         myGameManager.mapController.ChangeMapParameters(mapModel);
     }
     public void RenderMap()
