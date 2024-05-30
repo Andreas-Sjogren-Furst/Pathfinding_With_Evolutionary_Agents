@@ -72,7 +72,7 @@ public class WebView : MonoBehaviour, IScreenView
         SpawnAgents();
         RenderMMASGraph();
 
-        // myGameManager.graphController.Preprocessing(3);
+        //myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
         //Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
         //HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
