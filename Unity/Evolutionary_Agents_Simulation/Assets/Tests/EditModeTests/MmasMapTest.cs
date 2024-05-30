@@ -16,12 +16,12 @@ public class MmasMapTest
     [Test]
     public void MmasMapTestSimplePasses()
     {
-        int numRuns = 5;
+        int numRuns = 30;
         // Generate and save maps for simulations
-        savedMaps = GenerateMaps(numRuns, (60, 60), (15, 15), (17, 20), (100, 100), (100, 100));
-        //savedMaps = GenerateMaps(numRuns, (0, 0), (40, 40), (0, 0), (100, 100), (100, 100));
+        // savedMaps = GenerateMaps(numRuns, (60, 60), (15, 15), (17, 20), (100, 100), (100, 100));
+        savedMaps = GenerateMaps(numRuns, (0, 0), (40, 40), (0, 0), (100, 100), (100, 100));
 
-        RunSimulations("5_map_heuristics_experiment_14_stagnation", numRuns, true, false, true);
+        RunSimulations("30_experiment_2", numRuns, false, false, false);
 
     }
 
@@ -42,6 +42,7 @@ public class MmasMapTest
         List<MapModel> maps = new List<MapModel>();
         for (int i = 0; i < numMaps; i++)
         {
+            // Debug.Log($"Generating map {i} + {rand.Next(0, 100)}");
             MapModel mapModel = new MapModel(
           density: rand.Next(densityRange.min, densityRange.max),
             numberOfCheckPoints: rand.Next(checkPointsRange.min, checkPointsRange.max),
