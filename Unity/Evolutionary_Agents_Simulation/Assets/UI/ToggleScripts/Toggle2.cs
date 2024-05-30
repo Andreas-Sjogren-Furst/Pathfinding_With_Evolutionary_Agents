@@ -15,6 +15,6 @@ public class Toggle2 : MonoBehaviour
 
     void ToggleValueChanged(Toggle change)
     {
-        //TODO: make behavior from web view   
+        WebView.Instance.ShowOrHideMMASGraph(change.isOn);
     }
 }

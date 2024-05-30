@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Toggle3 : MonoBehaviour
+public class Toggle4 : MonoBehaviour
 {
     Toggle myToggle;
 
@@ -15,6 +15,6 @@ public class Toggle3 : MonoBehaviour
 
     void ToggleValueChanged(Toggle change)
     {
-        WebView.Instance.ShowOrHideMap(change.isOn);
+        WebView.Instance.ShowOrHideAgents(change.isOn);
     }
 }
