@@ -2,73 +2,114 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Codice.CM.Common;
 using UnityEngine;
 
 public class FieldOfView
 {
-    
-    public List<Vector2Int> ComputeFOV(Vector2Int origin, MapObject[,] map){
-        List<Vector2Int> markVisible = new(){origin};
-
-        foreach (Quadrant.Cardinal cardinal in Enum.GetValues(typeof(Quadrant.Cardinal))){
-            Quadrant quadrant = new(cardinal, origin);
-            Row firstRow = new(1, new Fraction(-1), new Fraction(1));
-            markVisible.AddRange(Scan(firstRow, map));
-        } return markVisible;
-        
+    public List<Point> markVisibleTiles;
+    public List<Point> markVisibleWalls;
+    private readonly MapObject[,] map;
+    public FieldOfView(MapObject[,] map){
+        this.map = map;
+        markVisibleTiles = new();
+        markVisibleWalls = new();
     }
-    public List<Vector2Int> Scan(Row row, MapObject[,] map) {
-        List<Vector2Int> markVisible = new();
+    public void ComputeFOV(Point origin){
+        markVisibleTiles = new(){origin};
+        markVisibleWalls = new();
+        for(int i = 0; i < 4; i++){
+            Quadrant quadrant = new(i, origin);
+            Row firstRow = new(1, new Fraction(-1), new Fraction(1));
+            ScanIterative(firstRow, quadrant);
+        }
+    }
+    
+    private void ScanIterative(Row row, Quadrant quadrant) {
         Stack<Row> rows = new();
-        rows.Append(row);
+        rows.Push(row);
         while(rows.Count != 0){
             row = rows.Pop();
-            MapObject prevTile = null;
-            foreach(MapObject tile in row.GetTiles(map)){   
-                if(tile.Type == MapObject.ObjectType.Wall || IsSymmetric(row, tile)){
-                    markVisible.Add(new Vector2Int(tile.ArrayPosition.x,tile.ArrayPosition.y));
+            Point prevTile = null;
+            foreach(Point tile in row.Tiles()){ 
+                if(IsWall(tile, quadrant) || IsSymmetric(row, tile)){
+                    Reveal(tile,quadrant);
                 }
-                if(prevTile.Type == MapObject.ObjectType.Wall && tile.Type == MapObject.ObjectType.Tile){
+                if(IsWall(prevTile,quadrant) && IsFloor(tile,quadrant)){
                     row.startSlope = Slope(tile);
                 }
-                if(prevTile.Type == MapObject.ObjectType.Tile && tile.Type == MapObject.ObjectType.Wall){
+                if(IsFloor(prevTile, quadrant) && IsWall(tile, quadrant)){
                     Row nextRow = row.Next();
                     nextRow.endSlope = Slope(tile);
-                    rows.Append(nextRow);
+                    rows.Push(nextRow);
                 } prevTile = tile;
             }
-
-            if(prevTile.Type == MapObject.ObjectType.Tile) rows.Append(row.Next());
-
-        } return markVisible;
+            if(IsFloor(prevTile, quadrant)){
+                rows.Push(row.Next());
+            } 
+    
+        }
     }
 
-    private void Reveal(Vector2Int tile, Quadrant quadrant, ref List<Vector2Int> markVisible){
-        Vector2Int absolutGridPosition = quadrant.Transform(tile);
-        markVisible.Add(absolutGridPosition);
+    private void Reveal(Point tile, Quadrant quadrant){
+        Point absolutGridPosition = quadrant.Transform(tile);
+        Debug.Log(absolutGridPosition.x + " " + absolutGridPosition.y);
+        Debug.Log(map[absolutGridPosition.x,absolutGridPosition.y].Type);
+        if(map[absolutGridPosition.x,absolutGridPosition.y].Type == MapObject.ObjectType.Tile){
+            markVisibleTiles.Add(absolutGridPosition);
+        } else markVisibleWalls.Add(absolutGridPosition);        
     }
 
-    private void IsWall(Vector2Int tile, Quadrant quadrant, ref List<Vector2Int> isBlocking){
-        if(tile == null) return;
-        Vector2Int absolutGridPosition = quadrant.Transform(tile);
-        isBlocking.Add(absolutGridPosition);
+    private bool IsWall(Point tile, Quadrant quadrant){
+        if(tile == null) return false;
+        Point absolutGridPosition = quadrant.Transform(tile);
+        MapObject mapObject = map[absolutGridPosition.x,absolutGridPosition.y];
+        if(mapObject.Type == MapObject.ObjectType.Wall){
+            return true;
+        } else return false;    
     }
 
-    private void IsFloor(Vector2Int tile, Quadrant quadrant, ref List<Vector2Int> isNotBlocking){
-        if(tile == null) return;
-        Vector2Int absolutGridPosition = quadrant.Transform(tile);
-        isNotBlocking.Add(absolutGridPosition);
+    private bool IsFloor(Point tile, Quadrant quadrant){
+        if(tile == null) return false;
+        Point absolutGridPosition = quadrant.Transform(tile);
+        MapObject mapObject = map[absolutGridPosition.x,absolutGridPosition.y];
+        if(mapObject.Type == MapObject.ObjectType.Tile) return true;
+        else return false;
     }
 
-    public Fraction Slope(MapObject tile){
-        int rowDepth = tile.ArrayPosition.x;
-        int col = tile.ArrayPosition.y;
+    public Fraction Slope(Point tile){
+        int rowDepth = tile.x;
+        int col = tile.y;
         return new Fraction(2 * col - 1, 2 * rowDepth);
     }
     
-    public bool IsSymmetric(Row row, MapObject tile){
-        int rowDepth = tile.ArrayPosition.x;
-        int col = tile.ArrayPosition.y;
+    public bool IsSymmetric(Row row, Point tile){
+        int col = tile.y;
         return col >= row.depth * row.startSlope.EvaluateFraction() && col <= row.depth * row.endSlope.EvaluateFraction();
     }
+
+    private bool IsTileExisting(Point tile){
+        if(tile.x >= 0 && tile.x < map.GetLength(0) && tile.y >= 0 && tile.y < map.GetLength(1)){
+            return true;
+        } else return false;
+    }
 }
+
+//private void ScanRecursive(Row row, Quadrant quadrant){
+    //     Point prevTile = null;
+    //     foreach(Point tile in row.Tiles()){
+    //         if(IsWall(tile, quadrant) || IsSymmetric(row, tile))
+    //             Reveal(tile, quadrant);
+    //         if(IsWall(prevTile, quadrant) && IsFloor(tile, quadrant))
+    //             row.startSlope = Slope(tile);
+    //         if(IsFloor(prevTile,quadrant) && IsWall(tile, quadrant)){
+    //             Row nextRow = row.Next();
+    //             nextRow.endSlope = Slope(tile);
+    //             ScanRecursive(nextRow, quadrant);
+    //         }
+    //         prevTile = tile;
+    //     }
+    //     if(IsFloor(prevTile, quadrant))
+    //         ScanRecursive(row.Next(), quadrant);
+    // }

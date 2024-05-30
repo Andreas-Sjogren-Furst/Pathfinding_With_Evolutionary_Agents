@@ -1,29 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class Quadrant
 {
-    public enum Cardinal{
-        north,
-        east,
-        south,
-        west
-    }
-    private readonly Vector2Int origin;
-    private readonly Cardinal cardinal;
-    public Quadrant(Cardinal cardinal, Vector2Int origin){
+    public readonly int north = 0;
+    public readonly int east = 1;
+    public readonly int south = 2;
+    public readonly int west = 3;
+    private readonly Point origin;
+    private readonly int cardinal;
+    public Quadrant(int cardinal, Point origin){
         this.cardinal = cardinal;
         this.origin = origin;
     }
 
-    public Vector2Int Transform(Vector2Int tile){
+    public Point Transform(Point tile){
         int row = tile.x;
         int col = tile.y;
-        if(cardinal == Cardinal.north) return new Vector2Int(origin.x + col, origin.y - row);
-        if(cardinal == Cardinal.south) return new Vector2Int(origin.x + col, origin.y + row);
-        if(cardinal == Cardinal.east) return new Vector2Int(origin.x + row, origin.y + col);
-        if(cardinal == Cardinal.west) return new Vector2Int(origin.x - row, origin.y + col);
+        if(cardinal == south) return new Point(origin.x + col, origin.y - row);
+        if(cardinal == north) return new Point(origin.x + col, origin.y + row);
+        if(cardinal == east) return new Point(origin.x + row, origin.y + col);
+        if(cardinal == west) return new Point(origin.x - row, origin.y + col);
         throw new System.Exception("Invalid cardinal value");
     }
 

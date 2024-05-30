@@ -42,10 +42,10 @@ public class GridExplorer
                 int newY = y + dy[i];
 
                 // Check bounds and whether the cell is walkable and not visited
-                if (newX >= 0 && newX < colLength && newY >= 0 && newY < rowLength && map[newY, newX].Type == MapObject.ObjectType.Tile && !visited[newY, newX])
+                if (newX >= 0 && newX < colLength && newY >= 0 && newY < rowLength && map[newX, newY].Type == MapObject.ObjectType.Tile && !visited[newX, newY])
                 {
                     queue.Enqueue((newX, newY));
-                    visited[newY, newX] = true;  // Mark as visited
+                    visited[newX, newY] = true;  // Mark as visited
                 }
             }
         } return accessibleCount;

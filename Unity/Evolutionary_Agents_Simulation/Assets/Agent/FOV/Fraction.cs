@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class Fraction
 {
@@ -13,12 +10,12 @@ public class Fraction
     }
     public Fraction(int numerator, int denominator){
         if(denominator == 0) throw new System.Exception("denominator can't be 0 for type Fraction");
-        this.numerator = numerator;
-        this.denominator = denominator;
-        FractionArithmetic.LowestTerm(this);
+        int gcd = FractionArithmetic.GCD(numerator,denominator);
+        this.numerator = numerator/gcd;
+        this.denominator = denominator/gcd;
     }
 
     public float EvaluateFraction(){
-        return numerator/denominator;
+        return (float)numerator/denominator;
     }
 }

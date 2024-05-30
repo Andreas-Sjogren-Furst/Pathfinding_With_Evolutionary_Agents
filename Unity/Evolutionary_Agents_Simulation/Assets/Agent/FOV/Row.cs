@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
-using UnityEngine;
+
 
 public class Row
 {
@@ -16,13 +14,13 @@ public class Row
         this.endSlope = endSlope;
     }
 
-    public List<MapObject> GetTiles(MapObject[,] map){
+    public List<Point> Tiles(){
         int minCol = RoundTiesUp(depth * startSlope.EvaluateFraction());
         int maxCol = RoundTiesDown(depth * endSlope.EvaluateFraction());
-        List<MapObject> tiles = new();
+        List<Point> tilesRelativePositions = new();
         for(int col = minCol; col <= maxCol; col++){
-            tiles.Add(map[depth,col]);
-        } return tiles;
+            tilesRelativePositions.Add(new Point(depth,col));
+        } return tilesRelativePositions;
     }
 
     public Row Next(){

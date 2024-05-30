@@ -26,6 +26,8 @@ public class WebView : MonoBehaviour, IScreenView
     public Material clusterMaterial;
     public Material intraEdgeMaterial;
     public Material interEdgeMaterial;
+    public Material darkColor;
+    public Material whiteColor;
 
     public Material pathMaterial;
 
@@ -63,14 +65,15 @@ public class WebView : MonoBehaviour, IScreenView
         InstantiatedMMASEdges = new();
         InstantiatedMMASNodes = new();
         InstantiatedHPAGraph = new List<GameObject>();
+
     }
 
     void Start()
     {
         RenderMap();
-        RenderHPAGraph(1);
+        //RenderHPAGraph(1);
         SpawnAgents();
-        RenderMMASGraph();
+        //RenderMMASGraph();
 
         //myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
@@ -313,6 +316,29 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
+    public void ShowOrHideExploredArea(bool isOn){
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        MapObject[,] map = screenViewModel.map;
+        HashSet<Point> visibleTiles = screenViewModel.visibleTiles;
+        if(isOn){
+            foreach(MapObject mapObject in map){
+                Point point = new(mapObject.ArrayPosition.x,mapObject.ArrayPosition.y);
+                if(!visibleTiles.Contains(point) && mapObject.Type == MapObject.ObjectType.Tile){
+                    int x = mapObject.ArrayPosition.x;
+                    int y = mapObject.ArrayPosition.y;
+                    Renderer renderer = InstantiatedMap[x,y].GetComponent<Renderer>();
+                    renderer.material = darkColor;
+                }
+            }
+        } else {
+            foreach(MapObject mapObject in map){
+                if(mapObject.Type == MapObject.ObjectType.Tile){
+                    Renderer renderer = InstantiatedMap[mapObject.ArrayPosition.x,mapObject.ArrayPosition.y].GetComponent<Renderer>();
+                    renderer.material = whiteColor;
+                }
+            }
+        }
+    }
 
     // ##### WebView for MMAS #####
     void RenderMMASGraph()
