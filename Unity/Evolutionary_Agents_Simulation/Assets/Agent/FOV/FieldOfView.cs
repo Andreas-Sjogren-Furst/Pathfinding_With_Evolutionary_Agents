@@ -53,16 +53,15 @@ public class FieldOfView
     }
 
     private void Reveal(Point tile, Quadrant quadrant){
+        if(tile == null || !IsTileExisting(tile,quadrant)) return;
         Point absolutGridPosition = quadrant.Transform(tile);
-        Debug.Log(absolutGridPosition.x + " " + absolutGridPosition.y);
-        Debug.Log(map[absolutGridPosition.x,absolutGridPosition.y].Type);
         if(map[absolutGridPosition.x,absolutGridPosition.y].Type == MapObject.ObjectType.Tile){
             markVisibleTiles.Add(absolutGridPosition);
         } else markVisibleWalls.Add(absolutGridPosition);        
     }
 
     private bool IsWall(Point tile, Quadrant quadrant){
-        if(tile == null) return false;
+        if(tile == null || !IsTileExisting(tile,quadrant)) return false;
         Point absolutGridPosition = quadrant.Transform(tile);
         MapObject mapObject = map[absolutGridPosition.x,absolutGridPosition.y];
         if(mapObject.Type == MapObject.ObjectType.Wall){
@@ -71,7 +70,7 @@ public class FieldOfView
     }
 
     private bool IsFloor(Point tile, Quadrant quadrant){
-        if(tile == null) return false;
+        if(tile == null || !IsTileExisting(tile, quadrant)) return false;
         Point absolutGridPosition = quadrant.Transform(tile);
         MapObject mapObject = map[absolutGridPosition.x,absolutGridPosition.y];
         if(mapObject.Type == MapObject.ObjectType.Tile) return true;
@@ -89,8 +88,9 @@ public class FieldOfView
         return col >= row.depth * row.startSlope.EvaluateFraction() && col <= row.depth * row.endSlope.EvaluateFraction();
     }
 
-    private bool IsTileExisting(Point tile){
-        if(tile.x >= 0 && tile.x < map.GetLength(0) && tile.y >= 0 && tile.y < map.GetLength(1)){
+    private bool IsTileExisting(Point tile, Quadrant quadrant){
+        Point globalTile = quadrant.Transform(tile);
+        if(globalTile.x >= 0 && globalTile.x < map.GetLength(0) && globalTile.y >= 0 && globalTile.y < map.GetLength(1)){
             return true;
         } else return false;
     }

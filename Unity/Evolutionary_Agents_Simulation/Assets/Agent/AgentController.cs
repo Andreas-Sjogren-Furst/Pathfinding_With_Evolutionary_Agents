@@ -14,10 +14,17 @@ public class AgentController{
         fieldOfView.ComputeFOV(agentPosition);
         List<Point> computedVisibleTiles = fieldOfView.markVisibleTiles;
         List<Point> computedVisibleWalls = fieldOfView.markVisibleWalls;
-        addVisibleTilesAndWalls(computedVisibleTiles,computedVisibleWalls);
+        AddVisibleTilesAndWalls(computedVisibleTiles,computedVisibleWalls);
     }
 
-    private void addVisibleTilesAndWalls(List<Point> computedVisibleTiles, List<Point> computedVisibleWalls){
+    public void UpdateFrontier(){
+        FrontierExplorer frontierExplorer = new FrontierExplorer(agentModel.map);
+        HashSet<Point> newFrontierPoints = frontierExplorer.FindFrontierPoints(agentModel.visibleTiles,agentModel.visibleWalls);
+        foreach(Point frontierPoint in newFrontierPoints) { agentModel.frontierPoints.Add(frontierPoint); }
+
+    }
+
+    private void AddVisibleTilesAndWalls(List<Point> computedVisibleTiles, List<Point> computedVisibleWalls){
         foreach(Point computedVisibleTile in computedVisibleTiles){
             agentModel.visibleTiles.Add(computedVisibleTile);
         }

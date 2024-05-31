@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class AgentModel
 {
@@ -10,7 +8,7 @@ public class AgentModel
     public AgentSpawnPoint spawnPoint;
     public HashSet<Point> visibleTiles;
     public HashSet<Point> visibleWalls;
-    // Stack<Vector2Int> frontierPoints;
+    public HashSet<Point> frontierPoints;
     
     public AgentModel(int amountOfAgents, MapObject[,] map, AgentSpawnPoint spawnPoint){
         this.amountOfAgents = amountOfAgents;
