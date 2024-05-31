@@ -29,7 +29,7 @@ public class MyGameManager
     public MyGameManager()
     {
         customMaps = new();
-        MapModel mapModel = customMaps.GetCustomMap(1);
+        MapModel mapModel = customMaps.GetCustomMap(0);
         mapController = new MapController(mapModel);
         AgentModel agentModel = new(1, mapModel.map, mapModel.spawnPoint);
         agentController = new AgentController(agentModel);
@@ -58,7 +58,8 @@ public class MyGameManager
         IEntranceManager entranceManager = new EntranceManager(_graphModel, _nodeManager);
         IClusterManager clusterManager = new ClusterManager(_graphModel, _nodeManager, edgeManager, entranceManager);
         HPAStar hpaStar = new HPAStar(_graphModel, clusterManager, _nodeManager, entranceManager, edgeManager, _pathFinder);
-        hpaStar.Preprocessing(3);
+        int maxLevel = HPAStar.maxLevelAllowed(map.GetLength(0), clusterSize: 10);
+        hpaStar.Preprocessing(maxLevel);
         return hpaStar;
     }
 
