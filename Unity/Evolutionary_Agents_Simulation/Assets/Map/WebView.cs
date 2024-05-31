@@ -61,7 +61,7 @@ public class WebView : MonoBehaviour, IScreenView
 
         InstantiatedCheckPoints = new();
         InstantiatedAgents = new();
-        InstantiatedMap = new GameObject[screenViewModel.map.GetLength(1),screenViewModel.map.GetLength(0)];
+        InstantiatedMap = new GameObject[screenViewModel.map.GetLength(1), screenViewModel.map.GetLength(0)];
         InstantiatedMMASEdges = new();
         InstantiatedMMASNodes = new();
         InstantiatedHPAGraph = new List<GameObject>();
@@ -114,9 +114,9 @@ public class WebView : MonoBehaviour, IScreenView
             int i = mapObject.ArrayPosition.x;
             int j = mapObject.ArrayPosition.y;
             if (mapObject.Type == MapObject.ObjectType.Tile)
-                InstantiatedMap[i,j] = Instantiate(tilePrefab, worldPosition, Quaternion.identity);
+                InstantiatedMap[i, j] = Instantiate(tilePrefab, worldPosition, Quaternion.identity);
             else
-                InstantiatedMap[i,j] = Instantiate(wallPrefab, worldPosition, Quaternion.identity);
+                InstantiatedMap[i, j] = Instantiate(wallPrefab, worldPosition, Quaternion.identity);
         }
     }
 
@@ -153,19 +153,19 @@ public class WebView : MonoBehaviour, IScreenView
         foreach (GameObject checkPoint in InstantiatedCheckPoints)
             if (checkPoint != null) Destroy(checkPoint);
 
-        if(InstantiatedSpawnPoint != null)
+        if (InstantiatedSpawnPoint != null)
             Destroy(InstantiatedSpawnPoint);
     }
 
     public void ShowOrHideMap(bool isOn)
     {
         foreach (GameObject mapObject in InstantiatedMap)
-            if(mapObject != null) mapObject.SetActive(isOn);
+            if (mapObject != null) mapObject.SetActive(isOn);
 
         foreach (GameObject checkPoint in InstantiatedCheckPoints)
             if (checkPoint != null) checkPoint.SetActive(isOn);
 
-        if(InstantiatedSpawnPoint != null)
+        if (InstantiatedSpawnPoint != null)
             InstantiatedSpawnPoint.SetActive(isOn);
     }
 
@@ -316,24 +316,32 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    public void ShowOrHideExploredArea(bool isOn){
+    public void ShowOrHideExploredArea(bool isOn)
+    {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         MapObject[,] map = screenViewModel.map;
         HashSet<Point> visibleTiles = screenViewModel.visibleTiles;
-        if(isOn){
-            foreach(MapObject mapObject in map){
-                Point point = new(mapObject.ArrayPosition.x,mapObject.ArrayPosition.y);
-                if(!visibleTiles.Contains(point) && mapObject.Type == MapObject.ObjectType.Tile){
+        if (isOn)
+        {
+            foreach (MapObject mapObject in map)
+            {
+                Point point = new(mapObject.ArrayPosition.x, mapObject.ArrayPosition.y);
+                if (!visibleTiles.Contains(point) && mapObject.Type == MapObject.ObjectType.Tile)
+                {
                     int x = mapObject.ArrayPosition.x;
                     int y = mapObject.ArrayPosition.y;
-                    Renderer renderer = InstantiatedMap[x,y].GetComponent<Renderer>();
+                    Renderer renderer = InstantiatedMap[x, y].GetComponent<Renderer>();
                     renderer.material = darkColor;
                 }
             }
-        } else {
-            foreach(MapObject mapObject in map){
-                if(mapObject.Type == MapObject.ObjectType.Tile){
-                    Renderer renderer = InstantiatedMap[mapObject.ArrayPosition.x,mapObject.ArrayPosition.y].GetComponent<Renderer>();
+        }
+        else
+        {
+            foreach (MapObject mapObject in map)
+            {
+                if (mapObject.Type == MapObject.ObjectType.Tile)
+                {
+                    Renderer renderer = InstantiatedMap[mapObject.ArrayPosition.x, mapObject.ArrayPosition.y].GetComponent<Renderer>();
                     renderer.material = whiteColor;
                 }
             }
@@ -353,7 +361,8 @@ public class WebView : MonoBehaviour, IScreenView
         foreach (CheckPoint checkPoint in checkPoints)
         {
             myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, false);
-        } myGameManager.MmasAddCheckpoint(screenViewModel.spawnPoint.ArrayPosition,1,100,false);
+        }
+        myGameManager.MmasAddCheckpoint(screenViewModel.spawnPoint.ArrayPosition, 1, 100, false);
         // Create node objects
         for (int i = 0; i < graph.Nodes.Count; i++)
         {
@@ -403,11 +412,13 @@ public class WebView : MonoBehaviour, IScreenView
             Destroy(edge);
         }
     }
-    public void ShowOrHideMMASGraph(bool isOn){
+    public void ShowOrHideMMASGraph(bool isOn)
+    {
         foreach (GameObject node in InstantiatedMMASNodes)
             if (node != null) node.SetActive(isOn);
-        foreach(GameObject edge in InstantiatedMMASEdges){
-            if(edge != null) edge.SetActive(isOn);
+        foreach (GameObject edge in InstantiatedMMASEdges)
+        {
+            if (edge != null) edge.SetActive(isOn);
         }
     }
     void UpdateEdgeTransparency(LineRenderer edge, double pheromoneLevel)

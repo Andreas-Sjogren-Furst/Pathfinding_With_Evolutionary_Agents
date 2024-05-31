@@ -21,7 +21,7 @@ public class MmasMapTest
         // savedMaps = GenerateMaps(numRuns, (60, 60), (15, 15), (17, 20), (100, 100), (100, 100));
         savedMaps = GenerateMaps(numRuns, (0, 0), (40, 40), (0, 0), (100, 100), (100, 100));
 
-        RunSimulations("30_experiment_2", numRuns, false, false, false);
+        RunSimulations("30_experiment_trail_limits", numRuns, false, false, false);
 
     }
 
