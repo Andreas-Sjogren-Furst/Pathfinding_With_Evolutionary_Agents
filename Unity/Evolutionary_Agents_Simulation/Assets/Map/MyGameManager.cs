@@ -36,6 +36,7 @@ public class MyGameManager
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
         agentController.Scan();
+        agentController.UpdateFrontier();
 
         // HPAGraphController.HierarchicalSearch(new Vector2Int(5, 5), new Vector2Int(95, 95), 1);
 

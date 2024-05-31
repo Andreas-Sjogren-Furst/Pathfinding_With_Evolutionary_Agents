@@ -325,8 +325,7 @@ public class WebView : MonoBehaviour, IScreenView
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         MapObject[,] map = screenViewModel.map;
         HashSet<Point> visibleTiles = screenViewModel.visibleTiles;
-        if (isOn)
-        {
+        if (isOn){
             foreach (MapObject mapObject in map)
             {
                 Point point = new(mapObject.ArrayPosition.x, mapObject.ArrayPosition.y);
@@ -338,9 +337,35 @@ public class WebView : MonoBehaviour, IScreenView
                     renderer.material = darkColor;
                 }
             }
+        } else {
+            foreach (MapObject mapObject in map)
+            {
+                if (mapObject.Type == MapObject.ObjectType.Tile)
+                {
+                    Renderer renderer = InstantiatedMap[mapObject.ArrayPosition.x, mapObject.ArrayPosition.y].GetComponent<Renderer>();
+                    renderer.material = whiteColor;
+                }
+            }
         }
-        else
-        {
+    }
+
+    public void ShowOrHideFrontierPoints(bool isOn){
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        MapObject[,] map = screenViewModel.map;
+        HashSet<Point> frontierPoints = screenViewModel.frontierPoints;
+        if(isOn){
+            foreach (MapObject mapObject in map)
+            {
+                Point point = new(mapObject.ArrayPosition.x, mapObject.ArrayPosition.y);
+                if (!frontierPoints.Contains(point) && mapObject.Type == MapObject.ObjectType.Tile)
+                {
+                    int x = mapObject.ArrayPosition.x;
+                    int y = mapObject.ArrayPosition.y;
+                    Renderer renderer = InstantiatedMap[x, y].GetComponent<Renderer>();
+                    renderer.material = darkColor;
+                }
+            }
+        } else {
             foreach (MapObject mapObject in map)
             {
                 if (mapObject.Type == MapObject.ObjectType.Tile)

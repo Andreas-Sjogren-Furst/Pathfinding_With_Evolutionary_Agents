@@ -16,6 +16,7 @@ public class AgentModel
         this.spawnPoint = spawnPoint;
         visibleTiles = new();
         visibleWalls = new();
+        frontierPoints = new();
         agents = new Agent[amountOfAgents];
         for(int i = 0; i < amountOfAgents; i++){ agents[i] = new Agent(spawnPoint.ArrayPosition,i); }
     }
