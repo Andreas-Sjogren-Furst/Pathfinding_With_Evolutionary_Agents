@@ -23,10 +23,9 @@ public class ClusterManager : IClusterManager
         _entranceManager = entranceManager;
     }
 
-    public HashSet<Cluster> BuildClusters(int level, MapObject[,] globalTileMap)
+    public HashSet<Cluster> BuildClusters(int level, MapObject[,] globalTileMap, int clusterSize = 10)
     {
         HashSet<Cluster> clusters = new HashSet<Cluster>();
-        int clusterSize = 10 * level;
 
         int gridWidth = (int)Math.Ceiling((double)globalTileMap.GetLength(1) / clusterSize);
         int gridHeight = (int)Math.Ceiling((double)globalTileMap.GetLength(0) / clusterSize);
@@ -295,6 +294,63 @@ public class ClusterManager : IClusterManager
     {
         return (node.Position.x == cluster.bottomLeftPos.x || node.Position.x == cluster.topRightPos.x ||
                 node.Position.y == cluster.bottomLeftPos.y || node.Position.y == cluster.topRightPos.y);
+    }
+
+
+    // TODO: prime numbers not allowed. 
+    public static int CalculateValidClusterSize(int mapSize, int minClusterSize = 5, int maxClusterSize = 50, int targetDivisor = 10)
+    {
+        if (mapSize <= 0)
+        {
+            throw new ArgumentException("Map size must be a positive integer.");
+        }
+
+        if (IsPrime(mapSize))
+        {
+            throw new ArgumentException("Map size must not be a prime number.");
+        }
+
+
+        int targetClusterSize = mapSize / targetDivisor;
+        int bestClusterSize = -1;
+        int smallestDifference = int.MaxValue;
+
+        // Iterate over possible cluster sizes and find the closest one that is divisible by map size
+        for (int clusterSize = minClusterSize; clusterSize <= maxClusterSize; clusterSize++)
+        {
+            if (mapSize % clusterSize == 0)
+            {
+                int difference = Math.Abs(targetClusterSize - clusterSize);
+                if (difference < smallestDifference)
+                {
+                    bestClusterSize = clusterSize;
+                    smallestDifference = difference;
+                }
+            }
+        }
+
+        if (bestClusterSize == -1)
+        {
+            throw new ArgumentException("No valid cluster size found that satisfies the constraints.");
+        }
+
+        return bestClusterSize;
+    }
+
+    // taken from stackoverflow https://stackoverflow.com/questions/15743192/check-if-number-is-prime-number
+    public static bool IsPrime(int number)
+    {
+        if (number <= 1) return false;
+        if (number == 2) return true;
+        if (number % 2 == 0) return false;
+
+        var boundary = (int)Math.Floor(Math.Sqrt(number));
+
+        for (int i = 3; i <= boundary; i += 2)
+            if (number % i == 0)
+                return false;
+
+        return true;
     }
 
 

@@ -38,7 +38,7 @@ public class MyGameManager
         agentController.Scan();
         agentController.UpdateFrontier();
 
-        // HPAGraphController.HierarchicalSearch(new Vector2Int(5, 5), new Vector2Int(95, 95), 1);
+        // HPAGraphController.HierarchicalSearch(new Vector2Int(5, 5), new Vector2Int(50, 50), 1);
 
 
 
@@ -65,8 +65,12 @@ public class MyGameManager
         IEntranceManager entranceManager = new EntranceManager(_graphModel, _nodeManager);
         IClusterManager clusterManager = new ClusterManager(_graphModel, _nodeManager, edgeManager, entranceManager);
         HPAStar hpaStar = new HPAStar(_graphModel, clusterManager, _nodeManager, entranceManager, edgeManager, _pathFinder);
-        int maxLevel = HPAStar.maxLevelAllowed(map.GetLength(0), clusterSize: 10);
-        hpaStar.Preprocessing(maxLevel);
+        int mapSize = map.GetLength(0);
+
+        int clusterSize = ClusterManager.CalculateValidClusterSize(mapSize, minClusterSize: 5, maxClusterSize: 50);
+        Debug.Log("Cluster Size: " + clusterSize);
+        int maxLevel = HPAStar.maxLevelAllowed(mapSize, clusterSize: clusterSize);
+        hpaStar.Preprocessing(maxLevel, clusterSize);
 
 
 

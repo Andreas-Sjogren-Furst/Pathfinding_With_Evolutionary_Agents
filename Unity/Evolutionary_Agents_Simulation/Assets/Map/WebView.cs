@@ -325,7 +325,8 @@ public class WebView : MonoBehaviour, IScreenView
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         MapObject[,] map = screenViewModel.map;
         HashSet<Point> visibleTiles = screenViewModel.visibleTiles;
-        if (isOn){
+        if (isOn)
+        {
             foreach (MapObject mapObject in map)
             {
                 Point point = new(mapObject.ArrayPosition.x, mapObject.ArrayPosition.y);
@@ -337,7 +338,9 @@ public class WebView : MonoBehaviour, IScreenView
                     renderer.material = darkColor;
                 }
             }
-        } else {
+        }
+        else
+        {
             foreach (MapObject mapObject in map)
             {
                 if (mapObject.Type == MapObject.ObjectType.Tile)
@@ -349,11 +352,13 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    public void ShowOrHideFrontierPoints(bool isOn){
+    public void ShowOrHideFrontierPoints(bool isOn)
+    {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         MapObject[,] map = screenViewModel.map;
         HashSet<Point> frontierPoints = screenViewModel.frontierPoints;
-        if(isOn){
+        if (isOn)
+        {
             foreach (MapObject mapObject in map)
             {
                 Point point = new(mapObject.ArrayPosition.x, mapObject.ArrayPosition.y);
@@ -365,7 +370,9 @@ public class WebView : MonoBehaviour, IScreenView
                     renderer.material = darkColor;
                 }
             }
-        } else {
+        }
+        else
+        {
             foreach (MapObject mapObject in map)
             {
                 if (mapObject.Type == MapObject.ObjectType.Tile)
