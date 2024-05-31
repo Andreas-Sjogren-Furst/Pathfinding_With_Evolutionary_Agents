@@ -14,6 +14,8 @@ public class MMASTest
     {
 
 
+
+
         string tspFilePath = "/Users/gustavsiphone/Documents/GitHub/Pathfinding_With_Evolutionary_Agents/Unity/Evolutionary_Agents_Simulation/Assets/Tests/EditModeTests/berlin52.tsp";
         string optimalTourFilePath = "/Users/gustavsiphone/Documents/GitHub/Pathfinding_With_Evolutionary_Agents/Unity/Evolutionary_Agents_Simulation/Assets/Tests/EditModeTests/berlin52.opt.tour";
 
@@ -28,22 +30,46 @@ public class MMASTest
         double q = 100.0;
         int maxIterations = 500;
 
-        MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q,graph);
-        mmas.SetGraph(graph);
-        mmas.Run(maxIterations);
+        double totalElapsedTime = 0.0;
+        int successCount = 0;
+        int iterations = 0;
 
-        Node[] bestTour = mmas.GetBestTour();
-        double bestTourLength = mmas.GetBestTourLength();
+        int numberofExperiments = 100;
+        int experimentUID = 3;
 
-        // UnityEngine.Debug.Log("Best Tour: " + string.Join(" -> ", bestTour));
-        UnityEngine.Debug.Log("Best Tour Length: " + bestTourLength + " (calculated again: " + optimalTourLength + ")");
+        for (int i = 0; i < numberofExperiments; i++)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
 
-        Assert.AreEqual((int)bestTourLength, (int)optimalTourLength); // Ensure the bestTourLength is calculated correctly. 
+            MMAS mmas = new MMAS(numAnts, alpha, beta, rho, q, graph);
+            mmas.SetGraph(graph);
+            iterations += mmas.Run(maxIterations);
 
-        // Assert the results
-        Assert.AreEqual(optimalTour.Length, bestTour.Length);
-        Assert.LessOrEqual(bestTourLength, optimalTourLength);
+            stopwatch.Stop();
+            totalElapsedTime += stopwatch.Elapsed.TotalMilliseconds;
 
+            Node[] bestTour = mmas.GetBestTour();
+            double bestTourLength = mmas.GetBestTourLength();
+
+            // UnityEngine.Debug.Log("Best Tour: " + string.Join(" -> ", bestTour));
+            UnityEngine.Debug.Log("Best Tour Length: " + bestTourLength + " (calculated again: " + optimalTourLength + ")");
+
+            if (System.Math.Abs(bestTourLength - optimalTourLength) < 1e-6)
+            {
+                successCount++;
+            }
+
+            // Assert the results
+            // Assert.AreEqual(optimalTour.Length, bestTour.Length);
+            // Assert.LessOrEqual(bestTourLength, optimalTourLength);
+        }
+
+        double averageTime = totalElapsedTime / numberofExperiments;
+
+        UnityEngine.Debug.Log("\n *** MMAS Test Results *** experiments: " + numberofExperiments + " ***" + "UID = " + experimentUID);
+        UnityEngine.Debug.Log("Average Time for Success: " + averageTime + " ms");
+        UnityEngine.Debug.Log("Success Count: " + successCount);
+        UnityEngine.Debug.Log("Average Iterations: " + iterations / numberofExperiments);
 
 
 

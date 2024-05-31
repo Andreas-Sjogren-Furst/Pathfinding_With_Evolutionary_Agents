@@ -31,7 +31,7 @@ public class MyGameManager
         customMaps = new();
         MapModel mapModel = customMaps.GetCustomMap(1);
         mapController = new MapController(mapModel);
-        AgentModel agentModel = new(1,mapModel.map,mapModel.spawnPoint);
+        AgentModel agentModel = new(1, mapModel.map, mapModel.spawnPoint);
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
@@ -42,7 +42,7 @@ public class MyGameManager
     public MyGameManager(MapModel mapModel)
     {
         mapController = new MapController(mapModel);
-        AgentModel agentModel = new(1,mapModel.map,mapModel.spawnPoint);
+        AgentModel agentModel = new(1, mapModel.map, mapModel.spawnPoint);
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();

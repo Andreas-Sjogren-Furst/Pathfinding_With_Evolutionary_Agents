@@ -365,6 +365,11 @@ public class MMAS
             {
                 _bestTour = antTours[bestIndex];
                 _bestTourLength = antTourLengths[bestIndex];
+
+                // dynamically update tau max and tau min according to the paper section 5.1 
+                _tauMax = 1.0 / (_rho * _bestTourLength);
+                _tauMin = _tauMax / (2.0 * _graph.Nodes.Count);
+
             }
 
             UpdatePheromones(antTours, antTourLengths); // O(N^2)
@@ -412,10 +417,10 @@ public class MMAS
         {
             _graph.AddNode(node);
             // _numAnts = _graph.Nodes.Count;
-            // recalculate tau min and tau max
             int numNodes = _graph.Nodes.Count;
-            _tauMax = 1.0 / (_rho * GetNearestNeighborTourLength());
-            _tauMin = _tauMax / (2.0 * numNodes);
+            // recalculate tau min and tau max
+            // _tauMax = 1.0 / (_rho * GetNearestNeighborTourLength());
+            // _tauMin = _tauMax / (2.0 * numNodes);
             _bestTourLength = double.MaxValue;
             _bestTour = new Node[numNodes];
 
@@ -426,8 +431,8 @@ public class MMAS
                 {
                     int keyForward = GetPheromoneKey(node, existingNode);
                     int keyBackward = GetPheromoneKey(existingNode, node);
-                    _pheromones[keyForward] = _tauMax;  // Or some initial value
-                    _pheromones[keyBackward] = _tauMax; // Or some initial value
+                    _pheromones[keyForward] = _tauMax;
+                    _pheromones[keyBackward] = _tauMax;
                 }
             }
         }
@@ -591,6 +596,8 @@ public class MMAS
 
     private void UpdatePheromones(Node[][] antTours, double[] antTourLengths)
     {
+
+        // evaporation
         for (int i = 0; i < _graph.Nodes.Count; i++)
         {
             for (int j = 0; j < _graph.Nodes.Count; j++)
@@ -603,6 +610,8 @@ public class MMAS
                 // _pheromones[i, j] *= _rho;
             }
         }
+
+        // Pheromone reinforcement for the best tour
 
         Node[] bestTour = antTours[Array.IndexOf(antTourLengths, antTourLengths.Min())];
         double bestTourLength = antTourLengths.Min();
