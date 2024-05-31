@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 
 public class FrontierExplorer
@@ -8,6 +11,51 @@ public class FrontierExplorer
     public FrontierExplorer(MapObject[,] map){
         this.map = map;
     }
+
+    public HashSet<Point> FindFrontier(HashSet<Point> visibleTiles, HashSet<Point> visibleWalls){
+        HashSet<Point> frontier = new();
+        HashSet<Point> frontierPoints = FindFrontierPoints(visibleTiles,visibleWalls);
+        while(frontierPoints.Count != 0){
+            List<Point> temp = frontierPoints.ToList();
+            Point point = temp[0];
+            HashSet<Point> frontierCluster = GridExplorer.ClusterFrontierPoints(frontierPoints,point,map);
+            frontier.Add(FindClosestToCentroid(frontierCluster));
+            frontierPoints.ExceptWith(frontierCluster);
+        } return frontier;
+    }
+
+    public Point FindClosestToCentroid(HashSet<Point> frontierCluster){
+        Point centroid = CalculateCentroid(frontierCluster);
+        List<Point> frontierClusterList = frontierCluster.ToList();
+        Point closestPoint = frontierClusterList[0];
+        double minDistance = double.MaxValue;
+        foreach(Point frontierPoint in frontierCluster){
+            double distance = CalculateEuclideanDistance(frontierPoint, centroid);
+            if(distance < minDistance){
+                minDistance = distance;
+                closestPoint = frontierPoint;
+            }
+        }
+        return closestPoint;
+    }
+
+    private Point CalculateCentroid(HashSet<Point> frontierCluster){
+        int sumX = 0;
+        int sumY = 0;
+        foreach(Point frontierPoint in frontierCluster){
+            sumX += frontierPoint.x;
+            sumY += frontierPoint.y;
+        }
+        int totalFrontierPoints = frontierCluster.Count;
+        return new Point(sumX/totalFrontierPoints, sumY/totalFrontierPoints);
+    }
+
+    private double CalculateEuclideanDistance(Point p1, Point p2){
+        int dx = p1.x - p2.x; 
+        int dy = p1.y - p1.y;
+        return Math.Sqrt(dx*dx + dy * dy);
+    }
+
     public HashSet<Point> FindFrontierPoints(HashSet<Point> visibleTiles, HashSet<Point> visibleWalls) {
         HashSet<Point> frontierPoints = new();
         foreach(Point point in visibleTiles){

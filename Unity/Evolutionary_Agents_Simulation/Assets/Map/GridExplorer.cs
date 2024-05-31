@@ -50,4 +50,53 @@ public class GridExplorer
             }
         } return accessibleCount;
     }
+
+    public static HashSet<Point> ClusterFrontierPoints(HashSet<Point> frontierPoints, Point frontierPoint, MapObject[,] map){
+        int rowLength = map.GetLength(0);
+        int colLength = map.GetLength(1);
+        
+        int[] dx = { -1, 0, 1, 0, 1, -1, -1, 1};
+        int[] dy = { 0, 1, 0, -1, 1, -1, 1, -1};
+        
+        int startX = frontierPoint.x;
+        int startY = frontierPoint.y;
+        
+        // Check if starting point is valid
+        if (startX < 0 || startX >= colLength || startY < 0 || startY >= rowLength || map[startY, startX].Type == MapObject.ObjectType.Wall)
+            throw new System.Exception("invalid frontier point");
+        
+        // Queue for managing BFS 
+        Queue<(int x, int y)> queue = new();
+        queue.Enqueue((startX, startY));
+
+        // Set to keep track of visited nodes
+        bool[,] visited = new bool[rowLength, colLength];
+        visited[startY, startX] = true;
+
+        // Variable to cluster frontier points
+        HashSet<Point> clusteredFrontierPoints = new();
+
+        while (queue.Count > 0)
+        {
+            (int x, int y) = queue.Dequeue();
+            clusteredFrontierPoints.Add(new Point(x,y));
+
+            // Explore adjacent cells around current node
+            for (int i = 0; i < 8; i++)
+            {
+                int newX = x + dx[i];
+                int newY = y + dy[i];
+
+                // Check bounds and whether the cell is walkable and not visited
+                if (newX >= 0 && newX < colLength && newY >= 0 && newY < rowLength && map[newX, newY].Type == MapObject.ObjectType.Tile && !visited[newX, newY])
+                {
+                    if(frontierPoints.Contains(new Point(newX,newY))){
+                        queue.Enqueue((newX, newY));
+                        visited[newX, newY] = true;
+                    }
+                     
+                }
+            }
+        } return clusteredFrontierPoints;
+    }
 }
