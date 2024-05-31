@@ -11,5 +11,4 @@ public interface IGraphModel
     Dictionary<int, HashSet<Entrance>> EntrancesByLevel { get; set; } // E 
 
 
-
 }

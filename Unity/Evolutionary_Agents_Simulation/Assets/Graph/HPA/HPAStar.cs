@@ -401,5 +401,17 @@ public class HPAStar : IHPAStar
                c1.bottomLeftPos.y == c2.topRightPos.y + 1 || c1.topRightPos.y == c2.bottomLeftPos.y - 1;
     }
 
+    public static int maxLevelAllowed(int mapSize, int clusterSize = 10, int remaingClusters = 4)
+    {
+        int maxLevel = 1;
+        int numClusters = mapSize / clusterSize;
+        while (numClusters > remaingClusters)
+        {
+            numClusters = numClusters / 2;
+            maxLevel++;
+        }
+        return maxLevel;
+    }
+
 
 }
