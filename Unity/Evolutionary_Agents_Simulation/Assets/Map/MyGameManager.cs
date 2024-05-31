@@ -67,7 +67,7 @@ public class MyGameManager
         HPAStar hpaStar = new HPAStar(_graphModel, clusterManager, _nodeManager, entranceManager, edgeManager, _pathFinder);
         int mapSize = map.GetLength(0);
 
-        int clusterSize = ClusterManager.CalculateValidClusterSize(mapSize, minClusterSize: 5, maxClusterSize: 50);
+        int clusterSize = ClusterManager.CalculateValidClusterSize(mapSize, minClusterSize: 5, maxClusterSize: 50, targetDivisor: 10);
         Debug.Log("Cluster Size: " + clusterSize);
         int maxLevel = HPAStar.maxLevelAllowed(mapSize, clusterSize: clusterSize);
         hpaStar.Preprocessing(maxLevel, clusterSize);
