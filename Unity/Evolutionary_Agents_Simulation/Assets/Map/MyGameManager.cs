@@ -36,6 +36,7 @@ public class MyGameManager
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
         agentController.Scan();
+        agentController.UpdateFrontier();
 
     }
 

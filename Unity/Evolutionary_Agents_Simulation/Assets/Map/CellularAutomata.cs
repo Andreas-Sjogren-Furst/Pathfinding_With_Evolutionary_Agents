@@ -26,7 +26,8 @@ public class CellularAutomata
         {
             for (int j = 0; j < width; j++)
             {
-                int randomValue = UnityEngine.Random.Range(0, 101); // Generate a random value
+                int randomValue = UnityEngine.Random.Range(1, 101); // Generate a random value
+                
                 map[i, j] = randomValue > density ? 0 : 1; // Assign floor or wall based on density.
             }
         }

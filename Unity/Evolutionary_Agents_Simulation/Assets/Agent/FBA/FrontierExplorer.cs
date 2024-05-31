@@ -14,7 +14,7 @@ public class FrontierExplorer
             List<Point> neighBoringPoints = FindNeighboringPoints(point);
             foreach(Point neighBoringPoint in neighBoringPoints){
                 if(!visibleTiles.Contains(neighBoringPoint) && !visibleWalls.Contains(neighBoringPoint)){
-                    frontierPoints.Add(neighBoringPoint);
+                    frontierPoints.Add(point);
                 }
             }
         } return frontierPoints;
