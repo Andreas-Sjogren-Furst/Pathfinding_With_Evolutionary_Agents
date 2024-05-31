@@ -19,7 +19,7 @@ public class MyGameManager
     public void main()
     {
 
-        mapController.ChangeMapParameters(customMaps.GetCustomMap(1));
+        mapController.ChangeMapParameters(customMaps.GetCustomMap(0));
 
     }
 
@@ -36,6 +36,12 @@ public class MyGameManager
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
         agentController.Scan();
+
+        // HPAGraphController.HierarchicalSearch(new Vector2Int(5, 5), new Vector2Int(95, 95), 1);
+
+
+
+
 
     }
 
@@ -60,6 +66,10 @@ public class MyGameManager
         HPAStar hpaStar = new HPAStar(_graphModel, clusterManager, _nodeManager, entranceManager, edgeManager, _pathFinder);
         int maxLevel = HPAStar.maxLevelAllowed(map.GetLength(0), clusterSize: 10);
         hpaStar.Preprocessing(maxLevel);
+
+
+
+
         return hpaStar;
     }
 

@@ -71,9 +71,13 @@ public class WebView : MonoBehaviour, IScreenView
     void Start()
     {
         RenderMap();
-        //RenderHPAGraph(1);
+        RenderHPAGraph(1);
         SpawnAgents();
-        //RenderMMASGraph();
+        RenderMMASGraph();
+
+
+
+
 
         //myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
