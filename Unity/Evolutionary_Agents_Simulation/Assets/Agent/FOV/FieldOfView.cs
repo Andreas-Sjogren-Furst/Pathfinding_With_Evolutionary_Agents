@@ -74,7 +74,7 @@ public class FieldOfView
     public Fraction Slope(Point tile){
         int rowDepth = tile.x;
         int col = tile.y;
-        return new Fraction(2 * col - 1, 2 * rowDepth);
+        return new Fraction(2 * col - 1, 2  * rowDepth);
     }
     
     public bool IsSymmetric(Row row, Point tile){

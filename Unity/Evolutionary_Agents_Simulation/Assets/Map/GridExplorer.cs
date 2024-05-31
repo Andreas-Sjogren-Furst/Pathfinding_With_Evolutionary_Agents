@@ -62,7 +62,7 @@ public class GridExplorer
         int startY = frontierPoint.y;
         
         // Check if starting point is valid
-        if (startX < 0 || startX >= colLength || startY < 0 || startY >= rowLength || map[startY, startX].Type == MapObject.ObjectType.Wall)
+        if (startX < 0 || startX >= colLength || startY < 0 || startY >= rowLength || map[startX, startY].Type == MapObject.ObjectType.Wall)
             throw new System.Exception("invalid frontier point");
         
         // Queue for managing BFS 

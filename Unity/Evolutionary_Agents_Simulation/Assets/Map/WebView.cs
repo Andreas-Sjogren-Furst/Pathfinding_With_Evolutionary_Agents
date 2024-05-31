@@ -22,6 +22,7 @@ public class WebView : MonoBehaviour, IScreenView
     public GameObject nodePrefab;
     public GameObject entrancePrefab;
     public GameObject linePrefab;
+    public GameObject frontierPrefab;
 
     public Material clusterMaterial;
     public Material intraEdgeMaterial;
@@ -40,6 +41,7 @@ public class WebView : MonoBehaviour, IScreenView
     private List<GameObject> InstantiatedAgents;
     private List<GameObject> InstantiatedMMASNodes;
     private List<GameObject> InstantiatedMMASEdges;
+    private List<GameObject> InstantiatedFrontiers;
     private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
     private readonly float nodeScale = 0.1f;
@@ -61,6 +63,7 @@ public class WebView : MonoBehaviour, IScreenView
 
         InstantiatedCheckPoints = new();
         InstantiatedAgents = new();
+        InstantiatedFrontiers = new();
         InstantiatedMap = new GameObject[screenViewModel.map.GetLength(1), screenViewModel.map.GetLength(0)];
         InstantiatedMMASEdges = new();
         InstantiatedMMASNodes = new();
@@ -74,6 +77,7 @@ public class WebView : MonoBehaviour, IScreenView
         RenderHPAGraph(1);
         SpawnAgents();
         RenderMMASGraph();
+        RenderFrontiers();
 
 
 
@@ -384,6 +388,26 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
+    public void ClearFrontiers(){
+        foreach(GameObject frontier in InstantiatedFrontiers){
+            if(frontier != null) Destroy(frontier);
+        }
+    }
+    public void RenderFrontiers(){
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        HashSet<Point> frontiers = screenViewModel.frontier;
+        ClearFrontiers();
+        foreach(Point frontier in frontiers){
+            Vector3 frontierPosition = new(frontier.x,1,frontier.y);
+            InstantiatedFrontiers.Add(Instantiate(frontierPrefab,frontierPosition,Quaternion.identity));
+        }
+    }
+    public void ShowOrHideFrontiers(bool isOn){
+        foreach(GameObject frontier in InstantiatedFrontiers){
+            frontier.SetActive(isOn);
+        }
+    }
+
     // ##### WebView for MMAS #####
     void RenderMMASGraph()
     {
@@ -396,9 +420,9 @@ public class WebView : MonoBehaviour, IScreenView
         List<CheckPoint> checkPoints = screenViewModel.checkPoints;
         foreach (CheckPoint checkPoint in checkPoints)
         {
-            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, false);
+            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, true);
         }
-        myGameManager.MmasAddCheckpoint(screenViewModel.spawnPoint.ArrayPosition, 1, 100, false);
+        myGameManager.MmasAddCheckpoint(screenViewModel.spawnPoint.ArrayPosition, 1, 100, true);
         // Create node objects
         for (int i = 0; i < graph.Nodes.Count; i++)
         {

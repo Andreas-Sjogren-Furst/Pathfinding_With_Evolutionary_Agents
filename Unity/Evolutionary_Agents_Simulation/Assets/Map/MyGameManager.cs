@@ -29,13 +29,14 @@ public class MyGameManager
     public MyGameManager()
     {
         customMaps = new();
-        MapModel mapModel = customMaps.GetCustomMap(0);
+        MapModel mapModel = customMaps.GetCustomMap(6);
         mapController = new MapController(mapModel);
         AgentModel agentModel = new(1, mapModel.map, mapModel.spawnPoint);
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
         agentController.Scan();
+        agentController.UpdateFrontierPoints();
         agentController.UpdateFrontier();
 
         // HPAGraphController.HierarchicalSearch(new Vector2Int(5, 5), new Vector2Int(50, 50), 1);
