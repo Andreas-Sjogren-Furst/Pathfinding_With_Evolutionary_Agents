@@ -29,9 +29,9 @@ public class HPAStar : IHPAStar
         _pathFinder = pathFinder;
 
     }
-    public void Preprocessing(int maxLevel)
+    public void Preprocessing(int maxLevel, int clusterSize = 10)
     {
-        AbstractMaze();
+        AbstractMaze(clusterSize);
         BuildGraph();
         for (int l = 2; l <= maxLevel; l++)
         {
@@ -39,9 +39,9 @@ public class HPAStar : IHPAStar
         }
     }
 
-    public void AbstractMaze()
+    public void AbstractMaze(int clusterSize)
     {
-        _graphModel.ClusterByLevel.Add(1, _clusterManager.BuildClusters(1, _graphModel.GlobalTileMap));
+        _graphModel.ClusterByLevel.Add(1, _clusterManager.BuildClusters(1, _graphModel.GlobalTileMap, clusterSize));
         foreach (Cluster c1 in _graphModel.ClusterByLevel[1])
         {
             foreach (Cluster c2 in _graphModel.ClusterByLevel[1])
@@ -412,6 +412,9 @@ public class HPAStar : IHPAStar
         }
         return maxLevel;
     }
+
+
+
 
 
 }
