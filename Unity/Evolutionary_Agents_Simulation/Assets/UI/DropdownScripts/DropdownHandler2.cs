@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DropdownHandler : MonoBehaviour
+public class DropdownHandler2 : MonoBehaviour
 {
     Dropdown dropdown;
     PanelManager1 panelManager;

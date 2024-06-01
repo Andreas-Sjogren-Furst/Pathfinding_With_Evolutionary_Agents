@@ -13,7 +13,7 @@ public class PanelManager1 : MonoBehaviour
     void Start()
     {
         submitButton = GetComponentInChildren<Button>();
-        dropdown = GetComponentInChildren<Dropdown>();
+        dropdown = GetComponentsInChildren<Dropdown>()[1];
         sliders = GetComponentsInChildren<Slider>();
         inputField = GetComponentInChildren<InputField>();
         

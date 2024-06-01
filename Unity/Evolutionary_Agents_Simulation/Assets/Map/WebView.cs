@@ -37,7 +37,8 @@ public class WebView : MonoBehaviour, IScreenView
     private GameObject[,] InstantiatedMap;
     private List<GameObject> InstantiatedCheckPoints;
     private GameObject InstantiatedSpawnPoint;
-    private List<GameObject> InstantiatedHPAGraph;
+    private List<GameObject> pHPAGraph;
+    private List<GameObject>[] InstantiatedHPAGraphs;
     private List<GameObject> InstantiatedAgents;
     private List<GameObject> InstantiatedMMASNodes;
     private List<GameObject> InstantiatedMMASEdges;
@@ -46,6 +47,8 @@ public class WebView : MonoBehaviour, IScreenView
     private readonly int tileSize = 1;
     private readonly float nodeScale = 0.1f;
     private readonly float animationSpeed = 5f;
+    public int amountHPALevels;
+    public int currentHPALevel;
 
 
     // Presenter
@@ -60,21 +63,23 @@ public class WebView : MonoBehaviour, IScreenView
         myGameManager = new();
         screenPresenter = new(myGameManager);
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-
+        amountHPALevels = myGameManager.HPAGraphController._graphModel.ClusterByLevel.Count;
+        InstantiatedHPAGraphs = new List<GameObject>[amountHPALevels];
+        for(int i = 0; i < amountHPALevels; i++) {InstantiatedHPAGraphs[i] = new();}
         InstantiatedCheckPoints = new();
         InstantiatedAgents = new();
         InstantiatedFrontiers = new();
         InstantiatedMap = new GameObject[screenViewModel.map.GetLength(1), screenViewModel.map.GetLength(0)];
         InstantiatedMMASEdges = new();
         InstantiatedMMASNodes = new();
-        InstantiatedHPAGraph = new List<GameObject>();
+        pHPAGraph = InstantiatedHPAGraphs[0];
+        currentHPALevel = 0;
 
     }
-
     void Start()
     {
         RenderMap();
-        RenderHPAGraph(1);
+        RenderHPAGraphs();
         SpawnAgents();
         RenderMMASGraph();
         RenderFrontiers();
@@ -177,37 +182,39 @@ public class WebView : MonoBehaviour, IScreenView
             InstantiatedSpawnPoint.SetActive(isOn);
     }
 
-    // ### Webview for Graph ###
-    private void RenderHPAGraph(int level)
+    // ### Webview for HPA Graph ###
+    private void RenderHPAGraphs()
     {
+
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        ClearHPAGraph(InstantiatedHPAGraph);
-        InstantiatedHPAGraph = new List<GameObject>();
         IGraphModel graph = screenViewModel.hpaGraph;
-        if (graph.ClusterByLevel.TryGetValue(level, out var clusters))
-        {
-            foreach (Cluster cluster in clusters)
+        foreach(KeyValuePair<int,HashSet<Cluster>> hpaGraph in graph.ClusterByLevel){
+            if (graph.ClusterByLevel.TryGetValue(hpaGraph.Key, out var clusters))
             {
-                Vector3 bottomLeft = transform.position + new Vector3(cluster.bottomLeftPos.x * tileSize, 0, cluster.bottomLeftPos.y * tileSize);
-                Vector3 topRight = transform.position + new Vector3(cluster.topRightPos.x * tileSize, 0, cluster.topRightPos.y * tileSize);
-                Vector3 topLeft = transform.position + new Vector3(cluster.bottomLeftPos.x * tileSize, 0, cluster.topRightPos.y * tileSize);
-                Vector3 bottomRight = transform.position + new Vector3(cluster.topRightPos.x * tileSize, 0, cluster.bottomLeftPos.y * tileSize);
-                DrawLine(bottomLeft, topLeft, clusterMaterial);
-                DrawLine(topLeft, topRight, clusterMaterial);
-                DrawLine(topRight, bottomRight, clusterMaterial);
-                DrawLine(bottomRight, bottomLeft, clusterMaterial);
-                DrawEntrances(cluster);
-                foreach (var node in cluster.Nodes)
+                int arrayIndex = hpaGraph.Key - 1;
+                foreach (Cluster cluster in clusters)
                 {
-                    DrawNode(node);
-                    DrawEdges(node, HPAEdgeType.INTRA);
-                    DrawEdges(node, HPAEdgeType.INTER);
+                    Vector3 bottomLeft = transform.position + new Vector3(cluster.bottomLeftPos.x * tileSize, 0, cluster.bottomLeftPos.y * tileSize);
+                    Vector3 topRight = transform.position + new Vector3(cluster.topRightPos.x * tileSize, 0, cluster.topRightPos.y * tileSize);
+                    Vector3 topLeft = transform.position + new Vector3(cluster.bottomLeftPos.x * tileSize, 0, cluster.topRightPos.y * tileSize);
+                    Vector3 bottomRight = transform.position + new Vector3(cluster.topRightPos.x * tileSize, 0, cluster.bottomLeftPos.y * tileSize);
+                    DrawLine(bottomLeft, topLeft, clusterMaterial, InstantiatedHPAGraphs[arrayIndex]);
+                    DrawLine(topLeft, topRight, clusterMaterial, InstantiatedHPAGraphs[arrayIndex]);
+                    DrawLine(topRight, bottomRight, clusterMaterial, InstantiatedHPAGraphs[arrayIndex]);
+                    DrawLine(bottomRight, bottomLeft, clusterMaterial, InstantiatedHPAGraphs[arrayIndex]);
+                    DrawEntrances(cluster, InstantiatedHPAGraphs[arrayIndex]);
+                    foreach (var node in cluster.Nodes)
+                    {
+                        DrawNode(node, InstantiatedHPAGraphs[arrayIndex]);
+                        DrawEdges(node, HPAEdgeType.INTRA, InstantiatedHPAGraphs[arrayIndex]);
+                        DrawEdges(node, HPAEdgeType.INTER, InstantiatedHPAGraphs[arrayIndex]);
+                    }
                 }
             }
-        }
-        else
-        {
-            Debug.Log($"No data available for level {level}");
+            else
+            {
+                Debug.Log($"No data available for level {hpaGraph.Key}");
+            }
         }
     }
 
@@ -222,18 +229,23 @@ public class WebView : MonoBehaviour, IScreenView
 
     public void ShowOrHideHPAGraph(bool isOn)
     {
-        foreach (GameObject graphObject in InstantiatedHPAGraph)
+        foreach (GameObject graphObject in pHPAGraph)
             if (graphObject != null) graphObject.SetActive(isOn);
     }
 
-    private void DrawNode(HPANode node)
+    public void SetCurrentHPALevel(int level){
+        pHPAGraph = InstantiatedHPAGraphs[level];
+    }
+
+    private void DrawNode(HPANode node, List<GameObject> InstantiatedGraph)
     {
         GameObject nodeObj = Instantiate(nodePrefab, transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize), Quaternion.identity);
         nodeObj.transform.localScale = Vector3.one * nodeScale * tileSize;
-        InstantiatedHPAGraph.Add(nodeObj);
+        InstantiatedGraph.Add(nodeObj);
+        nodeObj.SetActive(false);
     }
 
-    private void DrawPath(HPAPath path)
+    private void DrawPath(HPAPath path, List<GameObject> InstantiatedGraph)
     {
         for (int i = 0; i < path.path.Count - 1; i++)
         {
@@ -252,32 +264,33 @@ public class WebView : MonoBehaviour, IScreenView
             {
                 Debug.Log("intraEdgeMaterial is null");
             }
-            DrawLine(start, end, pathMaterial);
+            DrawLine(start, end, pathMaterial, InstantiatedGraph);
         }
     }
 
-    private void DrawEntrances(Cluster cluster)
+    private void DrawEntrances(Cluster cluster, List<GameObject> InstantiatedGraph)
     {
         foreach (Entrance entrance in cluster.Entrances)
         {
             GameObject entranceObj = Instantiate(entrancePrefab, transform.position + new Vector3(entrance.Node1.Position.x * tileSize, 0, entrance.Node1.Position.y * tileSize), Quaternion.identity);
             entranceObj.transform.localScale = Vector3.one * nodeScale * tileSize;
-            InstantiatedHPAGraph.Add(entranceObj);
+            InstantiatedGraph.Add(entranceObj);
+            entranceObj.SetActive(false);
         }
     }
 
-    private void DrawEdges(HPANode node, HPAEdgeType edgeType)
+    private void DrawEdges(HPANode node, HPAEdgeType edgeType, List<GameObject> InstantiatedGraph)
     {
         foreach (HPAEdge edge in node.Edges)
         {
             if (edge.Type != edgeType) continue;
             Vector3 start = transform.position + new Vector3(node.Position.x * tileSize, 0, node.Position.y * tileSize);
             Vector3 end = transform.position + new Vector3(edge.Node2.Position.x * tileSize, 0, edge.Node2.Position.y * tileSize);
-            DrawLine(start, end, edgeType == HPAEdgeType.INTRA ? intraEdgeMaterial : interEdgeMaterial);
+            DrawLine(start, end, edgeType == HPAEdgeType.INTRA ? intraEdgeMaterial : interEdgeMaterial, InstantiatedGraph);
         }
     }
 
-    private void DrawLine(Vector3 start, Vector3 end, Material material)
+    private void DrawLine(Vector3 start, Vector3 end, Material material, List<GameObject> InstantiatedGraph)
     {
         GameObject lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
         LineRenderer lr = lineObj.GetComponent<LineRenderer>();
@@ -285,7 +298,8 @@ public class WebView : MonoBehaviour, IScreenView
         lr.startWidth = 0.05f * tileSize;
         lr.endWidth = 0.05f * tileSize;
         lr.SetPositions(new Vector3[] { start, end });
-        InstantiatedHPAGraph.Add(lineObj);
+        InstantiatedGraph.Add(lineObj);
+        lineObj.SetActive(false);
     }
 
     // ### WebView for Agents ###

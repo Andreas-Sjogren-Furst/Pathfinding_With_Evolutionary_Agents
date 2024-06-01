@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MyGameManager
@@ -38,6 +39,14 @@ public class MyGameManager
         agentController.Scan();
         agentController.UpdateFrontierPoints();
         agentController.UpdateFrontier();
+
+        
+
+        
+        // foreach(KeyValuePair<int,HashSet<Cluster>> hpaGrah in HPAGraphController._graphModel.ClusterByLevel) {
+
+
+        // } 
 
         // HPAGraphController.HierarchicalSearch(new Vector2Int(5, 5), new Vector2Int(50, 50), 1);
 
