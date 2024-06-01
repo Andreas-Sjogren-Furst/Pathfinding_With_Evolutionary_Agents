@@ -8,13 +8,14 @@ public class ScreenViewModel
     public HashSet<Point> visibleTiles;
     public HashSet<Point> frontierPoints;
     public HashSet<Point> frontier;
+    public List<HashSet<Cluster>> hpaGraphs;
     public IGraphModel hpaGraph;
     public Graph mmasGraph;
     public List<CheckPoint> checkPoints;
     public AgentSpawnPoint spawnPoint;
     
 
-    public ScreenViewModel(int accessibleNodes, HashSet<Point> visibleTiles, HashSet<Point> frontierPoints, HashSet<Point> frontier, MapObject[,] map, Agent[] agents, IGraphModel hpaGraph, Graph mmasGraph, List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
+    public ScreenViewModel(int accessibleNodes, HashSet<Point> visibleTiles, HashSet<Point> frontierPoints, HashSet<Point> frontier, MapObject[,] map, Agent[] agents,IGraphModel hpaGraph, Graph mmasGraph, List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
         this.accessibleNodes = accessibleNodes;
         this.visibleTiles = visibleTiles;
         this.frontierPoints = frontierPoints;
