@@ -18,10 +18,12 @@ public class MmasMapTest
     {
         int numRuns = 30;
         // Generate and save maps for simulations
-        // savedMaps = GenerateMaps(numRuns, (60, 60), (15, 15), (17, 20), (100, 100), (100, 100));
-        savedMaps = GenerateMaps(numRuns, (0, 0), (40, 40), (0, 0), (100, 100), (100, 100));
+        savedMaps = GenerateMaps(numRuns, (60, 60), (15, 15), (17, 20), (100, 100), (100, 100));
+        // savedMaps = GenerateMaps(numRuns, (0, 0), (40, 40), (0, 0), (100, 100), (100, 100));
 
-        RunSimulations("30_experiment_trail_limits", numRuns, false, false, false);
+        RunSimulations("30_experiment_NEW3_alpa_1.5_beta_4.5_parameters_trail_limits_0_10000", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
+        // RunSimulations("30_experiment_NEW2_parameters_trail_limits_non_scaled", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
+        // RunSimulations("30_experiment_NEW2_parameters_trail_limits_non_scaled", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
 
     }
 
@@ -103,7 +105,7 @@ public class MmasMapTest
 
 
 
-    private void RunHeurticsSimulation(string mode, int simulationRun, int iterations, MapModel mapModel, string csvFilePath, bool LinearHeuristic = true, int heuristicsLevel = 1, bool scaleGraphEdges = false, bool plotIterations_stagnation = true)
+    private void RunHeurticsSimulation(string mode, int simulationRun, int iterations, MapModel mapModel, string csvFilePath, bool LinearHeuristic = true, int heuristicsLevel = 1, bool scaleGraphEdges = false, bool plotIterations_stagnation = false)
     {
         MyGameManager myGameManager = new MyGameManager(mapModel);
         int[,] map = CellularAutomata.Convert3DTo2D(mapModel.map);
@@ -202,10 +204,10 @@ public class MmasMapTest
 
         if (scaleGraphEdges)
         {
-            graph.ScaleGraphEdges(0, 1000);
+            graph.ScaleGraphEdges(0, 10000);
         }
 
-        for (int runs = 0; runs < 1; runs++)
+        for (int runs = 0; runs < 10; runs++)
         {
             Node[] nodes = new Node[graph.Nodes.Count];
             int MMASIterations = 0;
@@ -234,13 +236,15 @@ public class MmasMapTest
             int totalDistance = 0;
             for (int i = 0; i < nodes.Length - 1; i++)
             {
-                (List<Vector2Int> path, int exploredNodes) = Astar.FindPath(centerCheckpoint, new Vector2Int((int)nodes[i].X, (int)nodes[i].Y), map);
+                Node node1 = nodes[i];
+                Node node2 = nodes[i + 1];
+                Vector2Int v1 = new Vector2Int((int)node1.X, (int)node1.Y);
+                Vector2Int v2 = new Vector2Int((int)node2.X, (int)node2.Y);
+                (List<Vector2Int> path, int exploredNodes) = Astar.FindPath(v1, v2, map);
                 totalDistance += path.Count;
             }
 
 
-            // Debug.Log($"Valid Checkpoints: {validCheckpoints.Count}");
-            // Debug.Log($"Total Distance: {totalDistance}");
 
 
             // Collect and save results
@@ -328,7 +332,7 @@ public class MmasMapTest
             }
 
             // Run the MMAS algorithm to get the optimal path
-            int localIterations = myGameManager.mmasGraphController.Run(500);
+            int localIterations = myGameManager.mmasGraphController.Run(1000);
             MMASIterations = MMASIterations + localIterations;
             // Collect and save results
             SaveResults(mode, simulationRun, i, MMASIterations, localIterations, myGameManager.mmasGraphController, csvFilePath);

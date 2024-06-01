@@ -24,8 +24,8 @@ public class MMASTest
         double optimalTourLength = CalculateTourLength(optimalTour, graph);
 
         int numAnts = 52;
-        double alpha = 1.5;
-        double beta = 4.5;
+        double alpha = 1;
+        double beta = 5;
         double rho = 0.90;
         double q = 100.0;
         int maxIterations = 500;

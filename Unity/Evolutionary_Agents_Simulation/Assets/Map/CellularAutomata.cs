@@ -5,6 +5,8 @@ using System.Runtime.InteropServices.WindowsRuntime;
 public class CellularAutomata
 {
 
+
+
     public static int[,] Create2DMap(int height, int width, float density, int iterations, int erosionLimit)
     {
         int[,] map2D = new int[height, width];
@@ -27,7 +29,7 @@ public class CellularAutomata
             for (int j = 0; j < width; j++)
             {
                 int randomValue = UnityEngine.Random.Range(1, 101); // Generate a random value
-                
+
                 map[i, j] = randomValue > density ? 0 : 1; // Assign floor or wall based on density.
             }
         }
@@ -49,14 +51,18 @@ public class CellularAutomata
                 {
                     int neighborWallCount = 0;
 
+                    // Check all neighboring cells in a 3x3 grid around the current cell
                     for (int y = j - 1; y <= j + 1; y++)
                     {
                         for (int x = k - 1; x <= k + 1; x++)
                         {
+                            // Ensure the neighbor coordinates are within the map bounds
                             if (x >= 0 && x < width && y >= 0 && y < height)
                             {
+                                // Skip the current cell itself
                                 if (y != j || x != k)
                                 {
+                                    // Increment the wall count if the neighbor cell is a wall
                                     if (tempGrid[y, x] == 1)
                                     {
                                         neighborWallCount++;

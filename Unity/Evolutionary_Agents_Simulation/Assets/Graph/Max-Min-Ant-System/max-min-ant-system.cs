@@ -361,7 +361,7 @@ public class MMAS
 
             // Find the best tour after all ants have finished their tours
             int bestIndex = Array.IndexOf(antTourLengths, antTourLengths.Min());
-            if (antTourLengths[bestIndex] < _bestTourLength)
+            if (antTourLengths[bestIndex] < _bestTourLength) // global best tour
             {
                 _bestTour = antTours[bestIndex];
                 _bestTourLength = antTourLengths[bestIndex];
@@ -384,7 +384,7 @@ public class MMAS
                 if (convergenceCount >= convergenceCountRequired)
                 {
                     // UnityEngine.Debug.Log("Convergence reached after " + iterations + " iterations.");
-                    break; // Early stopping, this signifcanlty increased the speed of the algorithm from 5 sec to 0.5 sec
+                    break; //Convergence, this signifcanlty increased the speed of the algorithm from 5 sec to 0.5 sec
                 }
             }
             else
