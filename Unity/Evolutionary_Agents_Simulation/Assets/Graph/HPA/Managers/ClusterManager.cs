@@ -17,12 +17,12 @@ public class ClusterManager : IClusterManager
     public ClusterManager(IGraphModel graphModel, INodeManager nodeManager, IEdgeManager edgeManager, IEntranceManager entranceManager)
     {
         _graphModel = graphModel;
-
         _nodeManager = nodeManager;
         _edgeManager = edgeManager;
         _entranceManager = entranceManager;
     }
 
+    // O(N^2)
     public HashSet<Cluster> BuildClusters(int level, MapObject[,] globalTileMap, int clusterSize = 10)
     {
         HashSet<Cluster> clusters = new HashSet<Cluster>();
@@ -108,6 +108,8 @@ public class ClusterManager : IClusterManager
 
     public Cluster CreateEdgesForCluster(Cluster cluster, Vector2Int newNodePosition, Boolean dynamicallyAddInterEdges = false) // kan skiftes ud med createEdgeForCluster, men et parameter skal ændres ift. om den også skal lave inter.
     {
+
+
         foreach (var direction in new Vector2Int[] { new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1) })
         {
             Vector2Int adjacentPosition = newNodePosition + direction;
@@ -123,9 +125,6 @@ public class ClusterManager : IClusterManager
                 { // if the other node is on the border, we create a inter edge TOOD: perhaps we should create entrance instead. 
                     _edgeManager.AddHPAEdge(_graphModel.NodesByLevel[1][newNodePosition], _graphModel.NodesByLevel[1][adjacentPosition], 1, 1, HPAEdgeType.INTER);
                 }
-
-
-
             }
         }
         return cluster;
@@ -157,10 +156,6 @@ public class ClusterManager : IClusterManager
 
         mergedCluster.bottomLeftPos = bottomLeft;
         mergedCluster.topRightPos = topRight;
-
-
-
-
 
         // Merge all clusters
         foreach (Cluster cluster in clustersToMerge)
@@ -205,6 +200,7 @@ public class ClusterManager : IClusterManager
                     n1.Cluster = mergedCluster;
 
                 }
+
                 if (mergedCluster.Contains(n2.Position))
                 {
                     n2.Cluster = mergedCluster;
@@ -352,15 +348,4 @@ public class ClusterManager : IClusterManager
 
         return true;
     }
-
-
-
-
-
-
-
-
-
-
-
 }

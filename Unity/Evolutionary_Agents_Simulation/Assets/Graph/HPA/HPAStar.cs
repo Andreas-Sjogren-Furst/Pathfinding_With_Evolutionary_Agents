@@ -32,23 +32,23 @@ public class HPAStar : IHPAStar
     public void Preprocessing(int maxLevel, int clusterSize = 10)
     {
         AbstractMaze(clusterSize);
-        BuildGraph();
+        BuildGraph(); // build graph for level 1. 
         for (int l = 2; l <= maxLevel; l++)
         {
             AddLevelToGraph(l);
         }
     }
 
-    public void AbstractMaze(int clusterSize)
+    public void AbstractMaze(int clusterSize) // o(n^2)
     {
-        _graphModel.ClusterByLevel.Add(1, _clusterManager.BuildClusters(1, _graphModel.GlobalTileMap, clusterSize));
-        foreach (Cluster c1 in _graphModel.ClusterByLevel[1])
+        _graphModel.ClusterByLevel.Add(1, _clusterManager.BuildClusters(1, _graphModel.GlobalTileMap, clusterSize)); // O(n^2)
+        foreach (Cluster c1 in _graphModel.ClusterByLevel[1]) // O(C^2)
         {
             foreach (Cluster c2 in _graphModel.ClusterByLevel[1])
             {
                 if (Adjacent(c1, c2))
                 {
-                    HashSet<Entrance> entrances = _entranceManager.BuildEntrances(c1, c2);
+                    HashSet<Entrance> entrances = _entranceManager.BuildEntrances(c1, c2); // O(clustersize border size ) = o(c)
                     c1.Entrances.UnionWith(entrances);
                     c2.Entrances.UnionWith(entrances);
                     if (!_graphModel.EntrancesByLevel.ContainsKey(1))
@@ -109,7 +109,7 @@ public class HPAStar : IHPAStar
         var oldClusters = _graphModel.ClusterByLevel[l - 1].ToList();
         int numClusters = oldClusters.Count;
         int numClustersPerSide = (int)Math.Sqrt(numClusters);
-        int clustersToMergePerSide = 2; // Adjust this value as needed for the desired cluster merging size
+        int clustersToMergePerSide = 2; // Can be adjusted to merge more than 2 clusters per side
 
         // Calculate the number of complete blocks we can merge in both dimensions
         int fullBlocksPerSide = numClustersPerSide / clustersToMergePerSide;
@@ -178,6 +178,7 @@ public class HPAStar : IHPAStar
 
 
         // convert previous inter edges to intra 
+        // time complexity: O(N*E_intra)
         foreach (Vector2Int nodePos in _graphModel.NodesByLevel[l].Keys)
         {
             HPANode n = _graphModel.NodesByLevel[l][nodePos];
@@ -191,6 +192,8 @@ public class HPAStar : IHPAStar
             }
         }
 
+
+        // time complexity: O(C*E_C^2*A*)
         foreach (Cluster cluster in _graphModel.ClusterByLevel[l])
         {
             // Debug.Log("Cluster " + cluster.bottomLeftPos + " has " + cluster.Entrances.Count + " entrances at coordinates ");
@@ -371,7 +374,7 @@ public class HPAStar : IHPAStar
     }
 
 
-    private void BuildInterEdgesBetweenEntrances(Cluster c) // 
+    private void BuildInterEdgesBetweenEntrances(Cluster c) // (E_c^2) * O(A*) = 4*A* (with one entrace per side)
     {
         foreach (Entrance e1 in c.Entrances)
         {
