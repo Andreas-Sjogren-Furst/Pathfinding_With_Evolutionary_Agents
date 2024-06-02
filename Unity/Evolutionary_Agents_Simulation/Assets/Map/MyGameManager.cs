@@ -36,7 +36,7 @@ public class MyGameManager
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
-        agentController.Scan();
+        agentController.Scan(agentController.agentModel.agents[0]);
         agentController.UpdateFrontierPoints();
         agentController.UpdateFrontier();
 

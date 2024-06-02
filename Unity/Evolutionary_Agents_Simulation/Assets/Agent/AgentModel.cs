@@ -9,7 +9,7 @@ public class AgentModel
     public HashSet<Point> visibleTiles;
     public HashSet<Point> visibleWalls;
     public HashSet<Point> frontierPoints;
-    public HashSet<Point> frontier;
+    public Dictionary<int,Point> centroids;
     
     public AgentModel(int amountOfAgents, MapObject[,] map, AgentSpawnPoint spawnPoint){
         this.amountOfAgents = amountOfAgents;
@@ -18,7 +18,7 @@ public class AgentModel
         visibleTiles = new();
         visibleWalls = new();
         frontierPoints = new();
-        frontier = new();
+        centroids = new();
         agents = new Agent[amountOfAgents];
         for(int i = 0; i < amountOfAgents; i++){ agents[i] = new Agent(spawnPoint.ArrayPosition,i); }
     }

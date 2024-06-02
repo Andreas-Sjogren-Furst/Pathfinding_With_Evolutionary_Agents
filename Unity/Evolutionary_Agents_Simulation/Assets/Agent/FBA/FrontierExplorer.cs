@@ -12,15 +12,17 @@ public class FrontierExplorer
         this.map = map;
     }
 
-    public HashSet<Point> FindFrontier(HashSet<Point> visibleTiles, HashSet<Point> visibleWalls){
-        HashSet<Point> frontier = new();
+    public Dictionary<int,Point> FindFrontier(HashSet<Point> visibleTiles, HashSet<Point> visibleWalls){
+        Dictionary<int,Point> frontier = new();
         HashSet<Point> frontierPoints = FindFrontierPoints(visibleTiles,visibleWalls);
+        int frontierPointId = 0;
         while(frontierPoints.Count != 0){
             List<Point> temp = frontierPoints.ToList();
             Point point = temp[0];
             HashSet<Point> frontierCluster = GridExplorer.ClusterFrontierPoints(frontierPoints,point,map);
-            frontier.Add(FindClosestToCentroid(frontierCluster));
+            frontier.Add(frontierPointId, FindClosestToCentroid(frontierCluster));
             frontierPoints.ExceptWith(frontierCluster);
+            frontierPointId++;
         } return frontier;
     }
 

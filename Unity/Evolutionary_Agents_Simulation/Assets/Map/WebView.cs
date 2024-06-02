@@ -46,7 +46,7 @@ public class WebView : MonoBehaviour, IScreenView
     private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
     private readonly float nodeScale = 0.1f;
-    private readonly float animationSpeed = 5f;
+    private readonly float animationSpeed = 10f;
     public int amountHPALevels;
     public int currentHPALevel;
 
@@ -100,7 +100,12 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Update()
     {
-
+        if (Input.GetKeyUp(KeyCode.RightArrow))
+        {
+            myGameManager.agentController.SimulateAgents();
+            MoveAgents();
+            RenderFrontiers();
+        }
     }
     public void CreateMap(MapModel mapModel)
     {
@@ -324,7 +329,8 @@ public class WebView : MonoBehaviour, IScreenView
         {
             Vector2Int agentPosition = screenViewModel.agents[index].position;
             Vector3Int newWorldPosition = ConvertVector2DTo3D(agentPosition) + new Vector3Int(0, 1, 0);
-            agent.transform.position = Vector3.MoveTowards(agent.transform.position, newWorldPosition, step);
+            //agent.transform.position = Vector3.MoveTowards(agent.transform.position, newWorldPosition, step);
+            agent.transform.position = newWorldPosition;
             index++;
         }
     }
@@ -405,16 +411,16 @@ public class WebView : MonoBehaviour, IScreenView
     public void ClearFrontiers(){
         foreach(GameObject frontier in InstantiatedFrontiers){
             if(frontier != null) Destroy(frontier);
-        }
+        } InstantiatedFrontiers = new();
     }
     public void RenderFrontiers(){
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        HashSet<Point> frontiers = screenViewModel.frontier;
+        Dictionary<int,Point> centroids = screenViewModel.centroids;
         ClearFrontiers();
-        foreach(Point frontier in frontiers){
-            Vector3 frontierPosition = new(frontier.x,1,frontier.y);
+        foreach(KeyValuePair<int,Point> centroid in centroids){
+            Vector3 frontierPosition = new(centroid.Value.x,1,centroid.Value.y);
             InstantiatedFrontiers.Add(Instantiate(frontierPrefab,frontierPosition,Quaternion.identity));
-        }
+        } 
     }
     public void ShowOrHideFrontiers(bool isOn){
         foreach(GameObject frontier in InstantiatedFrontiers){
