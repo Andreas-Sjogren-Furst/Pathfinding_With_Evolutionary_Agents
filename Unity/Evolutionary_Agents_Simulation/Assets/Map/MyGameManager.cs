@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEngine.Analytics;
 
 public class MyGameManager
 {
@@ -40,9 +42,9 @@ public class MyGameManager
         agentController.UpdateFrontierPoints();
         agentController.UpdateFrontier();
 
-        
 
-        
+
+
         // foreach(KeyValuePair<int,HashSet<Cluster>> hpaGrah in HPAGraphController._graphModel.ClusterByLevel) {
 
 
@@ -116,20 +118,58 @@ public class MyGameManager
 
         if (mmasGraphController._graph.Nodes.Count < 3)
         {
-            mmasGraphController._graph.AddNode(newNode); // adds nodes statically
-            CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            List<(Node, double)> Edges = CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            if (Edges == null)
+            {
+                return;
+            }
+            else
+            {
+                mmasGraphController._graph.AddNode(newNode);
+                foreach ((Node, double) edge in Edges)
+                {
+                    mmasGraphController._graph.AddEdge(newNode, edge.Item1, edge.Item2);
+                    mmasGraphController._graph.AddEdge(edge.Item1, newNode, edge.Item2);
+                }
+
+            }
         }
         else if (mmasGraphController._graph.Nodes.Count == 3) // ensures graph is built when 3 checkpoints are added.
         {
-            mmasGraphController._graph.AddNode(newNode);
+            List<(Node, double)> Edges = CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            if (Edges == null)
+            {
+                return;
+            }
+            else
+            {
+                mmasGraphController._graph.AddNode(newNode);
+                foreach ((Node, double) edge in Edges)
+                {
+                    mmasGraphController._graph.AddEdge(newNode, edge.Item1, edge.Item2);
+                    mmasGraphController._graph.AddEdge(edge.Item1, newNode, edge.Item2);
+                }
 
-            CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            }
             mmasGraphController.SetGraph(mmasGraphController._graph);
         }
         else
         {
-            mmasGraphController.AddNode(newNode); // adds Dynamiclly.  
-            CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            List<(Node, double)> Edges = CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            if (Edges == null)
+            {
+                return;
+            }
+            else
+            {
+                mmasGraphController._graph.AddNode(newNode);
+                foreach ((Node, double) edge in Edges)
+                {
+                    mmasGraphController._graph.AddEdge(newNode, edge.Item1, edge.Item2);
+                    mmasGraphController._graph.AddEdge(edge.Item1, newNode, edge.Item2);
+                }
+
+            }
 
         }
         mmasGraphController._numAnts = mmasGraphController._graph.Nodes.Count;
@@ -141,8 +181,12 @@ public class MyGameManager
 
     }
 
-    private void CalculateEdges(int heuristicsLevel, bool linearHeuristic, Node newNode)
+    private List<(Node, double)> CalculateEdges(int heuristicsLevel, bool linearHeuristic, Node newNode)
     {
+
+        List<(Node, double)> edges = new List<(Node, double)>();
+
+
         foreach (Node node in mmasGraphController._graph.Nodes)
         {
             if (node != newNode)
@@ -163,13 +207,19 @@ public class MyGameManager
                     {
 
                         distance = path.Length;
+
+                    }
+                    else
+                    {
+                        return null;
                     }
                 }
 
-                mmasGraphController._graph.AddEdge(node, newNode, distance);
-                mmasGraphController._graph.AddEdge(newNode, node, distance);
+                edges.Add((node, distance));
             }
         }
+
+        return edges;
     }
 
     public void MmasRemoveCheckpoint(Vector2Int checkpoint, int iterations = 0)
