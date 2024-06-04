@@ -1,9 +1,56 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GridExplorer 
 {
+    public static List<Point> CountAccesibleCheckpoints(MapObject[,] map, AgentSpawnPoint spawnPoint, List<CheckPoint> checkPoints){
+        int rowLength = map.GetLength(0);
+        int colLength = map.GetLength(1);
+        List<Point> positionOfCheckPoints = new();
+        foreach(CheckPoint checkPoint in checkPoints) { positionOfCheckPoints.Add( new Point(checkPoint.ArrayPosition.x, checkPoint.ArrayPosition.y)); }
+        int[] dx = { -1, 0, 1, 0 };
+        int[] dy = { 0, 1, 0, -1 };
+        
+        int startX = spawnPoint.ArrayPosition.x;
+        int startY = spawnPoint.ArrayPosition.y;
+        
+        // Check if starting point is valid
+        if (startX < 0 || startX >= colLength || startY < 0 || startY >= rowLength || map[startY, startX].Type == MapObject.ObjectType.Wall)
+            throw new SystemException("invalid spawn point");
+        
+        // Queue for managing BFS 
+        Queue<(int x, int y)> queue = new();
+        queue.Enqueue((startX, startY));
+
+        // Set to keep track of visited nodes
+        bool[,] visited = new bool[rowLength, colLength];
+        visited[startY, startX] = true;
+
+        // List to count accessible checkpoints
+        List<Point> accessibleCheckPoints = new();
+
+        while (queue.Count > 0)
+        {
+            (int x, int y) = queue.Dequeue();
+            if(positionOfCheckPoints.Contains(new Point(x,y))) accessibleCheckPoints.Add(new Point(x,y));
+
+            // Explore adjacent cells around current node
+            for (int i = 0; i < 4; i++)
+            {
+                int newX = x + dx[i];
+                int newY = y + dy[i];
+
+                // Check bounds and whether the cell is walkable and not visited
+                if (newX >= 0 && newX < colLength && newY >= 0 && newY < rowLength && map[newX, newY].Type == MapObject.ObjectType.Tile && !visited[newX, newY])
+                {
+                    queue.Enqueue((newX, newY));
+                    visited[newX, newY] = true;  // Mark as visited
+                }
+            }
+        } return accessibleCheckPoints;
+    }
     public static int CountAccessibleNodes(MapObject[,] map, AgentSpawnPoint spawnPoint)
     {
         int rowLength = map.GetLength(0);
