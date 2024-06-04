@@ -291,6 +291,7 @@ public class AgentController
 
         if (agentModel.mmasGraphController._graph.Nodes.Find(x => x.X == checkpoint.x && x.Y == checkpoint.y) != null)
         {
+            Debug.Log("Checkpoint already exists");
             return;
         }
 
