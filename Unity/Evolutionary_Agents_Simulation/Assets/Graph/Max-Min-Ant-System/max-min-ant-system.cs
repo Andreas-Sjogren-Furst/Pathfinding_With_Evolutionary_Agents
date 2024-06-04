@@ -133,6 +133,7 @@ public class Graph
 
     public void RemoveEdge(Node source, Node destination)
     {
+        if (source == null || destination == null) return;
         int key = source.Id * 1000 + destination.Id;
         Edges.Remove(key);
     }
@@ -456,7 +457,7 @@ public class MMAS
             _graph.RemoveNode(node);
             _bestTourLength = double.MaxValue;
             _bestTour = new Node[_graph.Nodes.Count];
-            // _numAnts = _graph.Nodes.Count;
+            _numAnts = _graph.Nodes.Count;
 
         }
     }

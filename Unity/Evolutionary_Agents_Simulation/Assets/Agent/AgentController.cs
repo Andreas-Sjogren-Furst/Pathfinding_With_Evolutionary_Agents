@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AgentController
@@ -77,6 +78,7 @@ public class AgentController
         Node[] tourMMAS = agentModel.mmasGraphController.GetBestTour();
         foreach (Node node in tourMMAS)
         {
+            if (node == null) { return null; }
             Point checkpoint = new((int)node.X, (int)node.Y);
             tour.Add(checkpoint);
         }
@@ -186,6 +188,12 @@ public class AgentController
                         Debug.Log("Using MMAS-based tour calculation");
                         // Using MMAS-based tour calculation
                         List<Point> bestTour = FindBestTourAmoungCentroids(agent);
+                        if (bestTour == null)
+                        {
+                            Debug.Log("No tour found");
+                            continue;
+                        }
+
                         Debug.Log("Best tour length: " + bestTour.Count);
 
                         if (bestTour.Count > 0)
@@ -204,7 +212,10 @@ public class AgentController
                                     path.AddRange(subPath);
                                     currentPos = end;
                                 }
-                                // RemoveCheckpoint(end);  // Remove checkpoint after adding it to the path
+                                RemoveCheckpoint(end);  // Remove checkpoint after adding it to the path
+                                // remove centroid
+                                agentModel.centroids.Remove(agentModel.centroids.FirstOrDefault(x => x.Value.x == checkpoint.x && x.Value.y == checkpoint.y).Key);
+                                // RemoveCentroidFromStack()
 
                             }
                         }
