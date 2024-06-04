@@ -43,6 +43,8 @@ public class WebView : MonoBehaviour, IScreenView
     private List<GameObject> InstantiatedMMASNodes;
     private List<GameObject> InstantiatedMMASEdges;
     private List<GameObject> InstantiatedFrontiers;
+
+    private List<GameObject> InstantiatedPath;
     private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
     private readonly float nodeScale = 0.1f;
@@ -72,6 +74,7 @@ public class WebView : MonoBehaviour, IScreenView
         InstantiatedMap = new GameObject[screenViewModel.map.GetLength(1), screenViewModel.map.GetLength(0)];
         InstantiatedMMASEdges = new();
         InstantiatedMMASNodes = new();
+        InstantiatedPath = new();
         pHPAGraph = InstantiatedHPAGraphs[0];
         currentHPALevel = 0;
 
@@ -88,12 +91,21 @@ public class WebView : MonoBehaviour, IScreenView
 
 
 
+
+
         //myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
-        //Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
-        //HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
+        // Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
+        Vector2Int start = new(26, 40);
+        Vector2Int end = new(44, 28);
 
-        //DrawPath(path);
+        HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
+
+        // (List<Vector2Int> path1, int nodesExplored) = Astar.FindPath(start, end, CellularAutomata.Convert3DTo2D(screenPresenter.PackageData().map));
+
+
+
+        DrawPath(path, InstantiatedFrontiers);
 
 
     }
@@ -258,6 +270,30 @@ public class WebView : MonoBehaviour, IScreenView
         {
             Vector3 start = transform.position + new Vector3(path.path[i].Position.x * tileSize, -0.8f, path.path[i].Position.y * tileSize);
             Vector3 end = transform.position + new Vector3(path.path[i + 1].Position.x * tileSize, -0.8f, path.path[i + 1].Position.y * tileSize);
+
+            if (start == null)
+            {
+                Debug.Log("Start is null");
+            }
+            if (end == null)
+            {
+                Debug.Log("End is null");
+            }
+            if (pathMaterial == null)
+            {
+                Debug.Log("intraEdgeMaterial is null");
+            }
+            DrawLine(start, end, pathMaterial, InstantiatedGraph);
+        }
+    }
+
+
+    private void DrawPath(List<Vector2Int> path, List<GameObject> InstantiatedGraph)
+    {
+        for (int i = 0; i < path.Count - 1; i++)
+        {
+            Vector3 start = transform.position + new Vector3(path[i].x * tileSize, -0.8f, path[i].y * tileSize);
+            Vector3 end = transform.position + new Vector3(path[i + 1].x * tileSize, -0.8f, path[i + 1].y * tileSize);
 
             if (start == null)
             {
@@ -449,9 +485,9 @@ public class WebView : MonoBehaviour, IScreenView
         List<CheckPoint> checkPoints = screenViewModel.checkPoints;
         foreach (CheckPoint checkPoint in checkPoints)
         {
-            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, false);
+            MyGameManager.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, checkPoint.ArrayPosition, 1, 100, false);
         }
-        myGameManager.MmasAddCheckpoint(screenViewModel.spawnPoint.ArrayPosition, 1, 100, false);
+        MyGameManager.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, screenViewModel.spawnPoint.ArrayPosition, 1, 100, false);
         // Create node objects
         for (int i = 0; i < graph.Nodes.Count; i++)
         {

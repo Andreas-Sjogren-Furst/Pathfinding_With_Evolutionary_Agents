@@ -188,7 +188,7 @@ public static class Astar
 
                 if (closedList.ContainsKey(neighbor.Position)) continue;
 
-                int newCostToNeighbor = currentNode.gCost + (int)edge.Weight;
+                int newCostToNeighbor = currentNode.gCost + (int)edge.Weight; // cost of moving to neighbor
                 if (newCostToNeighbor < neighbor.gCost || !openListLookup.ContainsKey(neighbor.Position))
                 {
 

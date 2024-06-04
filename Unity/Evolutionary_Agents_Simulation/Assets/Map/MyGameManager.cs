@@ -68,10 +68,10 @@ public class MyGameManager
     }
 
 
-    private HPAStar InitialiseHPAStar(MapObject[,] map)
+    public HPAStar InitialiseHPAStar(MapObject[,] map)
     {
         GraphModel _graphModel = new GraphModel(map);
-        PathFinder _pathFinder = new PathFinder(new GraphModel(map));
+        PathFinder _pathFinder = new PathFinder(_graphModel);
         IEdgeManager edgeManager = new EdgeManager(_pathFinder);
         NodeManager _nodeManager = new NodeManager(_graphModel, edgeManager);
         IEntranceManager entranceManager = new EntranceManager(_graphModel, _nodeManager);
@@ -90,7 +90,7 @@ public class MyGameManager
         return hpaStar;
     }
 
-    private MMAS InitialiseMMMAS()
+    public MMAS InitialiseMMMAS()
     {
         Graph graph = new Graph();
         int numAnts = 0;
@@ -106,7 +106,7 @@ public class MyGameManager
         return mmas;
     }
 
-    public void MmasAddCheckpoint(Vector2Int checkpoint, int heuristicsLevel, int iterations = 0, bool linearHeuristic = true)
+    public static void MmasAddCheckpoint(ref MMAS mmasGraphController, ref HPAStar HPAGraphController, Vector2Int checkpoint, int heuristicsLevel, int iterations = 0, bool linearHeuristic = true)
     {
         if (mmasGraphController._graph == null)
         {
@@ -118,7 +118,7 @@ public class MyGameManager
 
         if (mmasGraphController._graph.Nodes.Count < 3)
         {
-            List<(Node, double)> Edges = CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            List<(Node, double)> Edges = CalculateEdges(ref mmasGraphController, ref HPAGraphController, heuristicsLevel, linearHeuristic, newNode);
             if (Edges == null)
             {
                 return;
@@ -136,7 +136,7 @@ public class MyGameManager
         }
         else if (mmasGraphController._graph.Nodes.Count == 3) // ensures graph is built when 3 checkpoints are added.
         {
-            List<(Node, double)> Edges = CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            List<(Node, double)> Edges = CalculateEdges(ref mmasGraphController, ref HPAGraphController, heuristicsLevel, linearHeuristic, newNode);
             if (Edges == null)
             {
                 return;
@@ -155,7 +155,7 @@ public class MyGameManager
         }
         else
         {
-            List<(Node, double)> Edges = CalculateEdges(heuristicsLevel, linearHeuristic, newNode);
+            List<(Node, double)> Edges = CalculateEdges(ref mmasGraphController, ref HPAGraphController, heuristicsLevel, linearHeuristic, newNode);
             if (Edges == null)
             {
                 return;
@@ -179,9 +179,10 @@ public class MyGameManager
             mmasGraphController.Run(iterations);
         }
 
+
     }
 
-    private List<(Node, double)> CalculateEdges(int heuristicsLevel, bool linearHeuristic, Node newNode)
+    public static List<(Node, double)> CalculateEdges(ref MMAS mmasGraphController, ref HPAStar HPAGraphController, int heuristicsLevel, bool linearHeuristic, Node newNode)
     {
 
         List<(Node, double)> edges = new List<(Node, double)>();
