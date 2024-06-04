@@ -322,13 +322,13 @@ public class MmasMapTest
             if (mode == "RebuildWholeGraph")
             {
 
-                MyGameManager.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, checkpoints[i].ArrayPosition, heuristicsLevel, linearHeuristic: LinearHeuristic);
+                DynamicGraphoperations.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, checkpoints[i].ArrayPosition, heuristicsLevel, linearHeuristic: LinearHeuristic);
                 myGameManager.mmasGraphController.SetGraph(graph);
             }
             else if (mode == "AddNodesDynamically")
             {
                 // Add nodes dynamically
-                MyGameManager.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, checkpoints[i].ArrayPosition, 1);
+                DynamicGraphoperations.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, checkpoints[i].ArrayPosition, 1);
             }
 
             // Run the MMAS algorithm to get the optimal path
