@@ -65,7 +65,7 @@ public class WebView : MonoBehaviour, IScreenView
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         amountHPALevels = myGameManager.HPAGraphController._graphModel.ClusterByLevel.Count;
         InstantiatedHPAGraphs = new List<GameObject>[amountHPALevels];
-        for(int i = 0; i < amountHPALevels; i++) {InstantiatedHPAGraphs[i] = new();}
+        for (int i = 0; i < amountHPALevels; i++) { InstantiatedHPAGraphs[i] = new(); }
         InstantiatedCheckPoints = new();
         InstantiatedAgents = new();
         InstantiatedFrontiers = new();
@@ -193,7 +193,8 @@ public class WebView : MonoBehaviour, IScreenView
 
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         IGraphModel graph = screenViewModel.hpaGraph;
-        foreach(KeyValuePair<int,HashSet<Cluster>> hpaGraph in graph.ClusterByLevel){
+        foreach (KeyValuePair<int, HashSet<Cluster>> hpaGraph in graph.ClusterByLevel)
+        {
             if (graph.ClusterByLevel.TryGetValue(hpaGraph.Key, out var clusters))
             {
                 int arrayIndex = hpaGraph.Key - 1;
@@ -238,7 +239,8 @@ public class WebView : MonoBehaviour, IScreenView
             if (graphObject != null) graphObject.SetActive(isOn);
     }
 
-    public void SetCurrentHPALevel(int level){
+    public void SetCurrentHPALevel(int level)
+    {
         pHPAGraph = InstantiatedHPAGraphs[level];
     }
 
@@ -408,22 +410,29 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
 
-    public void ClearFrontiers(){
-        foreach(GameObject frontier in InstantiatedFrontiers){
-            if(frontier != null) Destroy(frontier);
-        } InstantiatedFrontiers = new();
+    public void ClearFrontiers()
+    {
+        foreach (GameObject frontier in InstantiatedFrontiers)
+        {
+            if (frontier != null) Destroy(frontier);
+        }
+        InstantiatedFrontiers = new();
     }
-    public void RenderFrontiers(){
+    public void RenderFrontiers()
+    {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        Dictionary<int,Point> centroids = screenViewModel.centroids;
+        Dictionary<int, Point> centroids = screenViewModel.centroids;
         ClearFrontiers();
-        foreach(KeyValuePair<int,Point> centroid in centroids){
-            Vector3 frontierPosition = new(centroid.Value.x,1,centroid.Value.y);
-            InstantiatedFrontiers.Add(Instantiate(frontierPrefab,frontierPosition,Quaternion.identity));
-        } 
+        foreach (KeyValuePair<int, Point> centroid in centroids)
+        {
+            Vector3 frontierPosition = new(centroid.Value.x, 1, centroid.Value.y);
+            InstantiatedFrontiers.Add(Instantiate(frontierPrefab, frontierPosition, Quaternion.identity));
+        }
     }
-    public void ShowOrHideFrontiers(bool isOn){
-        foreach(GameObject frontier in InstantiatedFrontiers){
+    public void ShowOrHideFrontiers(bool isOn)
+    {
+        foreach (GameObject frontier in InstantiatedFrontiers)
+        {
             frontier.SetActive(isOn);
         }
     }
@@ -440,9 +449,9 @@ public class WebView : MonoBehaviour, IScreenView
         List<CheckPoint> checkPoints = screenViewModel.checkPoints;
         foreach (CheckPoint checkPoint in checkPoints)
         {
-            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, true);
+            myGameManager.MmasAddCheckpoint(checkPoint.ArrayPosition, 1, 100, false);
         }
-        myGameManager.MmasAddCheckpoint(screenViewModel.spawnPoint.ArrayPosition, 1, 100, true);
+        myGameManager.MmasAddCheckpoint(screenViewModel.spawnPoint.ArrayPosition, 1, 100, false);
         // Create node objects
         for (int i = 0; i < graph.Nodes.Count; i++)
         {
