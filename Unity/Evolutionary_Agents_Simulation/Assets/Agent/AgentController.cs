@@ -7,6 +7,7 @@ public class AgentController{
     public AgentModel agentModel;
     public AgentController(AgentModel agentModel){
         this.agentModel = agentModel;
+        agentModel.accesibleCheckpoints = GridExplorer.CountAccesibleCheckpoints(agentModel.map, agentModel.spawnPoint,agentModel.checkPoints);
     }
     
     public void Scan(Agent agent){
@@ -81,7 +82,6 @@ public class AgentController{
         int[,] map = CastToIntMap(agentModel.map);
         foreach(Agent agent in agentModel.agents){
             if(agent.state == SearchState.state.exploring){
-                
                 if(agent.path.Count == 0) agent.state = SearchState.state.scanning;
                 else MoveAgent(agent);
             } else if(agent.state == SearchState.state.scanning){
