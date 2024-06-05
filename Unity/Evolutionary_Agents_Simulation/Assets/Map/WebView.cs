@@ -114,7 +114,7 @@ public class WebView : MonoBehaviour, IScreenView
             myGameManager.agentController.SimulateAgents();
             MoveAgents();
             RenderFrontiers();
-            
+
         }
     }
     public void CreateNewMap(MapModel mapModel)
@@ -124,9 +124,11 @@ public class WebView : MonoBehaviour, IScreenView
         InitVariables(myGameManager);
         Start();
     }
-    
-    private void DestroyAllObjects(){
-        foreach(GameObject gameObject in InstantiatedMap){
+
+    private void DestroyAllObjects()
+    {
+        foreach (GameObject gameObject in InstantiatedMap)
+        {
             Destroy(gameObject);
         }
         foreach (GameObject gameObject in InstantiatedCheckPoints)
@@ -166,7 +168,8 @@ public class WebView : MonoBehaviour, IScreenView
             Destroy(gameObject);
         }
     }
-    private void InitVariables(MyGameManager myGameManager){
+    private void InitVariables(MyGameManager myGameManager)
+    {
         screenPresenter = new(myGameManager);
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         amountHPALevels = myGameManager.HPAGraphController._graphModel.ClusterByLevel.Count;
@@ -397,8 +400,8 @@ public class WebView : MonoBehaviour, IScreenView
         GameObject lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
         LineRenderer lr = lineObj.GetComponent<LineRenderer>();
         lr.material = material;
-        lr.startWidth = 0.05f * tileSize;
-        lr.endWidth = 0.05f * tileSize;
+        lr.startWidth = 0.05f * tileSize * 6;
+        lr.endWidth = 0.05f * tileSize * 6;
         lr.SetPositions(new Vector3[] { start, end });
         InstantiatedGraph.Add(lineObj);
         lineObj.SetActive(false);
@@ -569,8 +572,8 @@ public class WebView : MonoBehaviour, IScreenView
                         LineRenderer lr = edge.AddComponent<LineRenderer>();
                         lr.material = edgeMaterial;
                         lr.SetPositions(new Vector3[] { InstantiatedMMASNodes[i].transform.position, InstantiatedMMASNodes[j].transform.position });
-                        lr.startWidth = 0.05f;
-                        lr.endWidth = 0.05f;
+                        lr.startWidth = 0.05f * 8;
+                        lr.endWidth = 0.05f * 8;
                         InstantiatedMMASEdges.Add(edge);
                         UpdateEdgeTransparency(lr, mmas.getPheromone(nodei, nodej));
                     }
