@@ -30,16 +30,17 @@ public class PanelManager1 : MonoBehaviour
 
     private MapModel CreateMapModelFromUI(){
         MapModel mapModel;
-        List<string> values = new();
+        List<float> values = new();
         foreach(Slider slider in sliders){
-            values.Add(slider.GetComponentsInChildren<Text>()[0].text);
+            values.Add(slider.value);
         }
-        float density = float.Parse(values[0]);
-        int iterations = int.Parse(values[1]);
-        int mapSize = int.Parse(values[2]) * 10;
-        int numberOfCheckPoints = int.Parse(values[3]);
-        int randomSeed = int.Parse(values[4]);
-        mapModel = new(density,iterations,mapSize,numberOfCheckPoints,randomSeed);
+        int mapSize = (int) values[0] * 10;
+        float density = values[1];
+        int iterations = (int) values[2];
+        int numberOfCheckPoints = (int)values[3];
+        int amountOfAgents = (int)values[4];
+        int randomSeed = int.Parse(inputField.text);
+        mapModel = new(density,iterations,mapSize,numberOfCheckPoints,amountOfAgents,randomSeed);
         return mapModel;
     }
 

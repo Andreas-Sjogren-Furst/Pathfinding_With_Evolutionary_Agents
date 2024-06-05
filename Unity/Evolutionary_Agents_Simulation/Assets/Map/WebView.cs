@@ -119,15 +119,11 @@ public class WebView : MonoBehaviour, IScreenView
     public void CreateNewMap(MapModel mapModel)
     {
         DestroyAllObjects();
-        MyGameManager newGameManager = new(mapModel);
-        InitVariables(newGameManager);
-        Restart();
-    }
-    
-    private void Restart(){
-        Awake();
+        myGameManager = new(mapModel);
+        InitVariables(myGameManager);
         Start();
     }
+    
     private void DestroyAllObjects(){
         foreach(GameObject gameObject in InstantiatedMap){
             Destroy(gameObject);
@@ -161,7 +157,6 @@ public class WebView : MonoBehaviour, IScreenView
         }
     }
     private void InitVariables(MyGameManager myGameManager){
-        this.myGameManager = myGameManager;
         screenPresenter = new(myGameManager);
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         amountHPALevels = myGameManager.HPAGraphController._graphModel.ClusterByLevel.Count;

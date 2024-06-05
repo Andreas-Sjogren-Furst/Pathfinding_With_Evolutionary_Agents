@@ -138,9 +138,10 @@ public class PathfindingTest
             int cellularIterations = random.Next(cellularIterationsRange.min, cellularIterationsRange.max);
             int height = random.Next(heightRange.min, heightRange.max);
             int width = random.Next(widthRange.min, widthRange.max);
+            int amountOfAgents = 1;
 
             int randomSeed = random.Next();
-            MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize: height, randomSeed: randomSeed);
+            MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize: height, randomSeed: randomSeed, amountOfAgents: amountOfAgents);
             int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, 4);
             MapObject[,] map = CellularAutomata.Convert2DTo3D(tileMap);
             int xc = UnityEngine.Random.Range(2, 100); // Generates a random integer between 1 and 100
@@ -233,8 +234,9 @@ public class PathfindingTest
             int cellularIterations = random.Next(cellularIterationsRange.min, cellularIterationsRange.max);
             int height = random.Next(heightRange.min, heightRange.max);
             int width = random.Next(widthRange.min, widthRange.max);
+            int amountOfAgents = 1;
 
-            MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize: height, randomSeed: random.Next());
+            MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize: height, randomSeed: random.Next(), amountOfAgents: amountOfAgents);
 
             int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, 4);
             MapObject[,] map = CellularAutomata.Convert2DTo3D(tileMap);

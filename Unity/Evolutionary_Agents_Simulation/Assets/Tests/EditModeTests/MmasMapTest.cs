@@ -50,7 +50,8 @@ public class MmasMapTest
             numberOfCheckPoints: rand.Next(checkPointsRange.min, checkPointsRange.max),
             iterations: rand.Next(cellularIterationsRange.min, cellularIterationsRange.max),
             mapSize: rand.Next(widthRange.min, widthRange.max),
-            randomSeed: rand.Next(0, 100)
+            randomSeed: rand.Next(0, 100),
+            amountOfAgents: 1
             );
             maps.Add(mapModel);
         }

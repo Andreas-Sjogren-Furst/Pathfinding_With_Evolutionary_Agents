@@ -32,7 +32,7 @@ public class MyGameManager
         customMaps = new();
         MapModel mapModel = customMaps.GetCustomMap(6);
         mapController = new MapController(mapModel);
-        AgentModel agentModel = new(4, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
+        AgentModel agentModel = new(mapModel.amountOfAgents, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
@@ -43,12 +43,11 @@ public class MyGameManager
     public MyGameManager(MapModel mapModel)
     {
         mapController = new MapController(mapModel);
-        AgentModel agentModel = new(4, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
+        AgentModel agentModel = new(mapModel.amountOfAgents, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
-        //agentModel.bestTour = InitBestTour(mapModel.checkPoints, mapModel.spawnPoint);
-        agentModel.bestTour = new();
+        agentModel.bestTour = InitBestTour(mapModel.checkPoints, mapModel.spawnPoint);
     }
 
     private Stack<Point> InitBestTour(List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
