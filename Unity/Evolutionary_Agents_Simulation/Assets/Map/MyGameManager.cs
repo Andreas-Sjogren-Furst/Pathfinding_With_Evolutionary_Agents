@@ -45,6 +45,16 @@ public class MyGameManager
 
 
 
+        foreach (CheckPoint checkPoint in mapModel.checkPoints)
+        {
+            DynamicGraphoperations.MmasAddCheckpoint(ref this.mmasGraphController, ref this.HPAGraphController, checkPoint.ArrayPosition, 1, 100, false);
+        }
+        DynamicGraphoperations.MmasAddCheckpoint(ref this.mmasGraphController, ref this.HPAGraphController, mapModel.spawnPoint.ArrayPosition, 1, 100, false);
+
+        Node[] nodes = mmasGraphController.GetBestTour();
+
+
+
         // foreach(KeyValuePair<int,HashSet<Cluster>> hpaGrah in HPAGraphController._graphModel.ClusterByLevel) {
 
 

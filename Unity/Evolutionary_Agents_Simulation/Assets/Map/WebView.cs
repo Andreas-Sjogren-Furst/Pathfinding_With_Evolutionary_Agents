@@ -482,12 +482,7 @@ public class WebView : MonoBehaviour, IScreenView
         Graph graph = mmas._graph;
         ClearMMASGraph();
 
-        List<CheckPoint> checkPoints = screenViewModel.checkPoints;
-        foreach (CheckPoint checkPoint in checkPoints)
-        {
-            DynamicGraphoperations.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, checkPoint.ArrayPosition, 1, 100, false);
-        }
-        DynamicGraphoperations.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, screenViewModel.spawnPoint.ArrayPosition, 1, 100, false);
+
         // Create node objects
         for (int i = 0; i < graph.Nodes.Count; i++)
         {
