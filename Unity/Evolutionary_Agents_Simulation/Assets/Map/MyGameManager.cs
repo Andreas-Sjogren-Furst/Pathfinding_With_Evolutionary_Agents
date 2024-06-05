@@ -38,7 +38,7 @@ public class MyGameManager
         mmasGraphController = InitialiseMMMAS();
         agentModel.bestTour = InitBestTour(mapModel.checkPoints, mapModel.spawnPoint);
     }
-    
+
 
     public MyGameManager(MapModel mapModel)
     {
@@ -50,23 +50,27 @@ public class MyGameManager
         agentModel.bestTour = InitBestTour(mapModel.checkPoints, mapModel.spawnPoint);
     }
 
-    private Stack<Point> InitBestTour(List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
+    private Stack<Point> InitBestTour(List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint)
+    {
+        DynamicGraphoperations.MmasAddCheckpoint(ref mmasGraphController, ref HPAGraphController, spawnPoint.ArrayPosition, 1, 200, false);
         foreach (CheckPoint checkPoint in checkPoints)
         {
-            DynamicGraphoperations.MmasAddCheckpoint(ref mmasGraphController, ref HPAGraphController, checkPoint.ArrayPosition, 1, 100, false);
+            DynamicGraphoperations.MmasAddCheckpoint(ref mmasGraphController, ref HPAGraphController, checkPoint.ArrayPosition, 1, 200, false);
         }
-        DynamicGraphoperations.MmasAddCheckpoint(ref mmasGraphController, ref HPAGraphController, spawnPoint.ArrayPosition, 1, 100, false);
 
         Node[] nodes = mmasGraphController.GetBestTour();
         List<Point> bestTour = new();
-        foreach(Node node in nodes){
-            bestTour.Add(new Point((int)node.X,(int)node.Y));
-        } Point spawnPointPosition = new(spawnPoint.ArrayPosition.x, spawnPoint.ArrayPosition.y);
-        int index = 0;
-        for(int i = 0; i < bestTour.Count; i++)
-            if(bestTour[i].Equals(spawnPointPosition)){
-                index = i;
+        foreach (Node node in nodes)
+        {
+            bestTour.Add(new Point((int)node.X, (int)node.Y));
         }
+        Point spawnPointPosition = new(spawnPoint.ArrayPosition.x, spawnPoint.ArrayPosition.y);
+        int index = 0;
+        for (int i = 0; i < bestTour.Count; i++)
+            if (bestTour[i].Equals(spawnPointPosition))
+            {
+                index = i;
+            }
         int count = bestTour.Count - index;
         List<Point> subListA = bestTour.GetRange(index, count);
         List<Point> subListB = bestTour.GetRange(0, index);
