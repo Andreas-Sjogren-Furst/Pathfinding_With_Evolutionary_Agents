@@ -34,7 +34,12 @@ public class PanelManager1 : MonoBehaviour
         foreach(Slider slider in sliders){
             values.Add(slider.GetComponentsInChildren<Text>()[0].text);
         }
-        mapModel = new(float.Parse(values[0]),int.Parse(values[1]),int.Parse(values[2]),int.Parse(values[3]),int.Parse(values[4]));
+        float density = float.Parse(values[0]);
+        int iterations = int.Parse(values[1]);
+        int mapSize = int.Parse(values[2]) * 10;
+        int numberOfCheckPoints = int.Parse(values[3]);
+        int randomSeed = int.Parse(values[4]);
+        mapModel = new(density,iterations,mapSize,numberOfCheckPoints,randomSeed);
         return mapModel;
     }
 
@@ -68,7 +73,6 @@ public class PanelManager1 : MonoBehaviour
                     sliderValue.text = "1";
                     break;
                 default:
-                    Debug.Log(sliderName.text);
                     break;
             }
         } inputField.text = mapModel.randomSeed.ToString();
@@ -80,7 +84,6 @@ public class PanelManager1 : MonoBehaviour
     void OnSubmit(){
         ValidateInput(inputField.text);
         MapModel mapModel = CreateMapModelFromUI();
-        WebView.Instance.CreateMap(mapModel);
-        WebView.Instance.RenderMap();
+        WebView.Instance.CreateNewMap(mapModel);
     }
 }

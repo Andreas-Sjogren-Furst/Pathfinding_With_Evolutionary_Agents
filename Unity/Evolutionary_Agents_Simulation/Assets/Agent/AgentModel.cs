@@ -6,7 +6,6 @@ public class AgentModel
     public int amountOfAgents;
     public Agent[] agents;
     public MapObject[,] map;
-    public List<Point> accesibleCheckpoints; 
     public List<CheckPoint> checkPoints;
     public AgentSpawnPoint spawnPoint;
     public HashSet<Point> visibleTiles;
@@ -25,7 +24,6 @@ public class AgentModel
         this.checkPoints = checkPoints;
         centroidsForRendering = new();
         frontierPointsForRendering = new();
-        accesibleCheckpoints = new();
         visibleTiles = new();
         visibleWalls = new();
         frontierPoints = new();

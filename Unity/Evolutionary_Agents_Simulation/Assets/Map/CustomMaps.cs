@@ -5,9 +5,9 @@ public class CustomMaps
 {
 
     public static MapModel[] customMaps = {
-                                        new (0,0,100,0,0), // 0
+                                        new (0,0,100,5,0), // 0
                                         new (0,0,100,5,0),  // 1
-                                        new (0,5,0,100,0), // 2
+                                        new (0,5,100,5,0), // 2
                                         new (25,1,50,5,0), // 3
                                         new (25,1,100,5,0), // 4 
                                         new (25,1,100,5,0), // 5

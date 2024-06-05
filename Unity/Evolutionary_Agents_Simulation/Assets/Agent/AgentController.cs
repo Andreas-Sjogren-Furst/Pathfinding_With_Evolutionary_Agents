@@ -8,7 +8,6 @@ public class AgentController{
     public AgentModel agentModel;
     public AgentController(AgentModel agentModel){
         this.agentModel = agentModel;
-        agentModel.accesibleCheckpoints = GridExplorer.CountAccesibleCheckpoints(agentModel.map, agentModel.spawnPoint,agentModel.checkPoints);
     }
     
     public void Scan(Agent agent){

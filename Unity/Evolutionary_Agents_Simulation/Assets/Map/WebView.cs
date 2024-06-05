@@ -77,7 +77,6 @@ public class WebView : MonoBehaviour, IScreenView
         InstantiatedPath = new();
         pHPAGraph = InstantiatedHPAGraphs[0];
         currentHPALevel = 0;
-
     }
     void Start()
     {
@@ -117,9 +116,66 @@ public class WebView : MonoBehaviour, IScreenView
             RenderFrontiers();
         }
     }
-    public void CreateMap(MapModel mapModel)
+    public void CreateNewMap(MapModel mapModel)
     {
-        myGameManager.mapController.ChangeMapParameters(mapModel);
+        DestroyAllObjects();
+        MyGameManager newGameManager = new(mapModel);
+        InitVariables(newGameManager);
+        Restart();
+    }
+    
+    private void Restart(){
+        Awake();
+        Start();
+    }
+    private void DestroyAllObjects(){
+        foreach(GameObject gameObject in InstantiatedMap){
+            Destroy(gameObject);
+        }
+        foreach(GameObject gameObject in InstantiatedCheckPoints){
+            Destroy(gameObject);
+        }
+        foreach(GameObject gameObject in InstantiatedCheckPoints){
+            Destroy(gameObject);
+        }
+        foreach(GameObject gameObject in pHPAGraph){
+            Destroy(gameObject);
+        }
+        foreach(List<GameObject> listOfGameObjects in InstantiatedHPAGraphs){
+            foreach(GameObject gameObject in listOfGameObjects) Destroy(gameObject);
+        }
+        foreach(GameObject gameObject in InstantiatedAgents){
+            Destroy(gameObject);
+        }
+        foreach(GameObject gameObject in InstantiatedMMASNodes){
+            Destroy(gameObject);
+        }
+        foreach(GameObject gameObject in InstantiatedMMASEdges){
+            Destroy(gameObject);
+        }
+        foreach(GameObject gameObject in InstantiatedFrontiers){
+            Destroy(gameObject);
+        }
+        foreach(GameObject gameObject in InstantiatedPath){
+            Destroy(gameObject);
+        }
+    }
+    private void InitVariables(MyGameManager myGameManager){
+        this.myGameManager = myGameManager;
+        screenPresenter = new(myGameManager);
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        amountHPALevels = myGameManager.HPAGraphController._graphModel.ClusterByLevel.Count;
+        InstantiatedHPAGraphs = new List<GameObject>[amountHPALevels];
+        for (int i = 0; i < amountHPALevels; i++) { InstantiatedHPAGraphs[i] = new(); }
+        InstantiatedCheckPoints = new();
+        InstantiatedAgents = new();
+        InstantiatedFrontiers = new();
+        InstantiatedMap = new GameObject[screenViewModel.map.GetLength(1), screenViewModel.map.GetLength(0)];
+        InstantiatedMMASEdges = new();
+        InstantiatedMMASNodes = new();
+        InstantiatedPath = new();
+        pHPAGraph = InstantiatedHPAGraphs[0];
+        currentHPALevel = 0;
     }
     public void RenderMap()
     {

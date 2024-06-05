@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GridExplorer 
 {
-    public static List<Point> CountAccesibleCheckpoints(MapObject[,] map, AgentSpawnPoint spawnPoint, List<CheckPoint> checkPoints){
+    /*public static List<Point> CountAccesibleCheckpoints(MapObject[,] map, AgentSpawnPoint spawnPoint, List<CheckPoint> checkPoints){
         int rowLength = map.GetLength(0);
         int colLength = map.GetLength(1);
         List<Point> positionOfCheckPoints = new();
@@ -50,7 +50,7 @@ public class GridExplorer
                 }
             }
         } return accessibleCheckPoints;
-    }
+    }*/
     public static int CountAccessibleNodes(MapObject[,] map, AgentSpawnPoint spawnPoint)
     {
         int rowLength = map.GetLength(0);

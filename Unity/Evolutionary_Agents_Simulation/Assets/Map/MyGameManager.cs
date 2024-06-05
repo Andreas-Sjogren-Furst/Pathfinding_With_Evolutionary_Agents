@@ -37,7 +37,6 @@ public class MyGameManager
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
         agentModel.bestTour = InitBestTour(mapModel.checkPoints, mapModel.spawnPoint);
-        Debug.Log(agentModel.bestTour.Count);
     }
     
 
@@ -48,6 +47,7 @@ public class MyGameManager
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
+        agentModel.bestTour = InitBestTour(mapModel.checkPoints, mapModel.spawnPoint);
     }
 
     private Stack<Point> InitBestTour(List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
