@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AgentController{
@@ -27,9 +28,9 @@ public class AgentController{
 
     public void UpdateFrontier(){
         FrontierExplorer frontierExplorer = new(agentModel.map);
-        Dictionary<int,Point> centroids = frontierExplorer.FindFrontier(agentModel.visibleTiles,agentModel.visibleWalls);
+        HashSet<Point> centroids = frontierExplorer.FindFrontier(agentModel.visibleTiles,agentModel.visibleWalls);
         ResetFrontier();
-        foreach(KeyValuePair<int,Point> centroid in centroids) { agentModel.centroids.Add(centroid.Key,centroid.Value); }
+        foreach(Point centroid in centroids) { agentModel.centroids.Add(centroid); }
     }
 
     private void ResetFrontierPoints(){
@@ -54,23 +55,21 @@ public class AgentController{
     }
 
     private Point FindClosestCentroid(Agent agent){
-        Dictionary<int,Point> centroids = agentModel.centroids;
+        HashSet<Point> centroids = agentModel.centroids;
         double minDistance = double.MaxValue;
         Point closestPoint = null;
-        int key = 0;
-        foreach(KeyValuePair<int,Point> centroid in centroids){
+        foreach(Point centroid in centroids){
             Point agentPosition = new(agent.position.x,agent.position.y);
-            double distance = CalculateEuclideanDistance(agentPosition, centroid.Value);
+            double distance = CalculateEuclideanDistance(agentPosition, centroid);
             if(distance < minDistance){
                 minDistance = distance;
-                key = centroid.Key;
-                closestPoint = centroid.Value;
+                closestPoint = centroid;
             }
-        } RemoveCentroidFromStack(key);
+        } RemoveCentroidFromStack(closestPoint);
         return closestPoint;
     }
-    private void RemoveCentroidFromStack(int key){
-        agentModel.centroids.Remove(key);
+    private void RemoveCentroidFromStack(Point centroid){
+        agentModel.centroids.Remove(centroid);
     }
     private double CalculateEuclideanDistance(Point p1, Point p2){
         int dx = p1.x - p2.x; 
@@ -94,6 +93,8 @@ public class AgentController{
                 Vector2Int start = new(agent.position.x,agent.position.y);
                 Vector2Int end = new(centroid.x,centroid.y);
                 path = Astar.FindPath(end, start, map).Path;
+                if(agentModel.currentCentroidsInFocus.Contains(centroid)) path = null;
+                agentModel.currentCentroidsInFocus[agent.agentId] = centroid;
                }
                if(agentModel.centroids.Count == 0) {
                 agent.state = SearchState.state.idle;
@@ -127,4 +128,5 @@ public class AgentController{
             }
         } return intMap; 
     }
+
 }

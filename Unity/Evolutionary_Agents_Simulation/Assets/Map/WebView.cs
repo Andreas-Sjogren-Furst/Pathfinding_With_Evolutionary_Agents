@@ -421,11 +421,11 @@ public class WebView : MonoBehaviour, IScreenView
     public void RenderFrontiers()
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        Dictionary<int, Point> centroids = screenViewModel.centroids;
+        HashSet<Point> centroids = screenViewModel.centroids;
         ClearFrontiers();
-        foreach (KeyValuePair<int, Point> centroid in centroids)
+        foreach(Point centroid in centroids)
         {
-            Vector3 frontierPosition = new(centroid.Value.x, 1, centroid.Value.y);
+            Vector3 frontierPosition = new(centroid.x, 1, centroid.y);
             InstantiatedFrontiers.Add(Instantiate(frontierPrefab, frontierPosition, Quaternion.identity));
         }
     }
