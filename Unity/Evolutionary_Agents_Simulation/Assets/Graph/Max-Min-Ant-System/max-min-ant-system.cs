@@ -334,7 +334,7 @@ public class MMAS
 
     public Node[] GetBestTour()
     {
-        return _bestTour;
+        return _bestTour ?? new Node[0];
     }
 
     public double GetBestTourLength()
