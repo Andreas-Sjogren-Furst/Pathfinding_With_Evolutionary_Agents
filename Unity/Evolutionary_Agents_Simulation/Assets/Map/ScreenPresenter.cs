@@ -9,8 +9,8 @@ public class ScreenPresenter : IGamePresenter<ScreenViewModel>
         screenViewModel = new ScreenViewModel(
             myGameManager.mapController.mapModel.accessibleNodes,
             myGameManager.agentController.agentModel.visibleTiles,
-            myGameManager.agentController.agentModel.frontierPoints,
-            myGameManager.agentController.agentModel.centroids,
+            myGameManager.agentController.agentModel.frontierPointsForRendering,
+            myGameManager.agentController.agentModel.centroidsForRendering,
             myGameManager.mapController.mapModel.map,
             myGameManager.agentController.agentModel.agents,
             myGameManager.HPAGraphController._graphModel,

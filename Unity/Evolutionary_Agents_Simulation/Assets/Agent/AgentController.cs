@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using Codice.Client.Common.ProcessTree;
 using UnityEngine;
 
 public class AgentController{
@@ -21,22 +25,26 @@ public class AgentController{
         FrontierExplorer frontierExplorer = new FrontierExplorer(agentModel.map);
         HashSet<Point> newFrontierPoints = frontierExplorer.FindFrontierPoints(agentModel.visibleTiles,agentModel.visibleWalls);
         ResetFrontierPoints();
+        foreach(Point frontierPoint in newFrontierPoints) { agentModel.frontierPointsForRendering.Add(frontierPoint); }
         foreach(Point frontierPoint in newFrontierPoints) { agentModel.frontierPoints.Add(frontierPoint); }
 
     }
 
     public void UpdateFrontier(){
         FrontierExplorer frontierExplorer = new(agentModel.map);
-        Dictionary<int,Point> centroids = frontierExplorer.FindFrontier(agentModel.visibleTiles,agentModel.visibleWalls);
+        HashSet<Point> centroids = frontierExplorer.FindFrontier(agentModel.visibleTiles,agentModel.visibleWalls);
         ResetFrontier();
-        foreach(KeyValuePair<int,Point> centroid in centroids) { agentModel.centroids.Add(centroid.Key,centroid.Value); }
+        foreach(Point centroid in centroids) {agentModel.centroidsForRendering.Add(centroid); }
+        foreach(Point centroid in centroids) { agentModel.centroids.Add(centroid); }
     }
 
     private void ResetFrontierPoints(){
         agentModel.frontierPoints = new();
+        //agentModel.frontierPointsForRendering = new();
     }
     private void ResetFrontier(){
         agentModel.centroids = new();
+        //agentModel.centroidsForRendering = new();
     }
 
     private void AddVisibleTilesAndWalls(List<Point> computedVisibleTiles, List<Point> computedVisibleWalls){
@@ -54,27 +62,25 @@ public class AgentController{
     }
 
     private Point FindClosestCentroid(Agent agent){
-        Dictionary<int,Point> centroids = agentModel.centroids;
+        HashSet<Point> centroids = agentModel.centroids;
         double minDistance = double.MaxValue;
         Point closestPoint = null;
-        int key = 0;
-        foreach(KeyValuePair<int,Point> centroid in centroids){
+        foreach(Point centroid in centroids){
             Point agentPosition = new(agent.position.x,agent.position.y);
-            double distance = CalculateEuclideanDistance(agentPosition, centroid.Value);
+            double distance = CalculateEuclideanDistance(agentPosition, centroid);
             if(distance < minDistance){
                 minDistance = distance;
-                key = centroid.Key;
-                closestPoint = centroid.Value;
+                closestPoint = centroid;
             }
-        } RemoveCentroidFromStack(key);
+        } RemoveCentroidFromStack(closestPoint);
         return closestPoint;
     }
-    private void RemoveCentroidFromStack(int key){
-        agentModel.centroids.Remove(key);
+    private void RemoveCentroidFromStack(Point centroid){
+        agentModel.centroids.Remove(centroid);
     }
     private double CalculateEuclideanDistance(Point p1, Point p2){
         int dx = p1.x - p2.x; 
-        int dy = p1.y - p1.y;
+        int dy = p1.y - p2.y;
         return Math.Sqrt(dx*dx + dy * dy);
     }
 
@@ -86,14 +92,16 @@ public class AgentController{
                 else MoveAgent(agent);
             } else if(agent.state == SearchState.state.scanning){
                Scan(agent);
-               UpdateFrontier();
                UpdateFrontierPoints();
+               UpdateFrontier();
                List<Vector2Int> path = null;
                while(agentModel.centroids.Count != 0 && path == null){
                 Point centroid = FindClosestCentroid(agent);
                 Vector2Int start = new(agent.position.x,agent.position.y);
                 Vector2Int end = new(centroid.x,centroid.y);
                 path = Astar.FindPath(end, start, map).Path;
+                if(agentModel.currentCentroidsInFocus.Contains(centroid)) path = null;
+                agentModel.currentCentroidsInFocus[agent.agentId] = centroid;
                }
                if(agentModel.centroids.Count == 0) {
                 agent.state = SearchState.state.idle;
@@ -104,9 +112,18 @@ public class AgentController{
                 
                
             } else if(agent.state == SearchState.state.idle){
+                if(IsAllAgentsIdle(agentModel.agents)){
+                    ReturnHome(agentModel.agents);
+                }
                 if(agentModel.centroids.Count > 0){
                     agent.state = SearchState.state.exploring;
                 } Debug.Log("Im in idle");
+            } else if(agent.state == SearchState.state.goHome){
+                Vector2Int start = agentModel.spawnPoint.ArrayPosition;
+                Vector2Int end = new(agent.position.x,agent.position.y);
+                List<Vector2Int> path = Astar.FindPath(start, end, map).Path;
+                agent.path = new Stack<Vector2Int>(path);
+                agent.state = SearchState.state.exploring;
             } else throw new SystemException("Invalid state for agent");
         }
     }
@@ -126,5 +143,21 @@ public class AgentController{
                     throw new SystemException("Couldn't convert mapObject type to a valid integer");
             }
         } return intMap; 
+    }
+        
+    private bool IsAllAgentsIdle(Agent[] agents){
+        foreach(Agent agent in agents){
+            if(agent.state != SearchState.state.idle) return false;
+        } return true;
+    }
+    private bool IsAgentsHome(Agent[] agents){
+        foreach(Agent agent in agents){
+            if(!agent.position.Equals(agentModel.spawnPoint.ArrayPosition)) return false;
+        } return true;
+    }
+    private void ReturnHome(Agent[] agents){
+        foreach(Agent agent in agents){
+            agent.state = SearchState.state.goHome;
+        }
     }
 }

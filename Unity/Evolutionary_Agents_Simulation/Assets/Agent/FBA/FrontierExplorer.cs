@@ -12,17 +12,15 @@ public class FrontierExplorer
         this.map = map;
     }
 
-    public Dictionary<int,Point> FindFrontier(HashSet<Point> visibleTiles, HashSet<Point> visibleWalls){
-        Dictionary<int,Point> frontier = new();
+    public HashSet<Point> FindFrontier(HashSet<Point> visibleTiles, HashSet<Point> visibleWalls){
+        HashSet<Point> frontier = new();
         HashSet<Point> frontierPoints = FindFrontierPoints(visibleTiles,visibleWalls);
-        int frontierPointId = 0;
         while(frontierPoints.Count != 0){
             List<Point> temp = frontierPoints.ToList();
             Point point = temp[0];
             HashSet<Point> frontierCluster = GridExplorer.ClusterFrontierPoints(frontierPoints,point,map);
-            frontier.Add(frontierPointId, FindClosestToCentroid(frontierCluster));
+            frontier.Add(FindClosestToCentroid(frontierCluster));
             frontierPoints.ExceptWith(frontierCluster);
-            frontierPointId++;
         } return frontier;
     }
 
@@ -55,7 +53,7 @@ public class FrontierExplorer
     private double CalculateEuclideanDistance(Point p1, Point p2){
         int dx = p1.x - p2.x; 
         int dy = p1.y - p1.y;
-        return Math.Sqrt(dx*dx + dy * dy);
+        return Math.Sqrt((float)dx*dx + dy * dy);
     }
 
     public HashSet<Point> FindFrontierPoints(HashSet<Point> visibleTiles, HashSet<Point> visibleWalls) {

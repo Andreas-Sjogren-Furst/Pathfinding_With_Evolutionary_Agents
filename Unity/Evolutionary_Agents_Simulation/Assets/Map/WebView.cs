@@ -57,7 +57,7 @@ public class WebView : MonoBehaviour, IScreenView
     public ScreenPresenter screenPresenter;
 
     // GameManager
-    private MyGameManager myGameManager;
+    public MyGameManager myGameManager;
 
     void Awake()
     {
@@ -86,9 +86,7 @@ public class WebView : MonoBehaviour, IScreenView
         SpawnAgents();
         RenderMMASGraph();
         RenderFrontiers();
-
-
-
+        
 
 
 
@@ -418,7 +416,7 @@ public class WebView : MonoBehaviour, IScreenView
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         MapObject[,] map = screenViewModel.map;
-        HashSet<Point> frontierPoints = screenViewModel.frontierPoints;
+        List<Point> frontierPoints = screenViewModel.frontierPointsForRendering;
         if (isOn)
         {
             foreach (MapObject mapObject in map)
@@ -457,11 +455,12 @@ public class WebView : MonoBehaviour, IScreenView
     public void RenderFrontiers()
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        Dictionary<int, Point> centroids = screenViewModel.centroids;
+        List<Point> centroids = screenViewModel.centroidsForRendering;
         ClearFrontiers();
-        foreach (KeyValuePair<int, Point> centroid in centroids)
+        Debug.Log(centroids.Count);
+        foreach(Point centroid in centroids)
         {
-            Vector3 frontierPosition = new(centroid.Value.x, 1, centroid.Value.y);
+            Vector3 frontierPosition = new(centroid.x, 1, centroid.y);
             InstantiatedFrontiers.Add(Instantiate(frontierPrefab, frontierPosition, Quaternion.identity));
         }
     }
