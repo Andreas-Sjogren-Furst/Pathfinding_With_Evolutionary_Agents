@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using Codice.Client.Common.ProcessTree;
 using UnityEngine;
 
 public class AgentController{
@@ -109,9 +112,18 @@ public class AgentController{
                 
                
             } else if(agent.state == SearchState.state.idle){
+                if(IsAllAgentsIdle(agentModel.agents)){
+                    ReturnHome(agentModel.agents);
+                }
                 if(agentModel.centroids.Count > 0){
                     agent.state = SearchState.state.exploring;
                 } Debug.Log("Im in idle");
+            } else if(agent.state == SearchState.state.goHome){
+                Vector2Int start = agentModel.spawnPoint.ArrayPosition;
+                Vector2Int end = new(agent.position.x,agent.position.y);
+                List<Vector2Int> path = Astar.FindPath(start, end, map).Path;
+                agent.path = new Stack<Vector2Int>(path);
+                agent.state = SearchState.state.exploring;
             } else throw new SystemException("Invalid state for agent");
         }
     }
@@ -132,5 +144,20 @@ public class AgentController{
             }
         } return intMap; 
     }
-
+        
+    private bool IsAllAgentsIdle(Agent[] agents){
+        foreach(Agent agent in agents){
+            if(agent.state != SearchState.state.idle) return false;
+        } return true;
+    }
+    private bool IsAgentsHome(Agent[] agents){
+        foreach(Agent agent in agents){
+            if(!agent.position.Equals(agentModel.spawnPoint.ArrayPosition)) return false;
+        } return true;
+    }
+    private void ReturnHome(Agent[] agents){
+        foreach(Agent agent in agents){
+            agent.state = SearchState.state.goHome;
+        }
+    }
 }

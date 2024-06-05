@@ -55,7 +55,7 @@ public class WebView : MonoBehaviour, IScreenView
     public ScreenPresenter screenPresenter;
 
     // GameManager
-    private MyGameManager myGameManager;
+    public MyGameManager myGameManager;
 
     void Awake()
     {
