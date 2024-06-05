@@ -77,7 +77,7 @@ public class AgentController{
     }
     private double CalculateEuclideanDistance(Point p1, Point p2){
         int dx = p1.x - p2.x; 
-        int dy = p1.y - p1.y;
+        int dy = p1.y - p2.y;
         return Math.Sqrt(dx*dx + dy * dy);
     }
 
@@ -89,8 +89,8 @@ public class AgentController{
                 else MoveAgent(agent);
             } else if(agent.state == SearchState.state.scanning){
                Scan(agent);
-               UpdateFrontier();
                UpdateFrontierPoints();
+               UpdateFrontier();
                List<Vector2Int> path = null;
                while(agentModel.centroids.Count != 0 && path == null){
                 Point centroid = FindClosestCentroid(agent);
