@@ -1,6 +1,4 @@
 
-using UnityEngine;
-
 public class Quadrant
 {
     public readonly int north = 0;

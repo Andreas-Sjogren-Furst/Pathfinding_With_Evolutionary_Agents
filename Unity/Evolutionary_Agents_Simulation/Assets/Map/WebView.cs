@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using Codice.Client.BaseCommands;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class WebView : MonoBehaviour, IScreenView
 {

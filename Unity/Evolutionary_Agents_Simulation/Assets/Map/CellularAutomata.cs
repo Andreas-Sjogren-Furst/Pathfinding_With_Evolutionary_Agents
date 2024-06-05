@@ -1,7 +1,4 @@
 
-using System.Numerics;
-using System.Runtime.InteropServices.WindowsRuntime;
-
 public class CellularAutomata
 {
 

@@ -5,10 +5,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.TestTools;
-using UnityEngine.UIElements;
 using Debug = UnityEngine.Debug;
 
 public class PathfindingTest
