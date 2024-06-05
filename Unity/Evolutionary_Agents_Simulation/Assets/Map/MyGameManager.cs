@@ -34,13 +34,13 @@ public class MyGameManager
         customMaps = new();
         MapModel mapModel = customMaps.GetCustomMap(6);
         mapController = new MapController(mapModel);
-        AgentModel agentModel = new(1, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
+        AgentModel agentModel = new(4, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
-        agentController.Scan(agentController.agentModel.agents[0]);
-        agentController.UpdateFrontierPoints();
-        agentController.UpdateFrontier();
+        //agentController.Scan(agentController.agentModel.agents[0]);
+        //agentController.UpdateFrontierPoints();
+        //agentController.UpdateFrontier();
 
 
 
@@ -71,7 +71,7 @@ public class MyGameManager
     public MyGameManager(MapModel mapModel)
     {
         mapController = new MapController(mapModel);
-        AgentModel agentModel = new(1, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
+        AgentModel agentModel = new(4, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
