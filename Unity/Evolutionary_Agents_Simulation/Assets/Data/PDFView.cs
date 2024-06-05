@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
-using Unity.Plastic.Newtonsoft.Json;
+// using Unity.Plastic.Newtonsoft.Json;
 
 
 public class PDFView : IPrintView
@@ -9,16 +9,18 @@ public class PDFView : IPrintView
     List<PrintViewModel> data;
     public void WriteDataToFile(string fileName)
     {
-        string jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
-        File.WriteAllText(fileName, jsonData);
+        // string jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
+        // File.WriteAllText(fileName, jsonData);
     }
 
-    public PDFView(PrintPresenter printPresenter){
+    public PDFView(PrintPresenter printPresenter)
+    {
         data = new();
         this.printPresenter = printPresenter;
     }
 
-    public void StoreCurrentData(){
+    public void StoreCurrentData()
+    {
         PrintViewModel printViewModel = printPresenter.PackageData();
         data.Add(printViewModel);
     }

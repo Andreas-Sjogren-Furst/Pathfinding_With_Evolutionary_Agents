@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.IO;
-using Unity.Plastic.Newtonsoft.Json;
 public class PrintPresenter : IGamePresenter<PrintViewModel>
 {
     PrintViewModel printViewModel;
 
-    public PrintPresenter(MyGameManager myGameManager){
+    public PrintPresenter(MyGameManager myGameManager)
+    {
         printViewModel = new(
             myGameManager.mapController.mapModel.map,
             myGameManager.agentController.agentModel.agents,
@@ -16,8 +14,9 @@ public class PrintPresenter : IGamePresenter<PrintViewModel>
         );
     }
 
-    public PrintViewModel PackageData(){
+    public PrintViewModel PackageData()
+    {
         return printViewModel;
     }
-    
+
 }
