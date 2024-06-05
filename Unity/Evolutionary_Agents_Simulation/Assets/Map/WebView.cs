@@ -97,25 +97,24 @@ public class WebView : MonoBehaviour, IScreenView
         //myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
         // Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
-        Vector2Int start = new(26, 40);
-        Vector2Int end = new(44, 28);
+        // Vector2Int start = new(26, 40);
+        // Vector2Int end = new(44, 28);
 
-        HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
+        // HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
 
         // (List<Vector2Int> path1, int nodesExplored) = Astar.FindPath(start, end, CellularAutomata.Convert3DTo2D(screenPresenter.PackageData().map));
 
 
 
-        DrawPath(path, InstantiatedFrontiers);
+        // DrawPath(path, InstantiatedFrontiers);
 
 
     }
 
     void Update()
     {
-        if (true)
+        if (Input.GetKeyUp(KeyCode.RightArrow))
         {
-            Thread.Sleep(100);
             myGameManager.agentController.SimulateAgents();
             MoveAgents();
             RenderFrontiers();
