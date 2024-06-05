@@ -16,12 +16,12 @@ public class MmasMapTest
     [Test]
     public void MmasMapTestSimplePasses()
     {
-        int numRuns = 1;
+        int numRuns = 30;
         // Generate and save maps for simulations
-        savedMaps = GenerateMaps(numRuns, (60, 60), (15, 15), (17, 20), (100, 100), (100, 100));
-        // savedMaps = GenerateMaps(numRuns, (0, 0), (40, 40), (0, 0), (100, 100), (100, 100));
+        // savedMaps = GenerateMaps(numRuns, (60, 60), (15, 15), (17, 20), (100, 100), (100, 100));
+        savedMaps = GenerateMaps(numRuns, (0, 0), (40, 40), (0, 0), (100, 100), (100, 100));
 
-        RunSimulations("1_limit_normalize_pheromone_experiment", numRuns, heuristicSimulation: false, scaleGraphEdges: false, plotIterations_stagnation: false);
+        RunSimulations("30_limit_normalize_pheromone_experiment_2", numRuns, heuristicSimulation: false, scaleGraphEdges: false, plotIterations_stagnation: false);
         // RunSimulations("30_experiment_NEW2_parameters_trail_limits_non_scaled", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
         // RunSimulations("30_experiment_NEW2_parameters_trail_limits_non_scaled", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
 

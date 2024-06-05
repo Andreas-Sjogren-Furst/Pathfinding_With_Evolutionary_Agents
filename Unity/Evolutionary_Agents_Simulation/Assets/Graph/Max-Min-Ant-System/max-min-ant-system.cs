@@ -424,6 +424,11 @@ public class MMAS
             _bestTourLength = double.MaxValue;
             _bestTour = new Node[numNodes];
 
+            if (normalizePheromoneLevels)
+            {
+                NormalizePheromoneLevels();
+            }
+
             // Initialize pheromones for new connections
             foreach (Node existingNode in _graph.Nodes)
             {
@@ -435,10 +440,7 @@ public class MMAS
                     _pheromones[keyBackward] = _tauMax;
                 }
             }
-            if (normalizePheromoneLevels)
-            {
-                NormalizePheromoneLevels();
-            }
+
         }
     }
 
