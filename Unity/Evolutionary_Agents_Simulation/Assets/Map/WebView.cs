@@ -85,7 +85,7 @@ public class WebView : MonoBehaviour, IScreenView
         SpawnAgents();
         RenderMMASGraph();
         RenderFrontiers();
-        
+
 
 
 
@@ -93,16 +93,16 @@ public class WebView : MonoBehaviour, IScreenView
         //myGameManager.graphController.Preprocessing(3);
         //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
         // Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
-        Vector2Int start = new(26, 40);
-        Vector2Int end = new(44, 28);
+        // Vector2Int start = new(26, 40);
+        // Vector2Int end = new(44, 28);
 
-        HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
+        // HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
 
         // (List<Vector2Int> path1, int nodesExplored) = Astar.FindPath(start, end, CellularAutomata.Convert3DTo2D(screenPresenter.PackageData().map));
 
 
 
-        DrawPath(path, InstantiatedFrontiers);
+        // DrawPath(path, InstantiatedFrontiers);
 
 
     }
@@ -128,31 +128,40 @@ public class WebView : MonoBehaviour, IScreenView
         foreach(GameObject gameObject in InstantiatedMap){
             Destroy(gameObject);
         }
-        foreach(GameObject gameObject in InstantiatedCheckPoints){
+        foreach (GameObject gameObject in InstantiatedCheckPoints)
+        {
             Destroy(gameObject);
         }
-        foreach(GameObject gameObject in InstantiatedCheckPoints){
+        foreach (GameObject gameObject in InstantiatedCheckPoints)
+        {
             Destroy(gameObject);
         }
-        foreach(GameObject gameObject in pHPAGraph){
+        foreach (GameObject gameObject in pHPAGraph)
+        {
             Destroy(gameObject);
         }
-        foreach(List<GameObject> listOfGameObjects in InstantiatedHPAGraphs){
-            foreach(GameObject gameObject in listOfGameObjects) Destroy(gameObject);
+        foreach (List<GameObject> listOfGameObjects in InstantiatedHPAGraphs)
+        {
+            foreach (GameObject gameObject in listOfGameObjects) Destroy(gameObject);
         }
-        foreach(GameObject gameObject in InstantiatedAgents){
+        foreach (GameObject gameObject in InstantiatedAgents)
+        {
             Destroy(gameObject);
         }
-        foreach(GameObject gameObject in InstantiatedMMASNodes){
+        foreach (GameObject gameObject in InstantiatedMMASNodes)
+        {
             Destroy(gameObject);
         }
-        foreach(GameObject gameObject in InstantiatedMMASEdges){
+        foreach (GameObject gameObject in InstantiatedMMASEdges)
+        {
             Destroy(gameObject);
         }
-        foreach(GameObject gameObject in InstantiatedFrontiers){
+        foreach (GameObject gameObject in InstantiatedFrontiers)
+        {
             Destroy(gameObject);
         }
-        foreach(GameObject gameObject in InstantiatedPath){
+        foreach (GameObject gameObject in InstantiatedPath)
+        {
             Destroy(gameObject);
         }
     }
@@ -508,7 +517,7 @@ public class WebView : MonoBehaviour, IScreenView
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         List<Point> centroids = screenViewModel.centroidsForRendering;
         ClearFrontiers();
-        foreach(Point centroid in centroids)
+        foreach (Point centroid in centroids)
         {
             Vector3 frontierPosition = new(centroid.x, 1, centroid.y);
             InstantiatedFrontiers.Add(Instantiate(frontierPrefab, frontierPosition, Quaternion.identity));
