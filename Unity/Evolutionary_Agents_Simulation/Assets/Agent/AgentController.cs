@@ -22,6 +22,7 @@ public class AgentController{
         FrontierExplorer frontierExplorer = new FrontierExplorer(agentModel.map);
         HashSet<Point> newFrontierPoints = frontierExplorer.FindFrontierPoints(agentModel.visibleTiles,agentModel.visibleWalls);
         ResetFrontierPoints();
+        foreach(Point frontierPoint in newFrontierPoints) { agentModel.frontierPointsForRendering.Add(frontierPoint); }
         foreach(Point frontierPoint in newFrontierPoints) { agentModel.frontierPoints.Add(frontierPoint); }
 
     }
@@ -30,14 +31,17 @@ public class AgentController{
         FrontierExplorer frontierExplorer = new(agentModel.map);
         HashSet<Point> centroids = frontierExplorer.FindFrontier(agentModel.visibleTiles,agentModel.visibleWalls);
         ResetFrontier();
+        foreach(Point centroid in centroids) {agentModel.centroidsForRendering.Add(centroid); }
         foreach(Point centroid in centroids) { agentModel.centroids.Add(centroid); }
     }
 
     private void ResetFrontierPoints(){
         agentModel.frontierPoints = new();
+        //agentModel.frontierPointsForRendering = new();
     }
     private void ResetFrontier(){
         agentModel.centroids = new();
+        //agentModel.centroidsForRendering = new();
     }
 
     private void AddVisibleTilesAndWalls(List<Point> computedVisibleTiles, List<Point> computedVisibleWalls){

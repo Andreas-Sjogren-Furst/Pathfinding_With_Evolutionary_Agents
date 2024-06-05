@@ -10,6 +10,8 @@ public class AgentModel
     public AgentSpawnPoint spawnPoint;
     public HashSet<Point> visibleTiles;
     public HashSet<Point> visibleWalls;
+    public List<Point> centroidsForRendering;
+    public List<Point> frontierPointsForRendering;
     public HashSet<Point> frontierPoints;
     public HashSet<Point> centroids;
     public Point[] currentCentroidsInFocus;
@@ -19,6 +21,8 @@ public class AgentModel
         this.map = map;
         this.spawnPoint = spawnPoint;
         this.checkPoints = checkPoints;
+        centroidsForRendering = new();
+        frontierPointsForRendering = new();
         accesibleCheckpoints = new();
         visibleTiles = new();
         visibleWalls = new();

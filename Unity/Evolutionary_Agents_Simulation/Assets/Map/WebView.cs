@@ -382,7 +382,7 @@ public class WebView : MonoBehaviour, IScreenView
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         MapObject[,] map = screenViewModel.map;
-        HashSet<Point> frontierPoints = screenViewModel.frontierPoints;
+        List<Point> frontierPoints = screenViewModel.frontierPointsForRendering;
         if (isOn)
         {
             foreach (MapObject mapObject in map)
@@ -421,8 +421,9 @@ public class WebView : MonoBehaviour, IScreenView
     public void RenderFrontiers()
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        HashSet<Point> centroids = screenViewModel.centroids;
+        List<Point> centroids = screenViewModel.centroidsForRendering;
         ClearFrontiers();
+        Debug.Log(centroids.Count);
         foreach(Point centroid in centroids)
         {
             Vector3 frontierPosition = new(centroid.x, 1, centroid.y);
