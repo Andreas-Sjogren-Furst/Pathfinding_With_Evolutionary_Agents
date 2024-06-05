@@ -457,7 +457,6 @@ public class WebView : MonoBehaviour, IScreenView
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
         List<Point> centroids = screenViewModel.centroidsForRendering;
         ClearFrontiers();
-        Debug.Log(centroids.Count);
         foreach(Point centroid in centroids)
         {
             Vector3 frontierPosition = new(centroid.x, 1, centroid.y);

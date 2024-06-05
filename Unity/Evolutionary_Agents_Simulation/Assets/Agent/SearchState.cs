@@ -5,7 +5,8 @@ public class SearchState
         idle,
         exploring,
         scanning,
-        goHome
+        goHome,
+        gatherResources
     }    
 
 }

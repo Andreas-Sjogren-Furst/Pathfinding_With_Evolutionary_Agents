@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
-using UnityEngine.Analytics;
+
 
 public class MyGameManager
 {
@@ -38,35 +36,10 @@ public class MyGameManager
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
-        //agentController.Scan(agentController.agentModel.agents[0]);
-        //agentController.UpdateFrontierPoints();
-        //agentController.UpdateFrontier();
-
-
-
-
-        foreach (CheckPoint checkPoint in mapModel.checkPoints)
-        {
-            DynamicGraphoperations.MmasAddCheckpoint(ref this.mmasGraphController, ref this.HPAGraphController, checkPoint.ArrayPosition, 1, 100, false);
-        }
-        DynamicGraphoperations.MmasAddCheckpoint(ref this.mmasGraphController, ref this.HPAGraphController, mapModel.spawnPoint.ArrayPosition, 1, 100, false);
-
-        Node[] nodes = mmasGraphController.GetBestTour();
-
-
-
-        // foreach(KeyValuePair<int,HashSet<Cluster>> hpaGrah in HPAGraphController._graphModel.ClusterByLevel) {
-
-
-        // } 
-
-        // HPAGraphController.HierarchicalSearch(new Vector2Int(5, 5), new Vector2Int(50, 50), 1);
-
-
-
-
-
+        agentModel.bestTour = InitBestTour(mapModel.checkPoints, mapModel.spawnPoint);
+        Debug.Log(agentModel.bestTour.Count);
     }
+    
 
     public MyGameManager(MapModel mapModel)
     {
@@ -75,6 +48,30 @@ public class MyGameManager
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
+    }
+
+    private Stack<Point> InitBestTour(List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
+        foreach (CheckPoint checkPoint in checkPoints)
+        {
+            DynamicGraphoperations.MmasAddCheckpoint(ref mmasGraphController, ref HPAGraphController, checkPoint.ArrayPosition, 1, 100, false);
+        }
+        DynamicGraphoperations.MmasAddCheckpoint(ref mmasGraphController, ref HPAGraphController, spawnPoint.ArrayPosition, 1, 100, false);
+
+        Node[] nodes = mmasGraphController.GetBestTour();
+        List<Point> bestTour = new();
+        foreach(Node node in nodes){
+            bestTour.Add(new Point((int)node.X,(int)node.Y));
+        } Point spawnPointPosition = new(spawnPoint.ArrayPosition.x, spawnPoint.ArrayPosition.y);
+        int index = 0;
+        for(int i = 0; i < bestTour.Count; i++)
+            if(bestTour[i].Equals(spawnPointPosition)){
+                index = i;
+        }
+        int count = bestTour.Count - index;
+        List<Point> subListA = bestTour.GetRange(index, count);
+        List<Point> subListB = bestTour.GetRange(0, index);
+        subListA.AddRange(subListB);
+        return new Stack<Point>(subListA);
     }
 
 

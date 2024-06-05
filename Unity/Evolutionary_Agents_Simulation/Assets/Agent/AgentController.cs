@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using Codice.Client.Common.ProcessTree;
 using UnityEngine;
 
 public class AgentController{
@@ -88,7 +85,8 @@ public class AgentController{
         int[,] map = CastToIntMap(agentModel.map);
         foreach(Agent agent in agentModel.agents){
             if(agent.state == SearchState.state.exploring){
-                if(agent.path.Count == 0) agent.state = SearchState.state.scanning;
+                if(agent.path.Count == 0 && agent.state != SearchState.state.gatherResources) agent.state = SearchState.state.scanning;
+                else if(agent.path.Count == 0 && agent.state == SearchState.state.gatherResources) agent.state = SearchState.state.gatherResources;
                 else MoveAgent(agent);
             } else if(agent.state == SearchState.state.scanning){
                Scan(agent);
@@ -113,9 +111,11 @@ public class AgentController{
                
             } else if(agent.state == SearchState.state.idle){
                 if(IsAllAgentsIdle(agentModel.agents)){
-                    ReturnHome(agentModel.agents);
+                    if(IsAgentsHome(agentModel.agents)){
+                        if(agent.agentId == 0) agent.state = SearchState.state.gatherResources;
+                    } else ReturnHome(agentModel.agents);
                 }
-                if(agentModel.centroids.Count > 0){
+                else if(agentModel.centroids.Count > 0){
                     agent.state = SearchState.state.exploring;
                 } Debug.Log("Im in idle");
             } else if(agent.state == SearchState.state.goHome){
@@ -124,7 +124,11 @@ public class AgentController{
                 List<Vector2Int> path = Astar.FindPath(start, end, map).Path;
                 agent.path = new Stack<Vector2Int>(path);
                 agent.state = SearchState.state.exploring;
-            } else throw new SystemException("Invalid state for agent");
+            } else if(agent.state == SearchState.state.gatherResources){
+                GatherResources(agent,agentModel.map);
+            }
+            
+             else throw new SystemException("Invalid state for agent");
         }
     }
 
@@ -155,9 +159,23 @@ public class AgentController{
             if(!agent.position.Equals(agentModel.spawnPoint.ArrayPosition)) return false;
         } return true;
     }
+    private void GatherResources(Agent agent, MapObject[,] map){
+            if(agent.path.Count == 0){
+                if(agentModel.bestTour.Count == 0) agent.state = SearchState.state.goHome;
+                else {
+                    Point checkPoint = agentModel.bestTour.Pop();
+                    Vector2Int start = new(agent.position.x,agent.position.y);
+                    Vector2Int end = new(checkPoint.x,checkPoint.y);
+                    int[,] mapInt = CastToIntMap(map);
+                    List <Vector2Int> path = Astar.FindPath(end, start, mapInt).Path;
+                    agent.path = new Stack<Vector2Int>(path);
+                }
+            } else MoveAgent(agent);
+        } 
+
     private void ReturnHome(Agent[] agents){
         foreach(Agent agent in agents){
-            agent.state = SearchState.state.goHome;
+            if(agent.state != SearchState.state.gatherResources) agent.state = SearchState.state.goHome;
         }
     }
 }
