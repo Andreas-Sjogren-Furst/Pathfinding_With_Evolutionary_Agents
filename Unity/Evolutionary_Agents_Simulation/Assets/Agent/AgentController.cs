@@ -167,6 +167,7 @@ public class AgentController
         int[,] map = CastToIntMap(agentModel.map);
         foreach (Agent agent in agentModel.agents)
         {
+            Debug.Log("Agent state: " + agent.state + "path count: " + agent.path.Count + "centroids count: " + agentModel.centroids.Count);
             if (agent.state == SearchState.state.exploring)
             {
                 if (agent.path.Count == 0) agent.state = SearchState.state.scanning;
@@ -214,8 +215,17 @@ public class AgentController
                                 }
                                 RemoveCheckpoint(end);  // Remove checkpoint after adding it to the path
                                 // remove centroid
-                                agentModel.centroids.Remove(agentModel.centroids.FirstOrDefault(x => x.Value.x == checkpoint.x && x.Value.y == checkpoint.y).Key);
-                                // RemoveCentroidFromStack()
+
+                                foreach (var item in agentModel.centroids)
+                                {
+                                    if (item.Value.x == checkpoint.x && item.Value.y == checkpoint.y)
+                                    {
+                                        RemoveCentroidFromStack(item.Key);
+                                        break;
+                                    }
+
+
+                                }
 
                             }
                         }

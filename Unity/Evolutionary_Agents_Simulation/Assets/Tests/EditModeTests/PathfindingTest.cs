@@ -21,27 +21,27 @@ public class PathfindingTest
     public void PathfindingTestSimplePasses()
     {
 
-        RunHPASimulation(
-            iterations: 100,
+        // RunHPASimulation(
+        //     iterations: 100,
+        //     densityRange: (min: 60, max: 60),
+        //     checkPointsRange: (min: 1, max: 5),
+        //     cellularIterationsRange: (min: 17, max: 20),
+        //     heightRange: (min: 100, max: 100),
+        //     widthRange: (min: 100, max: 100),
+        //     refinePath: false,
+        //     name: "general_maps_timer_refined_random"
+        // );
+
+        RunDynamicReplanningTests(
+            iterations: 10,
             densityRange: (min: 60, max: 60),
             checkPointsRange: (min: 1, max: 5),
             cellularIterationsRange: (min: 17, max: 20),
             heightRange: (min: 100, max: 100),
             widthRange: (min: 100, max: 100),
-            refinePath: false,
-            name: "general_maps_timer_refined_random"
+            refinePath: true,
+            name: "hpaDynamic_1_timer"
         );
-
-        // RunDynamicReplanningTests(
-        //     iterations: 10,
-        //     densityRange: (min: 45, max: 65),
-        //     checkPointsRange: (min: 1, max: 5),
-        //     cellularIterationsRange: (min: 5, max: 10),
-        //     heightRange: (min: 100, max: 100),
-        //     widthRange: (min: 100, max: 100),
-        //     refinePath: true,
-        //     name: "dynamic_maps_timer"
-        // );
         // Create instances of the necessary classes
 
 
@@ -224,8 +224,9 @@ public class PathfindingTest
     private static void RunDynamicReplanningTests(int iterations, (int min, int max) densityRange, (int min, int max) checkPointsRange, (int min, int max) cellularIterationsRange, (int min, int max) heightRange, (int min, int max) widthRange, bool refinePath, string name)
     {
         var random = new System.Random();
-        var results = new List<string> { "Iteration,Density,CheckPoints,CellularIterations,Height,Width,ReplanningTime_Level1,ReplanningTime_AStar,PathLengthChange_Level1,PathLengthChange_AStar" };
-
+        var results = new List<string> {
+        "Iteration,Density,CheckPoints,CellularIterations,Height,Width,InitialTime_Level1,InitialTime_Level2,InitialTime_Level3,InitialTime_AStar,ReplanningTime_Level1,ReplanningTime_Level2,ReplanningTime_Level3,ReplanningTime_AStar,InitialPathLength_AStar,InitialPathLength_Level1,InitialPathLength_Level2,InitialPathLength_Level3,NewPathLength_AStar,NewPathLength_Level1,NewPathLength_Level2,NewPathLength_Level3,PathLengthChange_Level1,PathLengthChange_Level2,PathLengthChange_Level3,PathLengthChange_AStar"
+        };
         for (int i = 0; i < iterations; i++)
         {
             int density = random.Next(densityRange.min, densityRange.max);
@@ -234,74 +235,71 @@ public class PathfindingTest
             int height = random.Next(heightRange.min, heightRange.max);
             int width = random.Next(widthRange.min, widthRange.max);
 
-            MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize: height, randomSeed: random.Next());
-
+            MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize: height, randomSeed: 0);
             int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, 4);
             MapObject[,] map = CellularAutomata.Convert2DTo3D(tileMap);
-            Vector2Int start = new Vector2Int(10, 10);
-            Vector2Int end = new Vector2Int(mapModel.height - 10, mapModel.width - 10);
+            // Vector2Int start = new Vector2Int(10, 10);
+            // Vector2Int end = new Vector2Int(mapModel.height - 10, mapModel.width - 10);
+
+
+            Vector2Int start = new(26, 40);
+            Vector2Int end = new(44, 28);
 
             // Build graph once
             var graphModel = new GraphModel(map);
-            var edgeManager = new EdgeManager(new PathFinder(new GraphModel(map)));
+            var pathFinder = new PathFinder(graphModel);
+            var edgeManager = new EdgeManager(pathFinder);
             var nodeManager = new NodeManager(graphModel, edgeManager);
             var entranceManager = new EntranceManager(graphModel, nodeManager);
             var clusterManager = new ClusterManager(graphModel, nodeManager, edgeManager, entranceManager);
-            var hpaStar = new HPAStar(graphModel, clusterManager, nodeManager, entranceManager, edgeManager, new PathFinder(new GraphModel(map)));
+            var hpaStar = new HPAStar(graphModel, clusterManager, nodeManager, entranceManager, edgeManager, pathFinder);
 
             hpaStar.Preprocessing(3);
 
             // Initial Pathfinding
-            HPAPath hpaPath1 = ExecutePathfinding(hpaStar, start, end, 1, RefinePath: refinePath);
-            HPAPath hpaPath2 = ExecutePathfinding(hpaStar, start, end, 2, RefinePath: refinePath);
-            HPAPath hpaPath3 = ExecutePathfinding(hpaStar, start, end, 3, RefinePath: refinePath);
-            (List<Vector2Int> Path, int NodesExplored) Apath = Astar.FindPath(start, end, tileMap);
+            var (hpaPath1, initialTimeLevel1) = MeasurePathfindingTime(hpaStar, start, end, 1, refinePath);
+            var (hpaPath2, initialTimeLevel2) = MeasurePathfindingTime(hpaStar, start, end, 2, refinePath);
+            var (hpaPath3, initialTimeLevel3) = MeasurePathfindingTime(hpaStar, start, end, 3, refinePath);
+            var (Apath, nodesExplored, initialTimeAStar) = MeasureAStarTime(tileMap, start, end);
 
             // Define points to add and remove
-            List<Vector2Int> pointsToAdd = new List<Vector2Int> { new Vector2Int(15, 15), new Vector2Int(16, 16) };
-            List<Vector2Int> pointsToRemove = new List<Vector2Int> { new Vector2Int(20, 20), new Vector2Int(21, 21) };
+            var pointsToAdd = GenerateRandomPoints(random, mapModel, start, end, 0);
+            var pointsToRemove = GenerateRandomPoints(random, mapModel, start, end, 0);
 
-            for (int j = 0; j < 500; j++)
+            for (int j = start.x - 5; j < start.x + 5; j++)
             {
-                int x = random.Next(0, mapModel.height);
-                int y = random.Next(0, mapModel.width);
-                if (start.x == x && start.y == y) continue;
-                if (end.x == x && end.y == y) continue;
+                for (int k = start.y - 5; k < start.y + 5; k++)
+                {
+                    if (j >= 0 && j < mapModel.height && k >= 0 && k < mapModel.width)
+                    {
+                        pointsToAdd.Add(new Vector2Int(j, k));
 
-                pointsToAdd.Add(new Vector2Int(x, y));
-
-
-            }
-
-            for (int j = 0; j < 500; j++)
-            {
-                int x = random.Next(0, mapModel.height);
-                int y = random.Next(0, mapModel.width);
-                if (start.x == x && start.y == y) continue;
-                if (end.x == x && end.y == y) continue;
-
-                pointsToAdd.Remove(new Vector2Int(x, y));
-
-
+                    }
+                }
             }
 
 
+            if (pointsToRemove.Contains(start)) pointsToRemove.Remove(start);
+            if (pointsToRemove.Contains(end)) pointsToRemove.Remove(end);
 
-            // Filter points based on their existence in the graph
-            List<Vector2Int> validPointsToAdd = pointsToAdd.Where(p => !graphModel.NodesByLevel[1].ContainsKey(p)).ToList(); // Change 1 to appropriate level
-            List<Vector2Int> validPointsToRemove = pointsToRemove.Where(p => graphModel.NodesByLevel[1].ContainsKey(p)).ToList(); // Change 1 to appropriate level
 
-            // Simulate dynamic changes and replanning
-            long replanningTimeLevel1 = ApplyChangesAndReplan(hpaStar, start, end, 1, RefinePath: refinePath, validPointsToAdd, validPointsToRemove);
-            long replanningTimeLevel2 = ApplyChangesAndReplan(hpaStar, start, end, 2, RefinePath: true, validPointsToAdd, validPointsToRemove);
-            long replanningTimeLevel3 = ApplyChangesAndReplan(hpaStar, start, end, 3, RefinePath: true, validPointsToAdd, validPointsToRemove);
-            long replanningTimeAStar = ApplyChangesAndReplanAStar(tileMap, start, end, validPointsToAdd, validPointsToRemove);
+
+            // Apply changes and replan
+            var (hpaPath1_after, initialTimeLevel1_after) = ApplyChangesAndReplan(hpaStar, start, end, 1, refinePath, pointsToAdd, pointsToRemove);
+            var (hpaPath2_after, initialTimeLevel2_after) = ApplyChangesAndReplan(hpaStar, start, end, 2, refinePath, pointsToAdd, pointsToRemove);
+            var (hpaPath3_after, initialTimeLevel3_after) = ApplyChangesAndReplan(hpaStar, start, end, 3, refinePath, pointsToAdd, pointsToRemove);
+            var (Apath_after, nodesExplored_after, initialTimeAStar_after) = ApplyChangesAndReplanAStar(tileMap, start, end, pointsToAdd, pointsToRemove);
 
             // Calculate path length changes
-            long pathLengthChangeLevel1 = CalculatePathLengthChange(hpaPath1);
-            long pathLengthChangeLevel2 = CalculatePathLengthChange(hpaPath2);
-            long pathLengthChangeLevel3 = CalculatePathLengthChange(hpaPath3);
-            long pathLengthChangeAStar = CalculatePathLengthChange(Apath);
+            long pathLengthChangeLevel1 = CalculatePathLengthChange(hpaPath1_after, hpaPath1);
+            long pathLengthChangeLevel2 = CalculatePathLengthChange(hpaPath2_after, hpaPath1);
+            long pathLengthChangeLevel3 = CalculatePathLengthChange(hpaPath3_after, hpaPath3);
+            long pathLengthChangeAStar = CalculatePathLengthChange(Apath_after, Apath);
+
+            long replanningTimeLevel1 = initialTimeLevel1_after - initialTimeLevel1;
+            long replanningTimeLevel2 = initialTimeLevel2_after - initialTimeLevel2;
+            long replanningTimeLevel3 = initialTimeLevel3_after - initialTimeLevel3;
+            long replanningTimeAStar = initialTimeAStar_after - initialTimeAStar;
 
             string result = $"{i + 1}," +
                             $"{density}," +
@@ -309,25 +307,68 @@ public class PathfindingTest
                             $"{cellularIterations}," +
                             $"{height}," +
                             $"{width}," +
+                            $"{initialTimeLevel1}," +
+                            $"{initialTimeLevel2}," +
+                            $"{initialTimeLevel3}," +
+                            $"{initialTimeAStar}," +
                             $"{replanningTimeLevel1}," +
-                            // $"{replanningTimeLevel2}," +
-                            // $"{replanningTimeLevel3}," +
+                            $"{replanningTimeLevel2}," +
+                            $"{replanningTimeLevel3}," +
                             $"{replanningTimeAStar}," +
+                            $"{Apath?.Count ?? 0}," +
+                            $"{hpaPath1?.path?.Count ?? 0}," +
+                            $"{hpaPath2?.path?.Count ?? 0}," +
+                            $"{hpaPath3?.path?.Count ?? 0}," +
+                            $"{Apath_after?.Count ?? 0}," +
+                            $"{hpaPath1_after?.path?.Count ?? 0}," +
+                            $"{hpaPath2_after?.path?.Count ?? 0}," +
+                            $"{hpaPath3_after?.path?.Count ?? 0}," +
                             $"{pathLengthChangeLevel1}," +
-                            // $"{pathLengthChangeLevel2}," +
-                            // $"{pathLengthChangeLevel3}," +
+                            $"{pathLengthChangeLevel2}," +
+                            $"{pathLengthChangeLevel3}," +
                             $"{pathLengthChangeAStar}";
 
             results.Add(result);
         }
-        name = "dynamic_replanning_results_" + name + ".csv";
 
+        name = "dynamic_replanning_results_" + name + ".csv";
         string filePath = Path.Combine(Application.dataPath, name);
         File.WriteAllLines(filePath, results);
         Debug.Log($"Results saved to {filePath}");
     }
 
-    private static long ApplyChangesAndReplan(IHPAStar hpaStar, Vector2Int start, Vector2Int end, int level, bool RefinePath, List<Vector2Int> pointsToAdd, List<Vector2Int> pointsToRemove)
+    private static (HPAPath, long) MeasurePathfindingTime(IHPAStar hpaStar, Vector2Int start, Vector2Int end, int level, bool refinePath)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        HPAPath hpaPath = ExecutePathfinding(hpaStar, start, end, level, refinePath);
+        stopwatch.Stop();
+        return (hpaPath, stopwatch.ElapsedMilliseconds);
+    }
+
+    private static (List<Vector2Int> Path, int NodesExplored, long Time) MeasureAStarTime(int[,] tileMap, Vector2Int start, Vector2Int end)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        var Apath = Astar.FindPath(start, end, tileMap);
+        stopwatch.Stop();
+        return (Apath.Path, Apath.NodesExplored, stopwatch.ElapsedMilliseconds);
+    }
+
+    private static List<Vector2Int> GenerateRandomPoints(System.Random random, MapModel mapModel, Vector2Int start, Vector2Int end, int count)
+    {
+        var points = new List<Vector2Int>();
+        for (int j = 0; j < count; j++)
+        {
+            int x = random.Next(0, mapModel.height);
+            int y = random.Next(0, mapModel.width);
+            if (start.x == x && start.y == y) continue;
+            if (end.x == x && end.y == y) continue;
+            points.Add(new Vector2Int(x, y));
+        }
+        return points;
+    }
+
+
+    private static (HPAPath, long) ApplyChangesAndReplan(IHPAStar hpaStar, Vector2Int start, Vector2Int end, int level, bool RefinePath, List<Vector2Int> pointsToAdd, List<Vector2Int> pointsToRemove)
     {
         var stopwatch = Stopwatch.StartNew();
 
@@ -343,12 +384,12 @@ public class PathfindingTest
             hpaStar.DynamicallyRemoveHPANode(point);
         }
 
-        ExecutePathfinding(hpaStar, start, end, level, RefinePath);
+        var hpaPath = ExecutePathfinding(hpaStar, start, end, level, RefinePath);
         stopwatch.Stop();
-        return stopwatch.ElapsedMilliseconds;
+        return (hpaPath, stopwatch.ElapsedMilliseconds);
     }
 
-    private static long ApplyChangesAndReplanAStar(int[,] tileMap, Vector2Int start, Vector2Int end, List<Vector2Int> pointsToAdd, List<Vector2Int> pointsToRemove)
+    private static (List<Vector2Int> Path, int NodesExplored, long) ApplyChangesAndReplanAStar(int[,] tileMap, Vector2Int start, Vector2Int end, List<Vector2Int> pointsToAdd, List<Vector2Int> pointsToRemove)
     {
         var stopwatch = Stopwatch.StartNew();
 
@@ -370,9 +411,9 @@ public class PathfindingTest
             }
         }
 
-        (List<Vector2Int> Path, int NodesExplored) Apath = Astar.FindPath(start, end, tileMap);
+        (List<Vector2Int> path, int NodesExplored) = Astar.FindPath(start, end, tileMap);
         stopwatch.Stop();
-        return stopwatch.ElapsedMilliseconds;
+        return (path, NodesExplored, stopwatch.ElapsedMilliseconds);
     }
 
     private static long CalculatePathLengthChange(HPAPath hpaPath)
@@ -387,13 +428,22 @@ public class PathfindingTest
         return (hpaPath?.path?.Count ?? 0) - initialPathLength;
     }
 
-    private static long CalculatePathLengthChange((List<Vector2Int> Path, int NodesExplored) Apath)
+    private static long CalculatePathLengthChange(HPAPath initialPath, HPAPath newPath)
     {
-        if (Apath.Path == null) return 0;
-        // This method should compare the new path length with the initial path length
-        // For simplicity, assume we have a way to get the initial path length
-        int initialPathLength = 0; // Placeholder
-        return Apath.Path.Count - initialPathLength;
+        if (initialPath == null || newPath == null || initialPath.path == null || newPath.path == null)
+        {
+            return 0;
+        }
+        return newPath.path.Count - initialPath.path.Count;
+    }
+
+    private static long CalculatePathLengthChange(List<Vector2Int> initialPath, List<Vector2Int> newPath)
+    {
+        if (initialPath == null || newPath == null)
+        {
+            return 0;
+        }
+        return newPath.Count - initialPath.Count;
     }
 
     private static HPAPath ExecutePathfinding(IHPAStar hpaStar, Vector2Int start, Vector2Int end, int maxLevel, bool RefinePath)

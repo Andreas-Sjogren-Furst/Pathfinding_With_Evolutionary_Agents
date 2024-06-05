@@ -294,6 +294,10 @@ public class HPAStar : IHPAStar
 
     public void DynamicallyRemoveHPANode(Vector2Int position)
     {
+        if (!_graphModel.NodesByLevel[1].ContainsKey(position))
+        {
+            return;
+        }
         Cluster cluster = _clusterManager.DetermineCluster(position, 1);
         HPANode nodeToRemove = _nodeManager.GetNodeByPosition(position, 1);
         // Boolean _rebuildEntrances = false;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using Codice.Client.BaseCommands;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -112,8 +113,9 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.RightArrow))
+        if (true)
         {
+            Thread.Sleep(100);
             myGameManager.agentController.SimulateAgents();
             MoveAgents();
             RenderFrontiers();
