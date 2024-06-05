@@ -114,6 +114,7 @@ public class WebView : MonoBehaviour, IScreenView
             myGameManager.agentController.SimulateAgents();
             MoveAgents();
             RenderFrontiers();
+            
         }
     }
     public void CreateNewMap(MapModel mapModel)
