@@ -16,12 +16,12 @@ public class MmasMapTest
     [Test]
     public void MmasMapTestSimplePasses()
     {
-        int numRuns = 30;
+        int numRuns = 1;
         // Generate and save maps for simulations
         savedMaps = GenerateMaps(numRuns, (60, 60), (15, 15), (17, 20), (100, 100), (100, 100));
         // savedMaps = GenerateMaps(numRuns, (0, 0), (40, 40), (0, 0), (100, 100), (100, 100));
 
-        RunSimulations("30_experiment_NEW3_alpa_1.5_beta_4.5_parameters_trail_limits_0_10000", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
+        RunSimulations("1_limit_normalize_pheromone_experiment", numRuns, heuristicSimulation: false, scaleGraphEdges: false, plotIterations_stagnation: false);
         // RunSimulations("30_experiment_NEW2_parameters_trail_limits_non_scaled", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
         // RunSimulations("30_experiment_NEW2_parameters_trail_limits_non_scaled", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
 
@@ -65,7 +65,7 @@ public class MmasMapTest
             Directory.CreateDirectory(baseFolderPath);
         }
 
-        string[] fileNames = { "static.csv", "dynamic.csv", "manhattenHeuristic.csv", "linearHeuristic.csv", "astar.csv", "abstract1.csv", "abstract2.csv", "abstract3.csv" };
+        string[] fileNames = { "static.csv", "dynamic.csv", "manhattenHeuristic.csv", "linearHeuristic.csv", "astar.csv", "abstract1.csv", "abstract2.csv", "abstract3.csv", "normalize.csv" };
         string[] csvFilePaths = new string[fileNames.Length];
 
         for (int i = 0; i < fileNames.Length; i++)
@@ -97,6 +97,7 @@ public class MmasMapTest
             {
                 RunSimulation("RebuildWholeGraph", run, 10, savedMaps[run], csvFilePaths[0]);
                 RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[1]);
+                RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[8], normalize: true);
             }
         }
     }
@@ -264,7 +265,7 @@ public class MmasMapTest
 
 
 
-    private void RunSimulation(string mode, int simulationRun, int iterations, MapModel mapModel, string csvFilePath, bool LinearHeuristic = true, int heuristicsLevel = 1)
+    private void RunSimulation(string mode, int simulationRun, int iterations, MapModel mapModel, string csvFilePath, bool LinearHeuristic = true, int heuristicsLevel = 1, bool normalize = false)
     {
 
 
@@ -328,7 +329,7 @@ public class MmasMapTest
             else if (mode == "AddNodesDynamically")
             {
                 // Add nodes dynamically
-                MyGameManager.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, checkpoints[i].ArrayPosition, 1);
+                DynamicGraphoperations.MmasAddCheckpoint(ref myGameManager.mmasGraphController, ref myGameManager.HPAGraphController, checkpoints[i].ArrayPosition, 1, normalize: normalize);
             }
 
             // Run the MMAS algorithm to get the optimal path

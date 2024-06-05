@@ -411,7 +411,7 @@ public class MMAS
     }
 
 
-    public void AddNode(Node node)
+    public void AddNode(Node node, bool normalizePheromoneLevels = false)
     {
         if (!_graph.Nodes.Contains(node))
         {
@@ -434,6 +434,10 @@ public class MMAS
                     _pheromones[keyForward] = _tauMax;
                     _pheromones[keyBackward] = _tauMax;
                 }
+            }
+            if (normalizePheromoneLevels)
+            {
+                NormalizePheromoneLevels();
             }
         }
     }
@@ -463,17 +467,19 @@ public class MMAS
 
     public void AddEdge(Node source, Node destination, double distance)
     {
-        if (!_graph.Edges.ContainsKey(GetPheromoneKey(source, destination)))
+        // UnityEngine.Debug.Log("Adding edge");
+
+        // if (!_graph.Edges.ContainsKey(GetPheromoneKey(source, destination)))
         {
             _graph.AddEdge(source, destination, distance);
-            setPheromone(source, destination, _tauMax); // Initialize with some pheromone level, usually _tauMax
+            setPheromone(source, destination, _tauMax);
         }
     }
 
     public void RemoveEdge(Node source, Node destination)
     {
-        int key = GetPheromoneKey(source, destination);
-        if (_graph.Edges.ContainsKey(key))
+        // int key = GetPheromoneKey(source, destination);
+        // if (_graph.Edges.ContainsKey(key))
         {
             _graph.RemoveEdge(source, destination);
             removePheromone(source, destination);
@@ -717,6 +723,50 @@ public class MMAS
 
         return tourLength;
     }
+
+
+    public void NormalizePheromoneLevels()
+    {
+
+        // Normalizing the pheromone levels for each specific node relative to its neigbour nodes. 
+
+        foreach (var node in _graph.Nodes)
+        {
+            double maxPheromone = double.MinValue;
+
+
+            // Find the maximum pheromone level for the node
+            foreach (var neighbor in _graph.Nodes)
+            {
+                if (node != neighbor)
+                {
+                    double pheromoneLevel = getPheromone(node, neighbor);
+                    if (pheromoneLevel > maxPheromone)
+                    {
+                        maxPheromone = pheromoneLevel;
+                    }
+                }
+            }
+
+            if (maxPheromone > 0)
+            {
+                // Normalize the pheromone levels for the node
+                foreach (var neighbor in _graph.Nodes)
+                {
+                    if (node != neighbor)
+                    {
+                        int key = GetPheromoneKey(node, neighbor);
+                        if (_pheromones.TryGetValue(key, out double pheromone))
+                        {
+                            _pheromones[key] = pheromone / maxPheromone;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
 
