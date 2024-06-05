@@ -83,9 +83,7 @@ public class WebView : MonoBehaviour, IScreenView
         SpawnAgents();
         RenderMMASGraph();
         RenderFrontiers();
-
-
-
+        
 
 
         //myGameManager.graphController.Preprocessing(3);
