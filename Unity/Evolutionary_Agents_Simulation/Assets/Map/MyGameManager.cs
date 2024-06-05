@@ -47,7 +47,8 @@ public class MyGameManager
         agentController = new AgentController(agentModel);
         HPAGraphController = InitialiseHPAStar(mapModel.map);
         mmasGraphController = InitialiseMMMAS();
-        agentModel.bestTour = InitBestTour(mapModel.checkPoints, mapModel.spawnPoint);
+        //agentModel.bestTour = InitBestTour(mapModel.checkPoints, mapModel.spawnPoint);
+        agentModel.bestTour = new();
     }
 
     private Stack<Point> InitBestTour(List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
