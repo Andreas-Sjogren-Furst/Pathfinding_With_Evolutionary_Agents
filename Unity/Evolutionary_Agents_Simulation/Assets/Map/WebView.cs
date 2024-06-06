@@ -420,8 +420,8 @@ public class WebView : MonoBehaviour, IScreenView
         GameObject lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
         LineRenderer lr = lineObj.GetComponent<LineRenderer>();
         lr.material = material;
-        lr.startWidth = 0.05f * tileSize * 6;
-        lr.endWidth = 0.05f * tileSize * 6;
+        lr.startWidth = 0.05f * tileSize * 5;
+        lr.endWidth = 0.05f * tileSize * 5;
         lr.SetPositions(new Vector3[] { start, end });
         InstantiatedGraph.Add(lineObj);
         lineObj.SetActive(false);
