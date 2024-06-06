@@ -1,0 +1,2 @@
+Iteration,Density,CheckPoints,CellularIterations,Height,Width,PathLength_Level1,NodesExplored_Level1,Time_Level1,PathLength_Level2,NodesExplored_Level2,Time_Level2,PathLength_Level3,NodesExplored_Level3,Time_Level3,PathLength_AStar,NodesExplored_AStar,Time_AStar
+1,density,numberOfCheckPoints,cellularIterations,height,width,23,19,1,25,20,2,30,25,4,19,19,0
