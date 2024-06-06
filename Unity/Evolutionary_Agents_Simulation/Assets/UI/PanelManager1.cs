@@ -71,7 +71,8 @@ public class PanelManager1 : MonoBehaviour
                     slider.value = mapModel.numberOfCheckPoints;
                     break;
                 case "Agents":
-                    sliderValue.text = "1";
+                    sliderValue.text = mapModel.amountOfAgents.ToString();
+                    slider.value = mapModel.amountOfAgents;
                     break;
                 default:
                     break;
