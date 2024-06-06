@@ -1,0 +1,421 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		071041078113FDB6214CD64D /* MonoBleedingEdge in CopyFiles */ = {isa = PBXBuildFile; fileRef = 63504F81B9BC9E2D85F783A2 /* MonoBleedingEdge */; };
+		2787453F95299BB209610C27 /* lib_burst_generated.bundle in CopyPlugIns */ = {isa = PBXBuildFile; fileRef = EACC4BEFB70600DA5CA70B85 /* lib_burst_generated.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		50EF427C8C7A83622C846896 /* libMonoPosixHelper.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD1404B8DACEC04AFF8BD9E /* libMonoPosixHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		750575B4214B38CE004B1B34 /* UnityPlayer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 750575B3214B38CE004B1B34 /* UnityPlayer.dylib */; };
+		750575B5214B3DF2004B1B34 /* UnityPlayer.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 750575B3214B38CE004B1B34 /* UnityPlayer.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		752CA83E2149E6C400295EFC /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 752CA83D2149E6C400295EFC /* Main.cpp */; };
+		75D2DE1F2175685A0038651C /* unity default resources in Resources */ = {isa = PBXBuildFile; fileRef = 75D2DE1E2175685A0038651C /* unity default resources */; };
+		75E7179121715210002B2479 /* DefaultPreferences.plist in Resources */ = {isa = PBXBuildFile; fileRef = 75E7178E21715210002B2479 /* DefaultPreferences.plist */; };
+		75E7179221715210002B2479 /* Data in Resources */ = {isa = PBXBuildFile; fileRef = 75E7178F21715210002B2479 /* Data */; };
+		75E7179321715210002B2479 /* PlayerIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 75E7179021715210002B2479 /* PlayerIcon.icns */; };
+		9DD847268C0EDE5C06F78748 /* libmono-native.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4A5540B99E60BECADF7F3F74 /* libmono-native.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CDD5792C240E027400DEA632 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = CDD5792B240E027400DEA632 /* MainMenu.nib */; };
+		F0714E198849323439CE2EE9 /* libmonobdwgc-2.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D9064EDE931DFA15706AED6D /* libmonobdwgc-2.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		022D473B8A2DAFD3BDCBF8A8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents;
+			dstSubfolderSpec = 1;
+			files = (
+				071041078113FDB6214CD64D /* MonoBleedingEdge in CopyFiles */,
+			);
+			name = CopyFiles;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		419D42E6AFFAA81CA9ADA139 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F0714E198849323439CE2EE9 /* libmonobdwgc-2.0.dylib in Embed Frameworks */,
+				50EF427C8C7A83622C846896 /* libMonoPosixHelper.dylib in Embed Frameworks */,
+				9DD847268C0EDE5C06F78748 /* libmono-native.dylib in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		44B54A20826A72B0C4D65FCE /* CopyPlugIns */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				2787453F95299BB209610C27 /* lib_burst_generated.bundle in CopyPlugIns */,
+			);
+			name = CopyPlugIns;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		750575B6214B3DF2004B1B34 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				750575B5214B3DF2004B1B34 /* UnityPlayer.dylib in Embed Libraries */,
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0CD1404B8DACEC04AFF8BD9E /* libMonoPosixHelper.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libMonoPosixHelper.dylib; path = Evolutionary_Agents_Simulation/Frameworks/libMonoPosixHelper.dylib; sourceTree = SOURCE_ROOT; };
+		4A5540B99E60BECADF7F3F74 /* libmono-native.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libmono-native.dylib"; path = "Evolutionary_Agents_Simulation/Frameworks/libmono-native.dylib"; sourceTree = SOURCE_ROOT; };
+		63504F81B9BC9E2D85F783A2 /* MonoBleedingEdge */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MonoBleedingEdge; path = Evolutionary_Agents_Simulation/MonoBleedingEdge; sourceTree = SOURCE_ROOT; };
+		750575B3214B38CE004B1B34 /* UnityPlayer.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = UnityPlayer.dylib; path = Evolutionary_Agents_Simulation/Frameworks/UnityPlayer.dylib; sourceTree = "<group>"; };
+		752CA8282149E6C100295EFC /* Evolutionary_Agents_Simulation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Evolutionary_Agents_Simulation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		752CA83C2149E6C400295EFC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		752CA83D2149E6C400295EFC /* Main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
+		75D2DE1E2175685A0038651C /* unity default resources */ = {isa = PBXFileReference; lastKnownFileType = text; name = "unity default resources"; path = "Evolutionary_Agents_Simulation/Resources/unity default resources"; sourceTree = "<group>"; };
+		75E7178E21715210002B2479 /* DefaultPreferences.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = DefaultPreferences.plist; path = Evolutionary_Agents_Simulation/Resources/DefaultPreferences.plist; sourceTree = "<group>"; };
+		75E7178F21715210002B2479 /* Data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Data; path = Evolutionary_Agents_Simulation/Resources/Data; sourceTree = "<group>"; };
+		75E7179021715210002B2479 /* PlayerIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = PlayerIcon.icns; path = Evolutionary_Agents_Simulation/Resources/PlayerIcon.icns; sourceTree = "<group>"; };
+		CDD5792B240E027400DEA632 /* MainMenu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MainMenu.nib; path = Evolutionary_Agents_Simulation/Resources/MainMenu.nib; sourceTree = "<group>"; };
+		D9064EDE931DFA15706AED6D /* libmonobdwgc-2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libmonobdwgc-2.0.dylib"; path = "Evolutionary_Agents_Simulation/Frameworks/libmonobdwgc-2.0.dylib"; sourceTree = SOURCE_ROOT; };
+		EACC4BEFB70600DA5CA70B85 /* lib_burst_generated.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = lib_burst_generated.bundle; path = Evolutionary_Agents_Simulation/Plugins/lib_burst_generated.bundle; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		752CA8252149E6C100295EFC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				750575B4214B38CE004B1B34 /* UnityPlayer.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		750575B2214B38CE004B1B34 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				750575B3214B38CE004B1B34 /* UnityPlayer.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		752CA81F2149E6C100295EFC = {
+			isa = PBXGroup;
+			children = (
+				75E7179421715230002B2479 /* Resources */,
+				750575B2214B38CE004B1B34 /* Frameworks */,
+				752CA82A2149E6C100295EFC /* Evolutionary_Agents_Simulation */,
+				752CA8292149E6C100295EFC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		752CA8292149E6C100295EFC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				752CA8282149E6C100295EFC /* Evolutionary_Agents_Simulation.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		752CA82A2149E6C100295EFC /* Evolutionary_Agents_Simulation */ = {
+			isa = PBXGroup;
+			children = (
+				752CA83C2149E6C400295EFC /* Info.plist */,
+				752CA83D2149E6C400295EFC /* Main.cpp */,
+				8A464213819C8E892071B3D7 /* Plugins */,
+				C57646C3B921BE93DB18CB7E /* Frameworks */,
+				63504F81B9BC9E2D85F783A2 /* MonoBleedingEdge */,
+			);
+			path = Evolutionary_Agents_Simulation;
+			sourceTree = "<group>";
+		};
+		75E7179421715230002B2479 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CDD5792B240E027400DEA632 /* MainMenu.nib */,
+				75E7178F21715210002B2479 /* Data */,
+				75E7178E21715210002B2479 /* DefaultPreferences.plist */,
+				75E7179021715210002B2479 /* PlayerIcon.icns */,
+				75D2DE1E2175685A0038651C /* unity default resources */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		8A464213819C8E892071B3D7 /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				EACC4BEFB70600DA5CA70B85 /* lib_burst_generated.bundle */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		C57646C3B921BE93DB18CB7E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D9064EDE931DFA15706AED6D /* libmonobdwgc-2.0.dylib */,
+				0CD1404B8DACEC04AFF8BD9E /* libMonoPosixHelper.dylib */,
+				4A5540B99E60BECADF7F3F74 /* libmono-native.dylib */,
+			);
+			path = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		752CA8272149E6C100295EFC /* Evolutionary_Agents_Simulation */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 752CA8422149E6C400295EFC /* Build configuration list for PBXNativeTarget "Evolutionary_Agents_Simulation" */;
+			buildPhases = (
+				752CA8242149E6C100295EFC /* Sources */,
+				752CA8252149E6C100295EFC /* Frameworks */,
+				752CA8262149E6C100295EFC /* Resources */,
+				750575B6214B3DF2004B1B34 /* Embed Libraries */,
+				44B54A20826A72B0C4D65FCE /* CopyPlugIns */,
+				419D42E6AFFAA81CA9ADA139 /* Embed Frameworks */,
+				022D473B8A2DAFD3BDCBF8A8 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Evolutionary_Agents_Simulation;
+			productName = Evolutionary_Agents_Simulation;
+			productReference = 752CA8282149E6C100295EFC /* Evolutionary_Agents_Simulation.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		752CA8202149E6C100295EFC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1510;
+				ORGANIZATIONNAME = "Unity Technologies";
+				TargetAttributes = {
+					752CA8272149E6C100295EFC = {
+						CreatedOnToolsVersion = 9.4.1;
+						UnityMainTarget = 1;
+					};
+				};
+			};
+			buildConfigurationList = 752CA8232149E6C100295EFC /* Build configuration list for PBXProject "Builds" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 752CA81F2149E6C100295EFC;
+			productRefGroup = 752CA8292149E6C100295EFC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				752CA8272149E6C100295EFC /* Evolutionary_Agents_Simulation */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		752CA8262149E6C100295EFC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				75E7179121715210002B2479 /* DefaultPreferences.plist in Resources */,
+				CDD5792C240E027400DEA632 /* MainMenu.nib in Resources */,
+				75E7179221715210002B2479 /* Data in Resources */,
+				75E7179321715210002B2479 /* PlayerIcon.icns in Resources */,
+				75D2DE1F2175685A0038651C /* unity default resources in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		752CA8242149E6C100295EFC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				752CA83E2149E6C400295EFC /* Main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		752CA8402149E6C400295EFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		752CA8412149E6C400295EFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		752CA8432149E6C400295EFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = SN85GZAJRD;
+				INFOPLIST_FILE = Evolutionary_Agents_Simulation/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DefaultCompany.2DProject;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				UNITY_RUNTIME_VERSION = 2022.3.17f1;
+				UNITY_SCRIPTING_IL2CPP = 0;
+				VALID_ARCHS = "arm64 x86_64";
+			};
+			name = Debug;
+		};
+		752CA8442149E6C400295EFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = SN85GZAJRD;
+				INFOPLIST_FILE = Evolutionary_Agents_Simulation/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DefaultCompany.2DProject;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				UNITY_RUNTIME_VERSION = 2022.3.17f1;
+				UNITY_SCRIPTING_IL2CPP = 0;
+				VALID_ARCHS = "arm64 x86_64";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		752CA8232149E6C100295EFC /* Build configuration list for PBXProject "Builds" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				752CA8402149E6C400295EFC /* Debug */,
+				752CA8412149E6C400295EFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		752CA8422149E6C400295EFC /* Build configuration list for PBXNativeTarget "Evolutionary_Agents_Simulation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				752CA8432149E6C400295EFC /* Debug */,
+				752CA8442149E6C400295EFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 752CA8202149E6C100295EFC /* Project object */;
+}
