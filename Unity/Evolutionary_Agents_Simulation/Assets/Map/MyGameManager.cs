@@ -30,7 +30,7 @@ public class MyGameManager
     public MyGameManager()
     {
         customMaps = new();
-        MapModel mapModel = customMaps.GetCustomMap(6);
+        MapModel mapModel = customMaps.GetCustomMap(0);
         mapController = new MapController(mapModel);
         AgentModel agentModel = new(mapModel.amountOfAgents, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
         agentController = new AgentController(agentModel);
