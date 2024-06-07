@@ -98,9 +98,9 @@ public class MmasMapTest
             }
             else
             {
-                // RunSimulation("RebuildWholeGraph", run, 10, savedMaps[run], csvFilePaths[0]);
-                // RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[1]);
-                // RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[8], normalize: true);
+                RunSimulation("RebuildWholeGraph", run, 10, savedMaps[run], csvFilePaths[0]);
+                RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[1]);
+                RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[8], normalize: true);
                 RunSimulationRemovalOfCheckpoints("RebuildWholeGraph", run, 10, savedMaps[run], csvFilePaths[9]);
                 RunSimulationRemovalOfCheckpoints("RemoveNodesDynamically", run, 10, savedMaps[run], csvFilePaths[10]);
                 RunSimulationRemovalOfCheckpoints("RemoveNodesDynamically", run, 10, savedMaps[run], csvFilePaths[11], normalize: true);

@@ -50,7 +50,7 @@ public static class Astar
 
         Dictionary<Vector2Int, NodeCell> closedList;
 
-        openList = new FibonacciHeapPriorityQueue<NodeCell>(SortDirection.Ascending); // TODO: change to Priority queue with fibonaci heap. 
+        openList = new FibonacciHeapPriorityQueue<NodeCell>(SortDirection.Ascending); // priority queue with fibonaci heap. 
         Dictionary<Vector2Int, NodeCell> openListLookup = new Dictionary<Vector2Int, NodeCell>();  // for constant time lookup
 
 
@@ -64,16 +64,6 @@ public static class Astar
 
         while (openList.Count > 0) // N 
         {
-            // Debug.Log("OpenList: " + openList.Count);
-            // for (int i = 1; i < openList.Count; i++) // N
-            // {
-
-            //     if (openList[i].fCost < currentNode.fCost || (openList[i].fCost == currentNode.fCost && openList[i].hCost < currentNode.hCost))
-            //     // if cost is lower or if f cost is equal and hCost is lower
-            //     {
-            //         currentNode = openList[i];
-            //     }
-            // }
 
             NodeCell currentNode = openList.Dequeue(); // log n. 
             openListLookup.Remove(currentNode.Position);
@@ -104,7 +94,6 @@ public static class Astar
 
                 if (neighbor == null)
                 {
-                    //  Debug.Log("Creating new node at " + neighborPos + " from " + currentNode.position + " with gCost: " + currentNode.gCost + " and hCost: " + GetDistance(neighborPos, end) + " and fCost: " + (currentNode.gCost + GetDistance(neighborPos, end)) + " and parent: " + currentNode.position);
                     neighbor = new NodeCell(neighborPos);
                 }
 
@@ -138,20 +127,10 @@ public static class Astar
         start.gCost = 0;
         start.hCost = GetDistance(start.Position, end.Position);
 
-        // Debug.Log($"Adding to open list: {neighbor.Position} with gCost: {neighbor.gCost} and hCost: {neighbor.hCost}.");
-        // if (currentNode.parent != null)
-        // {
-        //     Debug.DrawLine(new Vector3(currentNode.Position.x, currentNode.Position.y, 0), new Vector3(currentNode.parent.Position.x, currentNode.parent.Position.y, 0), Color.red, duration: 0.001f);
-        // }
-
 
 
         openList.Enqueue(start);
         openListLookup.Add(start.Position, start);
-        // Debug.Log($"Starting pathfinding from {start.Position} to {end.Position}.");
-        Vector3 trans = new Vector3((float)(1 / 2.0), 0, (float)(1 / 2.0));
-        Vector3 curTrans = new Vector3(-50, 1, -50);
-        //  Debug.DrawRay(new Vector3(start.Position.x, 0, start.Position.y) + trans + curTrans, new Vector3(end.Position.x, 0, end.Position.y) + trans + curTrans, Color.green, duration: 5f);
 
 
         while (openList.Count > 0)
@@ -160,10 +139,6 @@ public static class Astar
             // When moving a node from open to closed list
             HPANode currentNode = openList.Dequeue();
             openListLookup.Remove(currentNode.Position);
-            // Debug.Log($"Moving to closed list: {currentNode.Position}.");
-
-
-
 
 
             if (closedList.ContainsKey(currentNode.Position))
@@ -197,7 +172,6 @@ public static class Astar
                     neighbor.hCost = GetDistance(neighbor.Position, end.Position);
                     neighbor.parent = currentNode;
 
-                    // Debug.Log($"Updating node {neighbor.Position}: New gCost: {newCostToNeighbor}, New hCost: {neighbor.hCost}.");
                     if (!openListLookup.ContainsKey(neighbor.Position))
                     {
                         // When adding to open list
@@ -238,69 +212,6 @@ public static class Astar
 
 
 
-
-    // public static List<Vector2Int> FindPath(HPANode startNode, HPANode endNode)
-    // {
-    //     var openList = new FibonacciHeapPriorityQueue<NodeCell>(SortDirection.Ascending);
-    //     var openListLookup = new Dictionary<int, NodeCell>();
-    //     var closedList = new Dictionary<int, NodeCell>();
-
-
-    //     NodeCell startCell = new NodeCell(startNode.Position) { gCost = 0, hCost = CalculateHCost(startNode, endNode) };
-    //     openList.Enqueue(startNode);
-    //     openListLookup.Add(startNode.Id, startCell);
-
-    //     while (openList.Count > 0)
-    //     {
-    //         NodeCell currentCell = openList.Dequeue();
-    //         HPANode currentNode = currentCell.Node;
-
-    //         // Check if we've reached the end node
-    //         if (currentNode.Id == endNode.Id)
-    //         {
-    //             return RetracePath(startCell, currentCell);
-    //         }
-
-    //         openListLookup.Remove(currentNode.Id);
-    //         closedList[currentNode.Id] = currentCell;
-
-    //         // Explore neighbors
-    //         foreach (var edge in currentNode.Edges)
-    //         {
-    //             HPANode neighborNode = edge.Node1.Id == currentNode.Id ? edge.Node2 : edge.Node1;
-    //             if (closedList.ContainsKey(neighborNode.Id)) continue; // Skip if already processed
-
-    //             int tentativeGCost = currentCell.gCost + (int)edge.Weight;
-    //             NodeCell neighborCell = openListLookup.GetValueOrDefault(neighborNode.Id);
-
-    //             // If new path to neighbor is shorter OR neighbor is not in openList
-    //             if (neighborCell == null)
-    //             {
-    //                 neighborCell = new NodeCell(neighborNode);
-    //                 openListLookup[neighborNode.Id] = neighborCell;
-    //             }
-    //             else if (tentativeGCost >= neighborCell.gCost) continue; // Skip if no better path found
-
-    //             // Update neighbor properties
-    //             neighborCell.gCost = tentativeGCost;
-    //             neighborCell.hCost = CalculateHCost(neighborNode, endNode);
-    //             neighborCell.parent = currentCell;
-
-    //             if (!openList.Contains(neighborCell))
-    //             {
-    //                 openList.Enqueue(neighborCell, neighborCell.fCost);
-    //             }
-    //         }
-    //     }
-
-
-    //     return null; // Path not found
-    // }
-
-
-
-
-
     private static bool PositionIsValid(Vector2Int position, int[,] map) // all 0s are walkable, 1s are walls, 2s are checkpoints (which are walkable.). 
     {
         return position.x >= 0 && position.x < map.GetLength(0) && position.y >= 0 && position.y < map.GetLength(1) && (map[position.x, position.y] != 1);
@@ -322,17 +233,8 @@ public static class Astar
 
     private static int GetDistance(Vector2Int a, Vector2Int b)
     {
-        // int dx = Mathf.Abs(a.x - b.x);
-        // int dy = Mathf.Abs(a.y - b.y);
 
-
-        // if (dx > dy)
-        //     return (int)14 * dy + 10 * (dx - dy);
-        // return (int)14 * dx + 10 * (dy - dx);
-
-
-        // (5,10) - (20,30) = (15, 20) => 15 + 20 = 35
-        // Calculate the x and y distance between two points. 
+        // Calculate the x and y distance between two points, manhatten. 
         return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
     }
 

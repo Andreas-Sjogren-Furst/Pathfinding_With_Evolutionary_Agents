@@ -148,7 +148,6 @@ public class MMAS
                 convergenceCount++;
                 if (convergenceCount >= convergenceCountRequired)
                 {
-                    // UnityEngine.Debug.Log("Convergence reached after " + iterations + " iterations.");
                     break; //Convergence, this signifcanlty increased the speed of the algorithm from 5 sec to 0.5 sec
                 }
             }
@@ -239,7 +238,6 @@ public class MMAS
 
     public void AddEdge(Node source, Node destination, double distance)
     {
-        // UnityEngine.Debug.Log("Adding edge");
 
         // if (!_graph.Edges.ContainsKey(GetPheromoneKey(source, destination)))
         {
@@ -277,11 +275,7 @@ public class MMAS
         int numNodes = _graph.Nodes.Count;
         Node[] tour = new Node[numNodes];
         ant.TabuList.Clear();
-        // This will generate a random integer between 1 and 10 (1 inclusive, 10 exclusive)
-        // int randomNumber = UnityEngine.Random.Range(0, numNodes);
-        // UnityEngine.Debug.Log("random number " + randomNumber);
-
-        ant.CurrentNode = _graph.Nodes[startNode]; // Start at a random node. 
+        ant.CurrentNode = _graph.Nodes[startNode];
         ant.TabuList.Add(ant.CurrentNode);
         tour[0] = ant.CurrentNode;
 
@@ -304,7 +298,6 @@ public class MMAS
         for (int i = 0; i < _graph.Nodes.Count; i++)
         {
             Node nextNode = _graph.Nodes[i];
-            // UnityEngine.Debug.Log("current node" + currentNode);
             if (!ant.TabuList.Contains(nextNode) && _graph.getEdge(currentNode, nextNode) < Double.MaxValue)
             {
                 // Directly access the distance from the adjacency matrix
