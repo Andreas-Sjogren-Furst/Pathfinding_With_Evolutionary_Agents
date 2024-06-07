@@ -137,13 +137,14 @@ public class DynamicGraphoperations
         return edges;
     }
 
-    public static void MmasRemoveCheckpoint(ref MMAS mmasGraphController, Vector2Int checkpoint, int iterations = 0)
+    public static void MmasRemoveCheckpoint(ref MMAS mmasGraphController, Vector2Int checkpoint, int iterations = 0, bool normalize = false)
     {
 
 
         Node nodeToRemove = mmasGraphController._graph.Nodes.Find(x => x.X == checkpoint.x && x.Y == checkpoint.y); // TODO: can be optimized. 
         if (nodeToRemove == null)
         {
+            Debug.Log("Node not found");
             return;
         }
         mmasGraphController.RemoveNode(nodeToRemove);

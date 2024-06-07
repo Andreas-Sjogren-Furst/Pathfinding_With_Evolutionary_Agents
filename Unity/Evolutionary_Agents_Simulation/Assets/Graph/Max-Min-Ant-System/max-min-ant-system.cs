@@ -442,7 +442,7 @@ public class MMAS
         }
     }
 
-    public void RemoveNode(Node node)
+    public void RemoveNode(Node node, bool normalize = false)
     {
         if (_graph.Nodes.Contains(node))
         {
@@ -460,7 +460,12 @@ public class MMAS
             _graph.RemoveNode(node);
             _bestTourLength = double.MaxValue;
             _bestTour = new Node[_graph.Nodes.Count];
-            // _numAnts = _graph.Nodes.Count;
+            _numAnts = _graph.Nodes.Count;
+
+            if (normalize)
+            {
+                NormalizePheromoneLevels();
+            }
 
         }
     }
