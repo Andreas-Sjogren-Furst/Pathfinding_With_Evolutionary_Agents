@@ -8,10 +8,12 @@ public class PanelManager1 : MonoBehaviour
     Dropdown dropdown;
     Slider[] sliders;
     InputField inputField;
+    CameraAdjuster cameraAdjuster;
 
     // Start is called before the first frame update
     void Start()
     {
+        cameraAdjuster = Camera.main.GetComponent<CameraAdjuster>();
         submitButton = GetComponentInChildren<Button>();
         dropdown = GetComponentsInChildren<Dropdown>()[1];
         sliders = GetComponentsInChildren<Slider>();
@@ -95,5 +97,6 @@ public class PanelManager1 : MonoBehaviour
         ValidateInput(inputField.text);
         MapModel mapModel = CreateMapModelFromUI();
         WebView.Instance.CreateNewMap(mapModel);
+        cameraAdjuster.AdjustCamera();
     }
 }
