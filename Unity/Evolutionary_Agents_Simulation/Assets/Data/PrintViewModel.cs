@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 // using Unity.Plastic.Newtonsoft.Json;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class PrintViewModel
 {
     // [JsonProperty("map")]

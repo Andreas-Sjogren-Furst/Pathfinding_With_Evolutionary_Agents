@@ -1,4 +1,4 @@
-// written by: Gustav Clausen s214940
+// written by: Gustav Clausen s214940, Andreas Sjögren Fürst
 
 using System.Collections.Generic;
 using UnityEngine;

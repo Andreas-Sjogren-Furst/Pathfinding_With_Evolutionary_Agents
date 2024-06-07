@@ -1,4 +1,4 @@
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class FractionArithmetic 
 {
     public static int GCD(int a, int b) {

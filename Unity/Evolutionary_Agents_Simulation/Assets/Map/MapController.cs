@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class MapController
 {
     public MapModel mapModel;

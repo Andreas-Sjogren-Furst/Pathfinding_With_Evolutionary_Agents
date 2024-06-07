@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class AgentController{
     
     public AgentModel agentModel;

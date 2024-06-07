@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+// Written by: Andreas Sjögren Fürst (s201189)
 
 public class PanelManager1 : MonoBehaviour
 {

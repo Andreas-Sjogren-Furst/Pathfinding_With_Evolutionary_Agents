@@ -1,5 +1,5 @@
 using System;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class Point
 {
     public readonly int x;

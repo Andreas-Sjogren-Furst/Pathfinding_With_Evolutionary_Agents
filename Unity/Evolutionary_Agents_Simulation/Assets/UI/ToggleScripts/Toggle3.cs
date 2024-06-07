@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class Toggle3 : MonoBehaviour
 {
     Toggle myToggle;

@@ -1,6 +1,6 @@
 
 using System.Collections.Generic;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class GridExplorer 
 {
     public static int CountAccessibleNodes(MapObject[,] map, AgentSpawnPoint spawnPoint)

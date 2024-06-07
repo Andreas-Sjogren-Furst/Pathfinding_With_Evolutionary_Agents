@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+// Written by: Andreas Sjögren Fürst (s201189)
 public class AgentModel
 {
     public int amountOfAgents;
