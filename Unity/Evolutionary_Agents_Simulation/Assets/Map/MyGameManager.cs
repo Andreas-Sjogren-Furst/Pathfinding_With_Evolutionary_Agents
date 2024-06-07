@@ -1,3 +1,5 @@
+// written by: Gustav Clausen s214940
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -91,7 +93,6 @@ public class MyGameManager
         int mapSize = map.GetLength(0);
 
         int clusterSize = ClusterManager.CalculateValidClusterSize(mapSize, minClusterSize: 5, maxClusterSize: 50, targetDivisor: 10);
-        Debug.Log("Cluster Size: " + clusterSize);
         int maxLevel = HPAStar.maxLevelAllowed(mapSize, clusterSize: clusterSize);
         hpaStar.Preprocessing(maxLevel, clusterSize);
 

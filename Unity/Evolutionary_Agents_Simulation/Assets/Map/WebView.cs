@@ -1,3 +1,5 @@
+// written by: Gustav Clausen s214940
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -305,29 +307,34 @@ public class WebView : MonoBehaviour, IScreenView
         InstantiatedGraph.Add(nodeObj);
         nodeObj.SetActive(false);
     }
-    public void ShowOrHidePath(bool isOn){
-        foreach(GameObject pathObject in InstantiatedPath){
+    public void ShowOrHidePath(bool isOn)
+    {
+        foreach (GameObject pathObject in InstantiatedPath)
+        {
             pathObject.SetActive(isOn);
         }
     }
-    public void RenderPath(){
+    public void RenderPath()
+    {
         ClearPath();
         InstantiatedPath = new();
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        if(screenViewModel.checkPoints.Count <= 0) return;
+        if (screenViewModel.checkPoints.Count <= 0) return;
         Vector2Int start = screenViewModel.spawnPoint.ArrayPosition;
         Vector2Int end = screenViewModel.checkPoints[0].ArrayPosition;
         HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, currentHPALevel);
         if(path == null || path.path.Count <= 0) return;
         DrawPath(path, InstantiatedPath);
     }
-    private void ClearPath(){
-        foreach(GameObject pathObject in InstantiatedPath){
+    private void ClearPath()
+    {
+        foreach (GameObject pathObject in InstantiatedPath)
+        {
             Destroy(pathObject);
         }
     }
     private void DrawPath(HPAPath path, List<GameObject> InstantiatedGraph)
-    {   
+    {
         for (int i = 0; i < path.path.Count - 1; i++)
         {
             Vector3 start = transform.position + new Vector3(path.path[i].Position.x * tileSize, -0.8f, path.path[i].Position.y * tileSize);

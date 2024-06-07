@@ -1,3 +1,5 @@
+// written by: Gustav Clausen s214940
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,7 +91,7 @@ public class HPAStar : IHPAStar
     {
         if (!_graphModel.ClusterByLevel.ContainsKey(l - 1))
         {
-            // Debug.LogError("Previous level does not exist, cannot build level " + l);
+            Debug.LogError("Previous level does not exist, cannot build level " + l);
             return;
         }
 
@@ -138,7 +140,6 @@ public class HPAStar : IHPAStar
         {
             for (int j = 0; j < numClustersPerSide; j++)
             {
-                // Debug.Log(" row " + i + " col " + j);
                 Cluster oldCluster = oldClusters[i * numClustersPerSide + j];
                 _clusterManager.IncreaseSingleClusterLevel(oldCluster);
             }
@@ -149,7 +150,6 @@ public class HPAStar : IHPAStar
         {
             for (int i = 0; i < fullBlocksPerSide * clustersToMergePerSide; i++)
             {
-                // Debug.Log(" row " + i + " col " + j);
                 Cluster oldCluster = oldClusters[i * numClustersPerSide + j];
                 _clusterManager.IncreaseSingleClusterLevel(oldCluster);
             }
@@ -163,7 +163,6 @@ public class HPAStar : IHPAStar
             {
                 for (int j = fullBlocksPerSide * clustersToMergePerSide; j < numClustersPerSide; j++)
                 {
-                    // Debug.Log(" row " + i + " col " + j);
 
                     Cluster oldCluster = oldClusters[i * numClustersPerSide + j];
                     _clusterManager.IncreaseSingleClusterLevel(oldCluster);
@@ -172,7 +171,6 @@ public class HPAStar : IHPAStar
 
         }
 
-        // Debug.Log("Added level " + l + " with " + _graphModel.ClusterByLevel[l].Count + " clusters.");
 
 
         // convert previous inter edges to intra 
@@ -194,7 +192,6 @@ public class HPAStar : IHPAStar
         // time complexity: O(C*E_C^2*A*)
         foreach (Cluster cluster in _graphModel.ClusterByLevel[l])
         {
-            // Debug.Log("Cluster " + cluster.bottomLeftPos + " has " + cluster.Entrances.Count + " entrances at coordinates ");
 
             foreach (Entrance e1 in cluster.Entrances)
             {
@@ -202,9 +199,9 @@ public class HPAStar : IHPAStar
                 foreach (Entrance e2 in cluster.Entrances)
                 {
 
-                    if (e1 != e2) //e1.Node1.Cluster == e2.Node1.Cluster && e1.Node1.Cluster == cluster && e2.Node1.Cluster == cluster && e1.Node1 != e2.Node1)
+                    if (e1 != e2)
                     {
-                        double d = _pathFinder.FindLocalPath(e1.Node1, e2.Node2, cluster)?.Length ?? double.PositiveInfinity; //TODO: safe path in memory in special path class? 
+                        double d = _pathFinder.FindLocalPath(e1.Node1, e2.Node2, cluster)?.Length ?? double.PositiveInfinity;
                         if (d < double.PositiveInfinity)
                         {
                             _edgeManager.AddHPAEdge(e1.Node1, e2.Node2, 1, l, HPAEdgeType.INTER);
@@ -214,7 +211,6 @@ public class HPAStar : IHPAStar
             }
         }
 
-        // Debug.Log("Added level " + l + " with " + _graphModel.ClusterByLevel[l].Count + " clusters.");
     }
 
 
@@ -235,7 +231,7 @@ public class HPAStar : IHPAStar
 
         HPAPath refinedPath = _pathFinder.RefinePath(abstractPath, level);
 
-        // Optional: Smoothing the path if needed
+        // Optional: Smoothing the path, could have been done here before returning the path.
         return refinedPath;
     }
 
@@ -251,18 +247,6 @@ public class HPAStar : IHPAStar
         return abstractPath;
     }
 
-    public void insertNodeGlobally(Vector2Int pos, int maxLevel)
-    {
-
-        // iterate through levels
-        for (int i = 1; i <= maxLevel; i++)
-        {
-
-            // Implement algorithm to update the graph dynamically across all levels. 
-
-
-        }
-    }
 
 
     public void DynamicallyAddHPANode(Vector2Int position, Boolean isFinalNodeInCluster = false)
@@ -351,7 +335,6 @@ public class HPAStar : IHPAStar
 
         if (NeighborCluster != null)
         {
-            Debug.Log("Rebuilding entrances between clusters");
             AddEntrancesBetweenClusters(cluster, NeighborCluster);
         }
 
@@ -361,9 +344,6 @@ public class HPAStar : IHPAStar
     private void AddEntrancesBetweenClusters(Cluster cluster, Cluster cNeighbor)
     {
         HashSet<Entrance> entrances = _entranceManager.BuildEntrances(cluster, cNeighbor);
-        // Debug.Log("Entrances " + entrances.Count);
-        // cluster.Entrances.UnionWith(entrances);
-        // cNeighbor.Entrances.UnionWith(entrances);
         if (!_graphModel.EntrancesByLevel.ContainsKey(1))
         {
             _graphModel.EntrancesByLevel.Add(1, new HashSet<Entrance>());
@@ -372,7 +352,7 @@ public class HPAStar : IHPAStar
         cNeighbor.Entrances.UnionWith(entrances);
         _graphModel.EntrancesByLevel[1].UnionWith(entrances);
 
-        BuildInterEdgesBetweenEntrances(cluster); // TODO: It is not nescarry to rebuilt all interedges again, but so important. 
+        BuildInterEdgesBetweenEntrances(cluster);
         BuildInterEdgesBetweenEntrances(cNeighbor);
     }
 
@@ -386,7 +366,7 @@ public class HPAStar : IHPAStar
                 if (e1.Node1 != e2.Node1)
                 {
                     HPAPath path = _pathFinder.FindLocalPath(e1.Node1, e2.Node1, c);
-                    double d = path?.Length ?? double.PositiveInfinity; //TODO: safe path in memory in special path class? 
+                    double d = path?.Length ?? double.PositiveInfinity;
                     if (d < double.PositiveInfinity)
                     {
                         _edgeManager.AddHPAEdge(e1.Node1, e2.Node1, d, 1, HPAEdgeType.INTER, IntraPath: path);
