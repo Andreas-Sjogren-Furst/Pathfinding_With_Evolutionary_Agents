@@ -362,7 +362,7 @@ public class WebView : MonoBehaviour, IScreenView
         Vector2Int start = screenViewModel.spawnPoint.ArrayPosition;
         Vector2Int end = screenViewModel.checkPoints[0].ArrayPosition;
         HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, currentHPALevel);
-        if (path == null && path.path.Count <= 0) return;
+        if (path == null || path.path.Count <= 0) return;
         DrawPath(path, InstantiatedPath);
     }
     private void ClearPath()
