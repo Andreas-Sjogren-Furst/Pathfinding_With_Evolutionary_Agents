@@ -6773,6 +6773,7 @@ MonoBehaviour:
   darkColor: {fileID: 2100000, guid: c4c722532e26c43468af5a8554fb6fd2, type: 2}
   whiteColor: {fileID: 2100000, guid: 144c44520f4bb430d8a77fd9eda88080, type: 2}
   pathMaterial: {fileID: 2100000, guid: 2d0e6a0dea7c54718938281b306e1128, type: 2}
+  toggle: {fileID: 1608353989}
   amountHPALevels: 0
   currentHPALevel: 0
 --- !u!114 &1743635986

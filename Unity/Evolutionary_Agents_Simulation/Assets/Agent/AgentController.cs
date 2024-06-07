@@ -30,7 +30,7 @@ public class AgentController{
         FrontierExplorer frontierExplorer = new(agentModel.map);
         HashSet<Point> centroids = frontierExplorer.FindFrontier(agentModel.visibleTiles,agentModel.visibleWalls);
         ResetFrontier();
-        foreach(Point centroid in centroids) {agentModel.centroidsForRendering.Add(centroid); }
+        foreach(Point centroid in centroids) { agentModel.centroidsForRendering.Add(centroid); }
         foreach(Point centroid in centroids) { agentModel.centroids.Add(centroid); }
     }
 
