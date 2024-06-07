@@ -11,7 +11,7 @@ public class CameraAdjuster : MonoBehaviour
 {
 
     private int mapSize;
-    private readonly int cameraHeight = 50;
+    private readonly int cameraHeight = 100;
     private readonly int frameSize = 10;
     void Start()
     {
@@ -24,9 +24,10 @@ public class CameraAdjuster : MonoBehaviour
         mapSize = screenViewModel.map.GetLength(0) / 2 + frameSize;
         int x = screenViewModel.spawnPoint.ArrayPosition.x;
         int z = screenViewModel.spawnPoint.ArrayPosition.y;
-        Vector3 cameraPosition = new(x, cameraHeight * 4, z);
+        Vector3 cameraPosition = new(x, cameraHeight, z);
         Camera.main.orthographicSize = mapSize;
         Camera.main.transform.position = cameraPosition;
+        Camera.main.fieldOfView = mapSize;
         Camera.main.transform.rotation = Quaternion.Euler(90, 0, 0);
     }
 
