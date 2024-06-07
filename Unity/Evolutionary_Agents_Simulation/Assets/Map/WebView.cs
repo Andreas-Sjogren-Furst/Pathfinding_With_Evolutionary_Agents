@@ -1,9 +1,8 @@
-// written by: Gustav Clausen s214940
+// written by: Gustav Clausen s214940, Andreas Sjögren Fürst (s201189)
 
 using System.Collections.Generic;
-using PlasticGui.Help.Conditions;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class WebView : MonoBehaviour, IScreenView
 {
 
@@ -33,6 +32,8 @@ public class WebView : MonoBehaviour, IScreenView
 
     public Material pathMaterial;
 
+    //Toggle for centroids
+    public Toggle toggle;
 
     // Local variables
     private GameObject[,] InstantiatedMap;
@@ -85,20 +86,15 @@ public class WebView : MonoBehaviour, IScreenView
         RenderMMASGraph();
         RenderFrontiers();
         RenderPath();
-
-
-
-
-
     }
 
     void Update()
     {
         if (Input.GetKey(KeyCode.RightArrow))
         {
+            RenderFrontiers();
             myGameManager.agentController.SimulateAgents();
             MoveAgents();
-            RenderFrontiers();
         }
     }
 
@@ -327,7 +323,7 @@ public class WebView : MonoBehaviour, IScreenView
         Vector2Int start = screenViewModel.spawnPoint.ArrayPosition;
         Vector2Int end = screenViewModel.checkPoints[0].ArrayPosition;
         HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, currentHPALevel);
-        if (path == null || path.path.Count <= 0) return;
+        if(path == null || path.path.Count <= 0) return;
         DrawPath(path, InstantiatedPath);
     }
     private void ClearPath()
@@ -530,13 +526,13 @@ public class WebView : MonoBehaviour, IScreenView
     public void RenderFrontiers()
     {
         ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        List<Point> centroids = screenViewModel.centroidsForRendering;
+        HashSet<Point> centroids = screenViewModel.centroidsForRendering;
         ClearFrontiers();
         foreach (Point centroid in centroids)
         {
             Vector3 frontierPosition = new(centroid.x, 1, centroid.y);
             InstantiatedFrontiers.Add(Instantiate(frontierPrefab, frontierPosition, Quaternion.identity));
-        }
+        } ShowOrHideFrontiers(toggle.isOn);
     }
     public void ShowOrHideFrontiers(bool isOn)
     {

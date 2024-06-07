@@ -1,3 +1,4 @@
+// Written by: Andreas Sjögren Fürst (s201189)
 using System;
 using System.Collections.Generic;
 using System.Linq;

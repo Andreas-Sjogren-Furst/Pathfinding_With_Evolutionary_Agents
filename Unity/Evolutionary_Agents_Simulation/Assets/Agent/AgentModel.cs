@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+// Written by: Andreas Sjögren Fürst (s201189)
 public class AgentModel
 {
     public int amountOfAgents;
@@ -8,7 +9,7 @@ public class AgentModel
     public AgentSpawnPoint spawnPoint;
     public HashSet<Point> visibleTiles;
     public HashSet<Point> visibleWalls;
-    public List<Point> centroidsForRendering;
+    public HashSet<Point> centroidsForRendering;
     public List<Point> frontierPointsForRendering;
     public HashSet<Point> frontierPoints;
     public HashSet<Point> centroids;

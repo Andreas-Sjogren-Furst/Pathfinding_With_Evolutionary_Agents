@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class ScreenViewModel
 {
     public int accessibleNodes;
@@ -7,7 +7,7 @@ public class ScreenViewModel
     public Agent[] agents;
     public HashSet<Point> visibleTiles;
     public List<Point> frontierPointsForRendering;
-    public List<Point> centroidsForRendering;
+    public HashSet<Point> centroidsForRendering;
     public List<HashSet<Cluster>> hpaGraphs;
     public IGraphModel hpaGraph;
     public Graph mmasGraph;
@@ -15,7 +15,7 @@ public class ScreenViewModel
     public AgentSpawnPoint spawnPoint;
     
 
-    public ScreenViewModel(int accessibleNodes, HashSet<Point> visibleTiles, List<Point> frontierPointsForRendering, List<Point> centroidsForRendering, MapObject[,] map, Agent[] agents,IGraphModel hpaGraph, Graph mmasGraph, List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
+    public ScreenViewModel(int accessibleNodes, HashSet<Point> visibleTiles, List<Point> frontierPointsForRendering, HashSet<Point> centroidsForRendering, MapObject[,] map, Agent[] agents,IGraphModel hpaGraph, Graph mmasGraph, List<CheckPoint> checkPoints, AgentSpawnPoint spawnPoint){
         this.accessibleNodes = accessibleNodes;
         this.visibleTiles = visibleTiles;
         this.frontierPointsForRendering = frontierPointsForRendering;

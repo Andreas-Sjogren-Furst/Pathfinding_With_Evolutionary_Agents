@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class PanelManager2 : MonoBehaviour
 {
     Text text;

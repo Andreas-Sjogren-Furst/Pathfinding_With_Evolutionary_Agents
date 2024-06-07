@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Unity.VisualScripting;
 using UnityEngine;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public abstract class MapObject
 {
     public enum ObjectType {

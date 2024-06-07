@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 // using Unity.Plastic.Newtonsoft.Json;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 
 public class PDFView : IPrintView
 {

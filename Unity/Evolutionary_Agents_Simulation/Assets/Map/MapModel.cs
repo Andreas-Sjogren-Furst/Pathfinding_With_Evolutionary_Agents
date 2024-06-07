@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class MapModel
 {
     public readonly int checkPointSpacing = 3;

@@ -1,4 +1,5 @@
 // code mainly from https://gist.github.com/ashleydavis/f025c03a9221bc840a2b with slight modifications
+// Written by: Andreas Sjögren Fürst (s201189)
 using UnityEngine;
 public class CameraAdjuster : MonoBehaviour
 {

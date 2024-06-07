@@ -1,4 +1,4 @@
-
+// Written by: Andreas Sjögren Fürst (s201189)
 public class ScreenPresenter : IGamePresenter<ScreenViewModel>
 {
     public ScreenViewModel screenViewModel;
