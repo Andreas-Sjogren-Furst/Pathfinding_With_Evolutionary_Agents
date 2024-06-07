@@ -5,7 +5,8 @@ using UnityEngine.UI;
 public class DropdownHandler1 : MonoBehaviour
 {
     Dropdown dropdown;
-    public Toggle toggle;
+    public Toggle hpaToggle;
+    public Toggle pathToggle;
     void Start()
     {
         // Get the Dropdown component from the same GameObject
@@ -33,6 +34,10 @@ public class DropdownHandler1 : MonoBehaviour
     {
         WebView.Instance.ShowOrHideHPAGraph(false);
         WebView.Instance.SetCurrentHPALevel(change.value);
-        if(toggle.isOn) WebView.Instance.ShowOrHideHPAGraph(true);
+        WebView.Instance.RenderPath();
+        WebView.Instance.ShowOrHidePath(pathToggle.isOn);
+        if(hpaToggle.isOn) WebView.Instance.ShowOrHideHPAGraph(true);
+        
+        
     }
 }

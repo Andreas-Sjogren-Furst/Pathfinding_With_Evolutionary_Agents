@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PlasticGui.Help.Conditions;
 using UnityEngine;
 
 public class WebView : MonoBehaviour, IScreenView
@@ -41,7 +42,6 @@ public class WebView : MonoBehaviour, IScreenView
     private List<GameObject> InstantiatedMMASNodes;
     private List<GameObject> InstantiatedMMASEdges;
     private List<GameObject> InstantiatedFrontiers;
-
     private List<GameObject> InstantiatedPath;
     private readonly float tileScale = 0.1f;
     private readonly int tileSize = 1;
@@ -82,6 +82,7 @@ public class WebView : MonoBehaviour, IScreenView
         SpawnAgents();
         RenderMMASGraph();
         RenderFrontiers();
+        RenderPath();
 
 
 
@@ -96,7 +97,7 @@ public class WebView : MonoBehaviour, IScreenView
 
         // (List<Vector2Int> path1, int nodesExplored) = Astar.FindPath(start, end, CellularAutomata.Convert3DTo2D(screenPresenter.PackageData().map));
 
-        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        /*ScreenViewModel screenViewModel = screenPresenter.PackageData();
         if (screenViewModel.checkPoints.Count > 1)
         {
             Vector2Int start = screenViewModel.spawnPoint.ArrayPosition;
@@ -115,7 +116,7 @@ public class WebView : MonoBehaviour, IScreenView
                 Debug.Log("Path Length: " + path.path.Count);
                 DrawPath(path, InstantiatedMMASEdges); // TODO: Change to InstantiatedPath, and create UI button for it. 
             }
-        }
+        }*/
 
 
 
@@ -333,6 +334,7 @@ public class WebView : MonoBehaviour, IScreenView
     public void SetCurrentHPALevel(int level)
     {
         pHPAGraph = InstantiatedHPAGraphs[level];
+        currentHPALevel = level + 1;
     }
 
     private void DrawNode(HPANode node, List<GameObject> InstantiatedGraph)
@@ -342,9 +344,29 @@ public class WebView : MonoBehaviour, IScreenView
         InstantiatedGraph.Add(nodeObj);
         nodeObj.SetActive(false);
     }
-
+    public void ShowOrHidePath(bool isOn){
+        foreach(GameObject pathObject in InstantiatedPath){
+            pathObject.SetActive(isOn);
+        }
+    }
+    public void RenderPath(){
+        ClearPath();
+        InstantiatedPath = new();
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        if(screenViewModel.checkPoints.Count <= 0) return;
+        Vector2Int start = screenViewModel.spawnPoint.ArrayPosition;
+        Vector2Int end = screenViewModel.checkPoints[0].ArrayPosition;
+        HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, currentHPALevel);
+        if(path == null && path.path.Count <= 0) return;
+        DrawPath(path, InstantiatedPath);
+    }
+    private void ClearPath(){
+        foreach(GameObject pathObject in InstantiatedPath){
+            Destroy(pathObject);
+        }
+    }
     private void DrawPath(HPAPath path, List<GameObject> InstantiatedGraph)
-    {
+    {   
         for (int i = 0; i < path.path.Count - 1; i++)
         {
             Vector3 start = transform.position + new Vector3(path.path[i].Position.x * tileSize, -0.8f, path.path[i].Position.y * tileSize);
