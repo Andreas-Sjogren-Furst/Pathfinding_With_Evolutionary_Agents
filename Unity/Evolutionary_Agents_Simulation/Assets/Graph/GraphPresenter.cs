@@ -27,9 +27,11 @@ public class GraphPresenter : MonoBehaviour
     private IPathFinder _pathFinder;
     private INodeManager _nodeManager;
 
+
+    // Visulisation of the HPA* Graph. Used for visual testing only in unity.
     void Start()
     {
-        
+
 
 
         // Cluster c1 = clusterManager.DetermineCluster(new Vector2Int(9, 5), visualizeLevel);
@@ -94,25 +96,25 @@ public class GraphPresenter : MonoBehaviour
 
 
 
-       /* Vector2Int goal = new Vector2Int(0, 0);
-        Vector2Int start = new Vector2Int(maxSize - 3, maxSize - 3);
+        /* Vector2Int goal = new Vector2Int(0, 0);
+         Vector2Int start = new Vector2Int(maxSize - 3, maxSize - 3);
 
-        // HPAPath nodes = HPAStar.HierarchicalSearch(start, goal, 1);
-        // HPAPath nodes2 = HPAStar.HierarchicalAbstractSearch(start, goal, visualizeLevel);
-        Cluster c4 = clusterManager.DetermineCluster(goal, visualizeLevel);
+         // HPAPath nodes = HPAStar.HierarchicalSearch(start, goal, 1);
+         // HPAPath nodes2 = HPAStar.HierarchicalAbstractSearch(start, goal, visualizeLevel);
+         Cluster c4 = clusterManager.DetermineCluster(goal, visualizeLevel);
 
-        // _nodeManager.FindOrCreateNode(goal.x, goal.y, c4);
+         // _nodeManager.FindOrCreateNode(goal.x, goal.y, c4);
 
-        // _nodeManager.insertCheckpoint(start, visualizeLevel);
-        // _nodeManager.insertCheckpoint(goal, visualizeLevel);
+         // _nodeManager.insertCheckpoint(start, visualizeLevel);
+         // _nodeManager.insertCheckpoint(goal, visualizeLevel);
 
-        HPAPath path = HPAStar.HierarchicalAbstractSearch(start, goal, visualizeLevel);
-        Debug.Log("Path Length: " + path.Length);
-        Debug.Log("Nodes Explored: " + path.NodesExplored);
+         HPAPath path = HPAStar.HierarchicalAbstractSearch(start, goal, visualizeLevel);
+         Debug.Log("Path Length: " + path.Length);
+         Debug.Log("Nodes Explored: " + path.NodesExplored);
 
-        HPAPath path2 = HPAStar.HierarchicalSearch(start, goal, visualizeLevel);
-        Debug.Log("Path Length: " + path2.Length);
-        Debug.Log("Nodes Explored: " + path2.NodesExplored);*/
+         HPAPath path2 = HPAStar.HierarchicalSearch(start, goal, visualizeLevel);
+         Debug.Log("Path Length: " + path2.Length);
+         Debug.Log("Nodes Explored: " + path2.NodesExplored);*/
 
 
 

@@ -73,7 +73,7 @@ public class WebView : MonoBehaviour, IScreenView
         InstantiatedMMASNodes = new();
         InstantiatedPath = new();
         pHPAGraph = InstantiatedHPAGraphs[0];
-        currentHPALevel = 0;
+        currentHPALevel = 1;
     }
     void Start()
     {
@@ -88,8 +88,7 @@ public class WebView : MonoBehaviour, IScreenView
 
 
         //myGameManager.graphController.Preprocessing(3);
-        //Vector2Int start = screenViewModel.checkPoints[0].ArrayPosition;
-        // Vector2Int end = screenViewModel.spawnPoint.ArrayPosition;
+
         // Vector2Int start = new(26, 40);
         // Vector2Int end = new(44, 28);
 
@@ -97,9 +96,30 @@ public class WebView : MonoBehaviour, IScreenView
 
         // (List<Vector2Int> path1, int nodesExplored) = Astar.FindPath(start, end, CellularAutomata.Convert3DTo2D(screenPresenter.PackageData().map));
 
+        ScreenViewModel screenViewModel = screenPresenter.PackageData();
+        if (screenViewModel.checkPoints.Count > 1)
+        {
+            Vector2Int start = screenViewModel.spawnPoint.ArrayPosition;
+            Vector2Int end = screenViewModel.checkPoints[0].ArrayPosition;
+            Debug.Log("Start: " + start);
+            Debug.Log("End: " + end);
+            Debug.Log("Level: " + currentHPALevel);
+            if (myGameManager == null)
+            {
+                Debug.Log("GameManager is null");
+            }
+            HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, currentHPALevel);
+
+            if (path != null && path.path.Count > 0)
+            {
+                Debug.Log("Path Length: " + path.path.Count);
+                DrawPath(path, InstantiatedMMASEdges); // TODO: Change to InstantiatedPath, and create UI button for it. 
+            }
+        }
 
 
-        // DrawPath(path, InstantiatedFrontiers);
+
+
 
 
     }
@@ -110,7 +130,7 @@ public class WebView : MonoBehaviour, IScreenView
         {
             myGameManager.agentController.SimulateAgents();
             MoveAgents();
-            //RenderFrontiers();
+            RenderFrontiers();
         }
     }
 
@@ -180,7 +200,7 @@ public class WebView : MonoBehaviour, IScreenView
         InstantiatedMMASNodes = new();
         InstantiatedPath = new();
         pHPAGraph = InstantiatedHPAGraphs[0];
-        currentHPALevel = 0;
+        currentHPALevel = 1;
     }
     public void RenderMap()
     {
@@ -397,8 +417,8 @@ public class WebView : MonoBehaviour, IScreenView
         GameObject lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
         LineRenderer lr = lineObj.GetComponent<LineRenderer>();
         lr.material = material;
-        lr.startWidth = 0.05f * tileSize * 6;
-        lr.endWidth = 0.05f * tileSize * 6;
+        lr.startWidth = 0.05f * tileSize * 5;
+        lr.endWidth = 0.05f * tileSize * 5;
         lr.SetPositions(new Vector3[] { start, end });
         InstantiatedGraph.Add(lineObj);
         lineObj.SetActive(false);

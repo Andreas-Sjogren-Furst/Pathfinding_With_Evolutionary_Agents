@@ -30,7 +30,7 @@ public class MyGameManager
     public MyGameManager()
     {
         customMaps = new();
-        MapModel mapModel = customMaps.GetCustomMap(6);
+        MapModel mapModel = customMaps.GetCustomMap(0);
         mapController = new MapController(mapModel);
         AgentModel agentModel = new(mapModel.amountOfAgents, mapModel.map, mapModel.spawnPoint, mapModel.checkPoints);
         agentController = new AgentController(agentModel);
@@ -117,140 +117,6 @@ public class MyGameManager
         return mmas;
     }
 
-    public static void MmasAddCheckpoint(ref MMAS mmasGraphController, ref HPAStar HPAGraphController, Vector2Int checkpoint, int heuristicsLevel, int iterations = 0, bool linearHeuristic = true)
-    {
-        if (mmasGraphController._graph == null)
-        {
-            Debug.LogError("Graph is null");
-        }
-
-
-        Node newNode = new Node(mmasGraphController._graph.Nodes.Count, checkpoint.x, checkpoint.y);
-
-        if (mmasGraphController._graph.Nodes.Count < 3)
-        {
-            List<(Node, double)> Edges = CalculateEdges(ref mmasGraphController, ref HPAGraphController, heuristicsLevel, linearHeuristic, newNode);
-            if (Edges == null)
-            {
-                return;
-            }
-            else
-            {
-                mmasGraphController._graph.AddNode(newNode);
-                foreach ((Node, double) edge in Edges)
-                {
-                    mmasGraphController._graph.AddEdge(newNode, edge.Item1, edge.Item2);
-                    mmasGraphController._graph.AddEdge(edge.Item1, newNode, edge.Item2);
-                }
-
-            }
-        }
-        else if (mmasGraphController._graph.Nodes.Count == 3) // ensures graph is built when 3 checkpoints are added.
-        {
-            List<(Node, double)> Edges = CalculateEdges(ref mmasGraphController, ref HPAGraphController, heuristicsLevel, linearHeuristic, newNode);
-            if (Edges == null)
-            {
-                return;
-            }
-            else
-            {
-                mmasGraphController._graph.AddNode(newNode);
-                foreach ((Node, double) edge in Edges)
-                {
-                    mmasGraphController._graph.AddEdge(newNode, edge.Item1, edge.Item2);
-                    mmasGraphController._graph.AddEdge(edge.Item1, newNode, edge.Item2);
-                }
-
-            }
-            mmasGraphController.SetGraph(mmasGraphController._graph);
-        }
-        else
-        {
-            List<(Node, double)> Edges = CalculateEdges(ref mmasGraphController, ref HPAGraphController, heuristicsLevel, linearHeuristic, newNode);
-            if (Edges == null)
-            {
-                return;
-            }
-            else
-            {
-                mmasGraphController._graph.AddNode(newNode);
-                foreach ((Node, double) edge in Edges)
-                {
-                    mmasGraphController._graph.AddEdge(newNode, edge.Item1, edge.Item2);
-                    mmasGraphController._graph.AddEdge(edge.Item1, newNode, edge.Item2);
-                }
-
-            }
-
-        }
-        mmasGraphController._numAnts = mmasGraphController._graph.Nodes.Count;
-
-        if (iterations > 0 && mmasGraphController._graph.Nodes.Count > 3)
-        {
-            mmasGraphController.Run(iterations);
-        }
-
-
-    }
-
-    public static List<(Node, double)> CalculateEdges(ref MMAS mmasGraphController, ref HPAStar HPAGraphController, int heuristicsLevel, bool linearHeuristic, Node newNode)
-    {
-
-        List<(Node, double)> edges = new List<(Node, double)>();
-
-
-        foreach (Node node in mmasGraphController._graph.Nodes)
-        {
-            if (node != newNode)
-            {
-                Vector2Int nodePosition = new Vector2Int((int)node.X, (int)node.Y);
-                Vector2Int newNodePosition = new Vector2Int((int)newNode.X, (int)newNode.Y);
-                double distance = double.PositiveInfinity;
-
-                if (linearHeuristic)
-                {
-                    distance = Vector2Int.Distance(nodePosition, newNodePosition);
-                }
-                else
-                {
-                    HPAPath path = HPAGraphController.HierarchicalAbstractSearch(nodePosition, newNodePosition, heuristicsLevel);
-
-                    if (path != null)
-                    {
-
-                        distance = path.Length;
-
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-
-                edges.Add((node, distance));
-            }
-        }
-
-        return edges;
-    }
-
-    public void MmasRemoveCheckpoint(Vector2Int checkpoint, int iterations = 0)
-    {
-
-
-        Node nodeToRemove = mmasGraphController._graph.Nodes.Find(x => x.X == checkpoint.x && x.Y == checkpoint.y); // TODO: can be optimized. 
-        if (nodeToRemove == null)
-        {
-            return;
-        }
-        mmasGraphController.RemoveNode(nodeToRemove);
-        mmasGraphController._numAnts = mmasGraphController._graph.Nodes.Count;
-
-        if (iterations > 0)
-        {
-            mmasGraphController.Run(iterations);
-        }
-    }
 
 
 

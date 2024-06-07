@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -19,27 +20,70 @@ public class PathfindingTest
     public void PathfindingTestSimplePasses()
     {
 
+        // specific map test as seen in the project. Where we know there is a path
+        // / myGameManager.graphController.Preprocessing(3);
+
+        MapModel mapModel = new(60, 17, 100, 20, 1, 0); // 6
+        MyGameManager myGameManager = new MyGameManager(mapModel);
+
+
+        Vector2Int start = new(26, 40);
+        Vector2Int end = new(44, 28);
+
+
+        List<Vector2Int> path = Astar.FindPath(start, end, CellularAutomata.Convert3DTo2D(mapModel.map)).Path;
+        HPAPath path1 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 1);
+        HPAPath path2 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
+        HPAPath path3 = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 3);
+
+
+        Assert.IsNotNull(path);
+        Assert.IsNotNull(path1);
+        Assert.IsNotNull(path2);
+        Assert.IsNotNull(path3);
+
+        Assert.Greater(path.Count, 5);
+        Assert.Greater(path1.path.Count, 5);
+        Assert.Greater(path2.path.Count, 5);
+        Assert.Greater(path3.path.Count, 5);
+
+        // Print results to csv. 
+        int iterations = 1;
+        List<(int[,], Vector2Int, Vector2Int)> maps = new List<(int[,], Vector2Int, Vector2Int)>();
+        for (int i = 0; i < iterations; i++)
+        {
+            maps.Add(GenerateMapForTests((min: 60, max: 60), (min: 5, max: 20), (min: 17, max: 20), (min: 100, max: 100), (min: 100, max: 100), 0));
+
+        }
+
+        // results will be logged in .csv format. 
+
         RunHPASimulation(
-            iterations: 100,
-            densityRange: (min: 60, max: 60),
-            checkPointsRange: (min: 1, max: 5),
-            cellularIterationsRange: (min: 17, max: 20),
-            heightRange: (min: 100, max: 100),
-            widthRange: (min: 100, max: 100),
-            refinePath: false,
-            name: "general_maps_timer_refined_random"
+            mapObjects: maps,
+            refinePath: true,
+            name: "ClusterSize10_exp3",
+            cluserSize: 10,
+            randomNumberSeed: 42
         );
 
-        // RunDynamicReplanningTests(
-        //     iterations: 10,
-        //     densityRange: (min: 45, max: 65),
-        //     checkPointsRange: (min: 1, max: 5),
-        //     cellularIterationsRange: (min: 5, max: 10),
-        //     heightRange: (min: 100, max: 100),
-        //     widthRange: (min: 100, max: 100),
-        //     refinePath: true,
-        //     name: "dynamic_maps_timer"
-        // );
+        RunHPASimulation(
+          mapObjects: maps,
+          refinePath: true,
+          name: "ClusterSize5_exp3",
+          cluserSize: 5,
+          randomNumberSeed: 42
+      );
+
+        RunDynamicReplanningTests(
+            iterations: iterations,
+            densityRange: (min: 45, max: 65),
+            checkPointsRange: (min: 1, max: 5),
+            cellularIterationsRange: (min: 5, max: 10),
+            heightRange: (min: 100, max: 100),
+            widthRange: (min: 100, max: 100),
+            refinePath: true,
+            name: "dynamic_maps_timer3"
+        );
         // Create instances of the necessary classes
 
 
@@ -47,6 +91,7 @@ public class PathfindingTest
 
 
         // int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.cellularIterations, 4);
+        // CellularAutomata.Convert2DTo3D(tileMap);
 
 
         // Vector2Int start = new Vector2Int(0, 0);
@@ -124,51 +169,37 @@ public class PathfindingTest
     }
 
 
-    private static void RunHPASimulation(int iterations, (int min, int max) densityRange, (int min, int max) checkPointsRange, (int min, int max) cellularIterationsRange, (int min, int max) heightRange, (int min, int max) widthRange, bool refinePath, string name)
+    private static void RunHPASimulation(List<(int[,], Vector2Int, Vector2Int)> mapObjects, bool refinePath, string name, int cluserSize, int randomNumberSeed = 0)
     {
-        var random = new System.Random();
+        var random = new System.Random(randomNumberSeed);
         var results = new List<string> { "Iteration,Density,CheckPoints,CellularIterations,Height,Width,PathLength_Level1,NodesExplored_Level1,Time_Level1,PathLength_Level2,NodesExplored_Level2,Time_Level2,PathLength_Level3,NodesExplored_Level3,Time_Level3,PathLength_AStar,NodesExplored_AStar,Time_AStar" };
 
-        for (int i = 0; i < iterations; i++)
+
+        for (int i = 0; i < mapObjects.Count; i++)
         {
-            int density = random.Next(densityRange.min, densityRange.max);
-            int numberOfCheckPoints = random.Next(checkPointsRange.min, checkPointsRange.max);
-            int cellularIterations = random.Next(cellularIterationsRange.min, cellularIterationsRange.max);
-            int height = random.Next(heightRange.min, heightRange.max);
-            int width = random.Next(widthRange.min, widthRange.max);
-            int amountOfAgents = 1;
-
-            int randomSeed = random.Next();
-            MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize: height, randomSeed: randomSeed, amountOfAgents: amountOfAgents);
-            int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, 4);
-            MapObject[,] map = CellularAutomata.Convert2DTo3D(tileMap);
-            int xc = UnityEngine.Random.Range(2, 100); // Generates a random integer between 1 and 100
-            int yc = UnityEngine.Random.Range(2, 100);
-
-            int xs = UnityEngine.Random.Range(2, 100); // Generates a random integer between 1 and 100
-            int ys = UnityEngine.Random.Range(2, 100);
-            Vector2Int start = new Vector2Int(xs, ys);
-            Vector2Int end = new Vector2Int(xc, yc);
+            MapObject[,] map = CellularAutomata.Convert2DTo3D(mapObjects[i].Item1);
+            Vector2Int start = mapObjects[i].Item2;
+            Vector2Int end = mapObjects[i].Item3;
 
             // HPA* Pathfinding at different abstraction levels
-            (HPAPath hpaPath1, var timeLevel1) = EffiencyInNodeExploration(map, start, end, 1, RefinePath: refinePath);
+            (HPAPath hpaPath1, var timeLevel1) = EffiencyInNodeExploration(map, start, end, 1, RefinePath: refinePath, clusterSize: cluserSize);
 
-            (HPAPath hpaPath2, var timeLevel2) = EffiencyInNodeExploration(map, start, end, 2, RefinePath: refinePath);
+            (HPAPath hpaPath2, var timeLevel2) = EffiencyInNodeExploration(map, start, end, 2, RefinePath: refinePath, cluserSize);
 
-            (HPAPath hpaPath3, var timeLevel3) = EffiencyInNodeExploration(map, start, end, 3, RefinePath: refinePath);
+            (HPAPath hpaPath3, var timeLevel3) = EffiencyInNodeExploration(map, start, end, 3, RefinePath: refinePath, cluserSize);
 
             // A* Pathfinding
             var stopwatch = Stopwatch.StartNew();
-            (List<Vector2Int> Path, int NodesExplored) Apath = Astar.FindPath(start, end, tileMap);
+            (List<Vector2Int> Path, int NodesExplored) Apath = Astar.FindPath(start, end, mapObjects[i].Item1);
             stopwatch.Stop();
             var timeAStar = stopwatch.ElapsedMilliseconds;
 
             string result = $"{i + 1}," +
-                            $"{density}," +
-                            $"{numberOfCheckPoints}," +
-                            $"{cellularIterations}," +
-                            $"{height}," +
-                            $"{width}," +
+                            $"{"density"}," +
+                            $"{"numberOfCheckPoints"}," +
+                            $"{"cellularIterations"}," +
+                            $"{"height"}," +
+                            $"{"width"}," +
                             $"{hpaPath1?.path?.Count ?? 0}," +
                             $"{hpaPath1?.NodesExplored ?? 0}," +
                             $"{timeLevel1}," +
@@ -191,18 +222,42 @@ public class PathfindingTest
         UnityEngine.Debug.Log($"Results saved to {filePath}");
     }
 
+    private static (int[,], Vector2Int, Vector2Int) GenerateMapForTests((int min, int max) densityRange, (int min, int max) checkPointsRange, (int min, int max) cellularIterationsRange, (int min, int max) heightRange, (int min, int max) widthRange, int seed = 42)
+    {
+        System.Random random = new System.Random(seed);
+        int density = random.Next(densityRange.min, densityRange.max);
+        int numberOfCheckPoints = random.Next(checkPointsRange.min, checkPointsRange.max);
+        int cellularIterations = random.Next(cellularIterationsRange.min, cellularIterationsRange.max);
+        int height = random.Next(heightRange.min, heightRange.max);
+        int width = random.Next(widthRange.min, widthRange.max);
+        int amountOfAgents = 1;
 
-    public static (HPAPath, long) EffiencyInNodeExploration(MapObject[,] tileMap, Vector2Int start, Vector2Int end, int maxLevel, Boolean RefinePath = false)
+        int randomSeed = 42;
+        MapModel mapModel = new MapModel(density: density, numberOfCheckPoints: numberOfCheckPoints, iterations: cellularIterations, mapSize: height, randomSeed: randomSeed, amountOfAgents: amountOfAgents);
+        int[,] tileMap = CellularAutomata.Create2DMap(mapModel.height, mapModel.width, mapModel.density, mapModel.iterations, 4);
+        // map = CellularAutomata.Convert2DTo3D(tileMap);
+        int xc = random.Next(2, 100); // Generates a random integer between 1 and 100
+        int yc = random.Next(2, 100);
+
+        int xs = random.Next(2, 100); // Generates a random integer between 1 and 100
+        int ys = random.Next(2, 100);
+        Vector2Int start = new Vector2Int(xs, ys);
+        Vector2Int end = new Vector2Int(xc, yc);
+
+        return (tileMap, start, end);
+    }
+
+    public static (HPAPath, long) EffiencyInNodeExploration(MapObject[,] tileMap, Vector2Int start, Vector2Int end, int maxLevel, Boolean RefinePath = false, int clusterSize = 10)
     {
         GraphModel _graphModel = new GraphModel(tileMap);
-        PathFinder _pathFinder = new PathFinder(new GraphModel(tileMap));
+        PathFinder _pathFinder = new PathFinder(_graphModel);
         IEdgeManager edgeManager = new EdgeManager(_pathFinder);
         NodeManager _nodeManager = new NodeManager(_graphModel, edgeManager);
         IEntranceManager entranceManager = new EntranceManager(_graphModel, _nodeManager);
         IClusterManager clusterManager = new ClusterManager(_graphModel, _nodeManager, edgeManager, entranceManager);
         IHPAStar HPAStar = new HPAStar(_graphModel, clusterManager, _nodeManager, entranceManager, edgeManager, _pathFinder);
 
-        HPAStar.Preprocessing(maxLevel);
+        HPAStar.Preprocessing(maxLevel, clusterSize);
         if (RefinePath)
         {
 
@@ -243,11 +298,12 @@ public class PathfindingTest
 
             // Build graph once
             var graphModel = new GraphModel(map);
-            var edgeManager = new EdgeManager(new PathFinder(new GraphModel(map)));
+            var pathFinder = new PathFinder(graphModel);
+            var edgeManager = new EdgeManager(pathFinder);
             var nodeManager = new NodeManager(graphModel, edgeManager);
             var entranceManager = new EntranceManager(graphModel, nodeManager);
             var clusterManager = new ClusterManager(graphModel, nodeManager, edgeManager, entranceManager);
-            var hpaStar = new HPAStar(graphModel, clusterManager, nodeManager, entranceManager, edgeManager, new PathFinder(new GraphModel(map)));
+            var hpaStar = new HPAStar(graphModel, clusterManager, nodeManager, entranceManager, edgeManager, pathFinder);
 
             hpaStar.Preprocessing(3);
 
@@ -310,12 +366,12 @@ public class PathfindingTest
                             $"{height}," +
                             $"{width}," +
                             $"{replanningTimeLevel1}," +
-                            // $"{replanningTimeLevel2}," +
-                            // $"{replanningTimeLevel3}," +
+                            $"{replanningTimeLevel2}," +
+                            $"{replanningTimeLevel3}," +
                             $"{replanningTimeAStar}," +
                             $"{pathLengthChangeLevel1}," +
-                            // $"{pathLengthChangeLevel2}," +
-                            // $"{pathLengthChangeLevel3}," +
+                            $"{pathLengthChangeLevel2}," +
+                            $"{pathLengthChangeLevel3}," +
                             $"{pathLengthChangeAStar}";
 
             results.Add(result);

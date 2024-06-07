@@ -19,9 +19,11 @@ public class MmasMapTest
         // savedMaps = GenerateMaps(numRuns, (60, 60), (15, 15), (17, 20), (100, 100), (100, 100));
         savedMaps = GenerateMaps(numRuns, (0, 0), (40, 40), (0, 0), (100, 100), (100, 100));
 
-        RunSimulations("30_limit_normalize_pheromone_experiment_2", numRuns, heuristicSimulation: false, scaleGraphEdges: false, plotIterations_stagnation: false);
+        RunSimulations("Experiment_10_remove_node_30runs", numRuns, heuristicSimulation: false, scaleGraphEdges: false, plotIterations_stagnation: false);
         // RunSimulations("30_experiment_NEW2_parameters_trail_limits_non_scaled", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
         // RunSimulations("30_experiment_NEW2_parameters_trail_limits_non_scaled", numRuns, heuristicSimulation: true, scaleGraphEdges: false, plotIterations_stagnation: false);
+
+        // 
 
     }
 
@@ -64,7 +66,7 @@ public class MmasMapTest
             Directory.CreateDirectory(baseFolderPath);
         }
 
-        string[] fileNames = { "static.csv", "dynamic.csv", "manhattenHeuristic.csv", "linearHeuristic.csv", "astar.csv", "abstract1.csv", "abstract2.csv", "abstract3.csv", "normalize.csv" };
+        string[] fileNames = { "static.csv", "dynamic.csv", "manhattenHeuristic.csv", "linearHeuristic.csv", "astar.csv", "abstract1.csv", "abstract2.csv", "abstract3.csv", "normalize.csv", "RemoveRebuild.csv", "RemoveDynamic.csv", "RemoveDynamicNormalize.csv" };
         string[] csvFilePaths = new string[fileNames.Length];
 
         for (int i = 0; i < fileNames.Length; i++)
@@ -94,9 +96,14 @@ public class MmasMapTest
             }
             else
             {
-                RunSimulation("RebuildWholeGraph", run, 10, savedMaps[run], csvFilePaths[0]);
-                RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[1]);
-                RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[8], normalize: true);
+                // RunSimulation("RebuildWholeGraph", run, 10, savedMaps[run], csvFilePaths[0]);
+                // RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[1]);
+                // RunSimulation("AddNodesDynamically", run, 10, savedMaps[run], csvFilePaths[8], normalize: true);
+                RunSimulationRemovalOfCheckpoints("RebuildWholeGraph", run, 10, savedMaps[run], csvFilePaths[9]);
+                RunSimulationRemovalOfCheckpoints("RemoveNodesDynamically", run, 10, savedMaps[run], csvFilePaths[10]);
+                RunSimulationRemovalOfCheckpoints("RemoveNodesDynamically", run, 10, savedMaps[run], csvFilePaths[11], normalize: true);
+
+
             }
         }
     }
@@ -336,6 +343,56 @@ public class MmasMapTest
             MMASIterations = MMASIterations + localIterations;
             // Collect and save results
             SaveResults(mode, simulationRun, i, MMASIterations, localIterations, myGameManager.mmasGraphController, csvFilePath);
+        }
+    }
+
+
+
+    private void RunSimulationRemovalOfCheckpoints(string mode, int simulationRun, int iterations, MapModel mapModel, string csvFilePath, bool LinearHeuristic = true, int heuristicsLevel = 1, bool normalize = false)
+    {
+
+
+
+        MyGameManager myGameManager = new MyGameManager(mapModel);
+
+
+
+        List<CheckPoint> checkpoints = mapModel.checkPoints;
+        int MMASIterations = 0;
+        Graph graph = new();
+        MMAS mmas = new MMAS(checkpoints.Count, 1.5, 4.5, 0.9, 100, graph);
+
+        Debug.Log($"Checkpoints: {checkpoints.Count}");
+
+        for (int j = 0; j < checkpoints.Count; j++)
+        {
+            DynamicGraphoperations.MmasAddCheckpoint(ref mmas, ref myGameManager.HPAGraphController, checkpoints[j].ArrayPosition, 1);
+        }
+        mmas.SetGraph(graph);
+        mmas.Run(5000);
+
+
+        for (int i = checkpoints.Count - 1; i > 4; i--)
+        {
+
+            if (mode == "RebuildWholeGraph")
+            {
+
+                DynamicGraphoperations.MmasRemoveCheckpoint(ref mmas, checkpoints[i].ArrayPosition);
+                // Debug.Log("Graph nodes " + graph.Nodes.Count);
+                mmas.SetGraph(mmas._graph);
+            }
+            else if (mode == "RemoveNodesDynamically")
+            {
+                // Remove nodes dynamically
+                DynamicGraphoperations.MmasRemoveCheckpoint(ref mmas, checkpoints[i].ArrayPosition, normalize: normalize);
+            }
+
+            // Run the MMAS algorithm to get the optimal path
+            int localIterations = mmas.Run(1000);
+            MMASIterations = MMASIterations + localIterations;
+            // Collect and save results
+            SaveResults(mode, simulationRun, i, MMASIterations, localIterations, mmas, csvFilePath);
         }
     }
 

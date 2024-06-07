@@ -8,7 +8,7 @@ public class PanelManager1 : MonoBehaviour
     Dropdown dropdown;
     Slider[] sliders;
     InputField inputField;
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -16,10 +16,10 @@ public class PanelManager1 : MonoBehaviour
         dropdown = GetComponentsInChildren<Dropdown>()[1];
         sliders = GetComponentsInChildren<Slider>();
         inputField = GetComponentInChildren<InputField>();
-        
+
         // Add listener to handle when the selected dropdown index changes
         dropdown.onValueChanged.AddListener(delegate { DropdownValueChanged(dropdown); });
-        submitButton.onClick.AddListener(OnSubmit);    
+        submitButton.onClick.AddListener(OnSubmit);
     }
 
     void DropdownValueChanged(Dropdown change)
@@ -28,28 +28,33 @@ public class PanelManager1 : MonoBehaviour
         ChangeSliderValues(mapModel);
     }
 
-    private MapModel CreateMapModelFromUI(){
+    private MapModel CreateMapModelFromUI()
+    {
         MapModel mapModel;
         List<float> values = new();
-        foreach(Slider slider in sliders){
+        foreach (Slider slider in sliders)
+        {
             values.Add(slider.value);
         }
-        int mapSize = (int) values[0] * 10;
+        int mapSize = (int)values[0] * 10;
         float density = values[1];
-        int iterations = (int) values[2];
+        int iterations = (int)values[2];
         int numberOfCheckPoints = (int)values[3];
         int amountOfAgents = (int)values[4];
         int randomSeed = int.Parse(inputField.text);
-        mapModel = new(density,iterations,mapSize,numberOfCheckPoints,amountOfAgents,randomSeed);
+        mapModel = new(density, iterations, mapSize, numberOfCheckPoints, amountOfAgents, randomSeed);
         return mapModel;
     }
 
-    private void ChangeSliderValues(MapModel mapModel){
-        foreach(Slider slider in sliders){
+    private void ChangeSliderValues(MapModel mapModel)
+    {
+        foreach (Slider slider in sliders)
+        {
             Text[] texts = slider.GetComponentsInChildren<Text>();
             Text sliderValue = texts[0];
             Text sliderName = texts[1];
-            switch(sliderName.text){
+            switch (sliderName.text)
+            {
                 case "Size":
                     sliderValue.text = mapModel.width.ToString();
                     slider.value = mapModel.width;
@@ -77,13 +82,16 @@ public class PanelManager1 : MonoBehaviour
                 default:
                     break;
             }
-        } inputField.text = mapModel.randomSeed.ToString();
+        }
+        inputField.text = mapModel.randomSeed.ToString();
     }
 
-    private void ValidateInput(string input){
+    private void ValidateInput(string input)
+    {
         if (!int.TryParse(input, out int result)) { inputField.text = "0"; }
     }
-    void OnSubmit(){
+    void OnSubmit()
+    {
         ValidateInput(inputField.text);
         MapModel mapModel = CreateMapModelFromUI();
         WebView.Instance.CreateNewMap(mapModel);

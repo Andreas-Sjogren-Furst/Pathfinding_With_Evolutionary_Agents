@@ -20,102 +20,10 @@ public class PathFinder : IPathFinder
 
     public HPAPath FindAbstractPath(HPANode start, HPANode goal, int level)
     {
-        // Implementation of A* search algorithm to find a path in the abstract graph
-        // You can use any standard A* implementation or library
-        // The search should be performed on the abstract graph at the specified level
-        // Return the list of HPANodes representing the abstract path from start to goal
-        // Example implementation using a placeholder A* algorithm
         HPAPath abstractPath = Astar.FindPath(start, goal, HPAEdgeType.INTER);
         return abstractPath;
     }
 
-
-    // public HPAPath RefinePath(HPAPath abstractPath, int level)
-    // {
-    //     if (abstractPath == null || abstractPath.path.Count == 0)
-    //     {
-    //         Debug.LogError("Abstract path is null or empty.");
-    //         return new HPAPath(new List<HPANode>());
-    //     }
-
-    //     HPAPath refinedPath = new HPAPath(new List<HPANode>());
-
-    //     for (int i = 0; i < abstractPath.path.Count - 1; i++)
-    //     {
-    //         HPANode startNode = abstractPath.path[i];
-    //         HPANode endNode = abstractPath.path[i + 1];
-
-    //         if (startNode == null || endNode == null)
-    //         {
-    //             Debug.LogError($"Null node encountered in abstract path at indices {i} and {i + 1}.");
-    //             continue;
-    //         }
-
-    //         if (NeightBorCheck(startNode, endNode))
-    //         {
-    //             refinedPath.path.Add(startNode);
-    //             continue;
-    //         }
-
-    //         // Attempt to use precomputed path in HPAInterEdge
-    //         HPAPath interEdge = FindInterEdge(startNode, endNode);
-    //         if (interEdge != null && interEdge.path.Count > 0)
-    //         {
-    //             if (level > 1)
-    //             {
-    //                 Debug.Log($"Refining interEdge between {startNode.Position} and {endNode.Position} at level {level - 1}");
-    //                 HPAPath refinedInterEdge = RefinePath(interEdge, level - 1);
-    //                 refinedPath.AddRange(refinedInterEdge);
-    //             }
-    //             else
-    //             {
-    //                 Debug.Log($"Adding interEdge directly between {startNode.Position} and {endNode.Position} at level 1");
-    //                 refinedPath.AddRange(interEdge);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             if (level > 1)
-    //             {
-    //                 // Recompute everything by finding nodes at a lower level
-    //                 if (_graphModel.NodesByLevel[level - 1].TryGetValue(startNode.Position, out HPANode lowerStartNode) &&
-    //                     _graphModel.NodesByLevel[level - 1].TryGetValue(endNode.Position, out HPANode lowerEndNode))
-    //                 {
-    //                     Debug.Log($"Refining local path between {startNode.Position} and {endNode.Position} at level {level - 1}");
-    //                     HPAPath lowerLevelPath = new HPAPath(new List<HPANode> { lowerStartNode, lowerEndNode });
-    //                     HPAPath refinedLowerLevelPath = RefinePath(lowerLevelPath, level - 1);
-    //                     refinedPath.AddRange(refinedLowerLevelPath);
-    //                 }
-    //                 else
-    //                 {
-    //                     Debug.LogError($"Failed to find nodes at level {level - 1} for positions {startNode.Position} and {endNode.Position}");
-    //                 }
-    //             }
-    //             else
-    //             {
-    //                 // Find local path within the same cluster at level 1
-    //                 HPAPath localPath = FindLocalPath(startNode, endNode, startNode.Cluster);
-    //                 if (localPath != null && localPath.path.Count > 0)
-    //                 {
-    //                     Debug.Log($"Adding local path directly between {startNode.Position} and {endNode.Position} at level 1");
-    //                     refinedPath.AddRange(localPath);
-    //                 }
-    //                 else
-    //                 {
-    //                     Debug.LogError($"Local path not found between {startNode.Position} and {endNode.Position} at level 1");
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     // Add the last node of the abstract path to the refined path
-    //     if (abstractPath.path.Count > 0)
-    //     {
-    //         refinedPath.path.Add(abstractPath.path.Last());
-    //     }
-
-    //     return refinedPath;
-    // }
 
     public HPAPath RefinePath(HPAPath abstractPath, int initialLevel)
     {

@@ -1,0 +1,2 @@
+Iteration,Density,CheckPoints,CellularIterations,Height,Width,ReplanningTime_Level1,ReplanningTime_AStar,PathLengthChange_Level1,PathLengthChange_AStar
+1,62,4,5,100,100,1,0,0,0,0,0,0,0

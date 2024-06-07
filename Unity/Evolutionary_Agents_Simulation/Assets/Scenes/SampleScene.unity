@@ -1052,8 +1052,8 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 95
-  orthographic: 1
+  field of view: 34.7
+  orthographic: 0
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -1097,6 +1097,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39469412123ae4004b5682d1350573f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movementSpeed: 10
+  fastMovementSpeed: 100
+  freeLookSensitivity: 3
+  zoomSensitivity: 10
+  fastZoomSensitivity: 50
 --- !u!1 &188114369
 GameObject:
   m_ObjectHideFlags: 0
@@ -6585,7 +6590,7 @@ MonoBehaviour:
   entrancePrefab: {fileID: 3474578016508092520, guid: 1d895660dbec74c5c96bbfe575c57966, type: 3}
   linePrefab: {fileID: 8532086230293038068, guid: 9a7a87e13e0a44b4b81cdc81db3432fa, type: 3}
   frontierPrefab: {fileID: 8889202966607809601, guid: 1ee85b57e3d5443a3a16d7f9187e6588, type: 3}
-  clusterMaterial: {fileID: 2100000, guid: edf3f4707d65044e9a62d1450f067cda, type: 2}
+  clusterMaterial: {fileID: 2100000, guid: c4c722532e26c43468af5a8554fb6fd2, type: 2}
   intraEdgeMaterial: {fileID: 2100000, guid: 2edd948b783e146fb893d44a49d5eeac, type: 2}
   interEdgeMaterial: {fileID: 2100000, guid: 1fd6fb1bc1f094556a12c4a452b24fb5, type: 2}
   darkColor: {fileID: 2100000, guid: c4c722532e26c43468af5a8554fb6fd2, type: 2}
