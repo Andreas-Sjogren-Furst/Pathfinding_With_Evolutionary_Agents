@@ -1,7 +1,7 @@
 # Implementation and Evaluation of frontier based exploration and heuristic path finding in 2D Environments
 
 ## Installment:
-1. To install and try the program goto the Builds folder
+1. Goto: [https://github.com/Andreas-Sjogren-Furst/Pathfinding_With_Evolutionary_Agents/releases](https://github.com/Andreas-Sjogren-Furst/Pathfinding_With_Evolutionary_Agents/releases)
 2. Download the latest version zip file of the program for your operating system. 
 3. Extract the zip file and run the executable file.
 
