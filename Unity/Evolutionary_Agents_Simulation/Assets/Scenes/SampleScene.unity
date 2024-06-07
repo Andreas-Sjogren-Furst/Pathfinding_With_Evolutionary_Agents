@@ -6605,7 +6605,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43d3c4033ee6145ecab3434c26861e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pools: []
 --- !u!1 &1750744981
 GameObject:
   m_ObjectHideFlags: 0
@@ -8690,6 +8689,8 @@ MonoBehaviour:
     - m_Text: 4
       m_Image: {fileID: 0}
     - m_Text: 5
+      m_Image: {fileID: 0}
+    - m_Text: 6
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:

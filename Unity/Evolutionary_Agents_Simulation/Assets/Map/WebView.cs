@@ -50,7 +50,6 @@ public class WebView : MonoBehaviour, IScreenView
     public int amountHPALevels;
     public int currentHPALevel;
 
-
     // Presenter
     public ScreenPresenter screenPresenter;
 
@@ -107,14 +106,14 @@ public class WebView : MonoBehaviour, IScreenView
 
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow))
         {
             myGameManager.agentController.SimulateAgents();
             MoveAgents();
-            RenderFrontiers();
-
+            //RenderFrontiers();
         }
     }
+
     public void CreateNewMap(MapModel mapModel)
     {
         DestroyAllObjects();
