@@ -65,7 +65,6 @@ public class PathFinder : IPathFinder
                 if (_graphModel.NodesByLevel[level - 1].TryGetValue(startNode.Position, out HPANode lowerStartNode) &&
                     _graphModel.NodesByLevel[level - 1].TryGetValue(endNode.Position, out HPANode lowerEndNode))
                 {
-                    Debug.Log($"Refining path between {startNode.Position} and {endNode.Position} at level {level - 1}");
 
                     HPAPath lowerLevelPath = FindAbstractPath(lowerStartNode, lowerEndNode, level - 1);
                     if (lowerLevelPath != null && lowerLevelPath.path.Count > 0)
