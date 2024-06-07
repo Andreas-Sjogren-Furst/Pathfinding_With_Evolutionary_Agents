@@ -90,41 +90,6 @@ public class WebView : MonoBehaviour, IScreenView
 
 
 
-        //myGameManager.graphController.Preprocessing(3);
-
-        // Vector2Int start = new(26, 40);
-        // Vector2Int end = new(44, 28);
-
-        // HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, 2);
-
-        // (List<Vector2Int> path1, int nodesExplored) = Astar.FindPath(start, end, CellularAutomata.Convert3DTo2D(screenPresenter.PackageData().map));
-
-        /*ScreenViewModel screenViewModel = screenPresenter.PackageData();
-        if (screenViewModel.checkPoints.Count > 1)
-        {
-            Vector2Int start = screenViewModel.spawnPoint.ArrayPosition;
-            Vector2Int end = screenViewModel.checkPoints[0].ArrayPosition;
-            Debug.Log("Start: " + start);
-            Debug.Log("End: " + end);
-            Debug.Log("Level: " + currentHPALevel);
-            if (myGameManager == null)
-            {
-                Debug.Log("GameManager is null");
-            }
-            HPAPath path = myGameManager.HPAGraphController.HierarchicalSearch(start, end, currentHPALevel);
-
-            if (path != null && path.path.Count > 0)
-            {
-                Debug.Log("Path Length: " + path.path.Count);
-                DrawPath(path, InstantiatedMMASEdges); // TODO: Change to InstantiatedPath, and create UI button for it. 
-            }
-        }*/
-
-
-
-
-
-
     }
 
     void Update()
