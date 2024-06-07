@@ -91,7 +91,6 @@ public class PathFinder : IPathFinder
                 HPAPath localPath = FindLocalPath(startNode, endNode, startNode.Cluster);
                 if (localPath != null && localPath.path.Count > 0)
                 {
-                    Debug.Log($"Adding local path directly between {startNode.Position} and {endNode.Position} at level 1");
                     refinedPath.AddRange(localPath);
                 }
                 else
