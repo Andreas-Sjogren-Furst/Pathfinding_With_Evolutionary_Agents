@@ -1,3 +1,4 @@
+// written by: Gustav Clausen s214940
 
 public class CellularAutomata
 {

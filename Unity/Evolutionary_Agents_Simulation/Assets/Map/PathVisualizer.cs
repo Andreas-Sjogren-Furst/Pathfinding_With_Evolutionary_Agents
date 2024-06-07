@@ -1,3 +1,5 @@
+// written by: Gustav Clausen s214940
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,8 +33,8 @@ public class PathVisualizer : MonoBehaviour
         }
     }
 
-    
-    
+
+
     // Coroutine to move the pathVisualizer along the path
     IEnumerator FollowPath(List<Vector2Int> path, Vector3 gridOrigin, float tileSize)
     {

@@ -1,3 +1,5 @@
+// written by: Gustav Clausen s214940
+
 using System.Linq;
 
 public class Entrance

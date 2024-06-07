@@ -1,6 +1,10 @@
+// // written by: Gustav Clausen s214940
+
+// using System;
 // using System.Collections;
 // using System.Collections.Generic;
 // using UnityEngine;
+// using UnityEngine.Assertions;
 // using UnityEngine.TestTools;
 
 // public class HPAStarTest
@@ -78,4 +82,8 @@
 //         // Check if node's addition reflects in the graph structure
 //         Assert.IsTrue(_clusterManager.IsNodeInCorrectCluster(newNodePosition, 1));
 //     }
+// }
+
+// internal class TestAttribute : Attribute
+// {
 // }
